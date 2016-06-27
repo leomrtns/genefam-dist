@@ -113,32 +113,32 @@ unsigned long long int biomcmc_rng_get_initial_seed (void);
 biomcmc_rng new_biomcmc_rng_from_seed (unsigned long long int seed, int stream_number);
 
 /*! \brief Returns a random number from a Standard Normal distribution N(0,1) - prob_distribution.h has general case */
-inline double biomcmc_rng_snorm32 (void);
+extern double biomcmc_rng_snorm32 (void);
 /*! \brief Returns a random number from a Standard Normal distribution with maximum (52 bits) integer precision */
-inline double biomcmc_rng_snorm (void);
+extern double biomcmc_rng_snorm (void);
 
 /*! \brief Returns a random number between 0 and 1 (including 1) with precision \f$\approx 10^{-15}\f$ (52 bits). */
-inline double biomcmc_rng_unif (void);
+extern double biomcmc_rng_unif (void);
 /*! \brief Returns a positive random number between 0 and 1 (excluding 0 and including 1) (52 bits). */
-inline double biomcmc_rng_unif_pos (void);
+extern double biomcmc_rng_unif_pos (void);
 /*! \brief Returns an long integer (64 bits) random number between 0 and n (excluding 1), with \f$n < 10^{15}\f$. */
-inline uint64_t biomcmc_rng_unif_int64 (uint64_t n);
+extern uint64_t biomcmc_rng_unif_int64 (uint64_t n);
 
 /*! \brief Returns a random number between 0 and 1 (including 1) with precision \f$\approx 10^{-9}\f$ (32 int bits). */
-inline double biomcmc_rng_unif32 (void);
+extern double biomcmc_rng_unif32 (void);
 /*! \brief Returns a positive random number between 0 and 1 (including 1) (32 int bits). */
-inline double biomcmc_rng_unif_pos32 (void);
+extern double biomcmc_rng_unif_pos32 (void);
 /*! \brief Returns an integer (32 bits) random number between 0 and n (excluding n), provided \f$n < 4 10^9\f$ approx. */
-inline uint32_t biomcmc_rng_unif_int (uint32_t n);
+extern uint32_t biomcmc_rng_unif_int (uint32_t n);
 
 /* * * low level functions (direct access to generator) */
 
 /*! \brief  new value with 64 random bits */
-inline uint64_t biomcmc_rng_get (void);
+extern uint64_t biomcmc_rng_get (void);
 /*! \brief  new value with 52 random bits as a double precision float */
-inline double   biomcmc_rng_get_52 (void);
+extern double   biomcmc_rng_get_52 (void);
 /*! \brief  new value with 32 random bits */
-inline uint32_t biomcmc_rng_get_32 (void);
+extern uint32_t biomcmc_rng_get_32 (void);
 
 /*! \brief get current time with maximum precision and soter in vector time[2] */
 void biomcmc_get_time (int *time);

@@ -13,6 +13,8 @@ CXXFLAGS=${CXXFLAGS-""}
 
 dnl automake initialization (completely unrelated to compiler arguments)
 AM_INIT_AUTOMAKE([-Wall -Werror])
+AC_USE_SYSTEM_EXTENSIONS
+dnl must be called after AC_USE_SYSTEM_EXTENSIONS (new restriction in autoconf2.68) 
 m4_ifdef([AM_PROG_AR], [AM_PROG_AR])
 
 dnl Basic compiler and related tools
@@ -65,7 +67,7 @@ if test x"$debugit" = x"yes"; then
     AC_DEFINE([BIOMCMC_DEBUG],[],[Debug Mode, with assert()-like error checking])
     AM_CFLAGS="${AM_CFLAGS} -g -W -Wall -Werror -Wno-uninitialized -O0"
 else
-    AM_CFLAGS="${AM_CFLAGS} -std=gnu89  -funroll-loops -fomit-frame-pointer -finline-functions -O4"
+    AM_CFLAGS="${AM_CFLAGS} -funroll-loops -fomit-frame-pointer -finline-functions -O4"
 fi
 
 AC_MSG_CHECKING([whether you want static binaries (not the library, but the executables)])
@@ -78,6 +80,19 @@ if test -n "${statbin_use}"; then
 else
     AC_MSG_RESULT([no])
 fi
+
+AC_MSG_CHECKING([whether to use GNU89 standard (temporary option, debug only)])
+AC_ARG_ENABLE(gnu89,
+    [AS_HELP_STRING([--enable-gnu89],[gnu89 standard for the GCC library (default=no)])],
+    [ gnu89_use="yes" ], [ gnu89_use=""    ])
+if test -n "${gnu89_use}"; then
+    AC_MSG_RESULT([yes])
+    AM_CFLAGS="${AM_CFLAGS} -std=gnu89"
+else
+    AC_MSG_RESULT([no])
+    AM_CFLAGS="${AM_CFLAGS} -std=gnu11"
+fi
+
 
 AC_MSG_RESULT([                ===    end of configuration options specific to genefam-dist])
 

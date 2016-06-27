@@ -27,7 +27,13 @@
 
 void rng_set_marsaglia_constants (uint32_t *m, uint32_t s1, uint32_t s2);
 
-
+/*
+inline uint64_t rng_get_taus (rng_taus_struct *r);
+inline uint64_t rng_get_xorshift (rng_xorshift_struct *r);
+inline uint64_t rng_get_mt19937 (rng_mt19937_struct *r);
+inline uint32_t rng_get_mt19937ar (rng_mt19937ar_struct *r);
+inline uint32_t rng_get_gfsr4 (rng_gfsr4_struct *r);
+*/
 inline uint64_t
 rng_get_taus (rng_taus_struct *r)
 { /* r->x[30] (6 vectors of size 4 or 5) */

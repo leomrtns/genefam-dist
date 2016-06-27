@@ -54,23 +54,24 @@ typedef struct { uint32_t x[32];    int n; } rng_well1024_struct;
 
 /*! \brief Maximally equidistributed combined Tausworthe (Linear Feedback Shift Register) random number generator.
  * (for more info see file docs/random_number_generation.txt or http://www.gnu.org/software/gsl).  */
-inline uint64_t rng_get_taus (rng_taus_struct *r);
+/*  https://gcc.gnu.org/onlinedocs/gcc/Inline.html --> inline behaviour changed in GNU11 which is the dafault for GCC5  */
+extern uint64_t rng_get_taus (rng_taus_struct *r);
 void            rng_set_taus (rng_taus_struct *r, uint64_t seed, int stream);
 void            rng_set_stream_taus (rng_taus_struct *r, int stream_number);
 
-inline uint64_t rng_get_xorshift (rng_xorshift_struct *r);
+extern uint64_t rng_get_xorshift (rng_xorshift_struct *r);
 void            rng_set_xorshift (rng_xorshift_struct *r, uint64_t seed);
 
 /*! \brief MT19937-64, the Mersenne Twister for 64 bits */
-inline uint64_t rng_get_mt19937 (rng_mt19937_struct *r);
+extern uint64_t rng_get_mt19937 (rng_mt19937_struct *r);
 void            rng_set_mt19937 (rng_mt19937_struct *r, uint64_t seed);
 
 /*! \brief MT19937, the Mersenne Twister for 32 bits */
-inline uint32_t rng_get_mt19937ar (rng_mt19937ar_struct *r);
+extern uint32_t rng_get_mt19937ar (rng_mt19937ar_struct *r);
 void            rng_set_mt19937ar (rng_mt19937ar_struct *r, uint32_t seed);
 
 /*! \brief gfsr lagged-Fibonacci generator (two-tap Generalised Feedback Shift Register). */
-inline uint32_t rng_get_gfsr4 (rng_gfsr4_struct *r);
+extern uint32_t rng_get_gfsr4 (rng_gfsr4_struct *r);
 void            rng_set_gfsr4 (rng_gfsr4_struct *r, uint32_t seed);
 
 uint32_t rng_get_diaconis (rng_diaconis_struct *r);
