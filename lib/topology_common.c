@@ -18,9 +18,9 @@
 unsigned int update_subtree_bipartitions (topol_node this);
 /*! \brief tree traversal with preorder and postorder node tracking */
 unsigned int update_subtree_traversal (topology tree, topol_node this, int *postcount, int *undonecount);
-/*! \brief Auxiliary function to topology_to_string(). */
-void topology_subtree_to_string_by_id (char *str, const topol_node node, double *blen);
-/*! \brief Auxiliary function to topology_to_string_with_name(). */
+/*! \brief Auxiliary function to topology_to_string_by_id() and toplogy_to_string_create_name(). */
+void topology_subtree_to_string_by_id (char *str, const topol_node node, double *blen, bool create_name);
+/*! \brief Auxiliary function to topology_to_string_by_name(). */
 void topology_subtree_to_string_by_name (char *str, const topol_node node, const char **taxlabel, double *blen);
 /*! \brief Flag nodes descending from this topol_node_struct as upper part undone, in pre-order. */
 void undo_udone (topol_node this);
@@ -423,23 +423,43 @@ topology_to_string_by_id (const topology tree, double *blen)
 
   str = (char *) biomcmc_malloc (sizeof (char) * size);
   memset (str, 0, sizeof (char) * size);
-  topology_subtree_to_string_by_id (str, tree->root, blen);
+  topology_subtree_to_string_by_id (str, tree->root, blen, false);
+  return str;
+}
+
+char *
+topology_to_string_create_name (const topology tree, double *blen) 
+{
+  char *str;
+  /* allocate space for str (overestimate size) */
+  int size = tree->nnodes * 4 + tree->nleaves * 12;
+  if (blen) size += 16 * tree->nnodes;
+
+  str = (char *) biomcmc_malloc (sizeof (char) * size);
+  memset (str, 0, sizeof (char) * size);
+  topology_subtree_to_string_by_id (str, tree->root, blen, true);
   return str;
 }
 
 void
-topology_subtree_to_string_by_id (char *str, const topol_node node, double *blen)
+topology_subtree_to_string_by_id (char *str, const topol_node node, double *blen, bool create_name)
 {
   if (node->internal) { /* internal node */
     sprintf (str, "%s(", str);
-    topology_subtree_to_string_by_id (str, node->left, blen);
+    topology_subtree_to_string_by_id (str, node->left, blen, create_name);
     sprintf (str, "%s,", str);
-    topology_subtree_to_string_by_id (str, node->right, blen);
+    topology_subtree_to_string_by_id (str, node->right, blen, create_name);
     if (blen) sprintf (str, "%s):%12.8lf", str, blen[node->id]);
     else sprintf (str, "%s)", str);
-  }
-  else if (blen) sprintf (str, "%s%d:%12.8lf", str, node->id+1, blen[node->id]);
-  else sprintf (str, "%s%d", str, node->id+1);
+  } else {
+    if (create_name) { /* taxa names will be s1, s2 etc. */
+      if (blen) sprintf (str, "%ss%d:%12.8lf", str, node->id+1, blen[node->id]);
+      else sprintf (str, "%ss%d", str, node->id+1);
+    } else {
+      if (blen) sprintf (str, "%s%d:%12.8lf", str, node->id+1, blen[node->id]);
+      else sprintf (str, "%s%d", str, node->id+1);
+    }
+  } // else (not internal)
 }
 
 

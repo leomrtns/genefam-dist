@@ -1,0 +1,10 @@
+
+
+2016.06.28
+	* topology_to_string_create_name(): similar to topology_to_string_by_id() but creates names like "s1", "s2" etc	(instead of 1,2,)
+	* distmatrix_genetree_sptree, generate_spr_trees: two small programs based on guenomu's test ones. STDOUT results. 
+	* TODO: give rooted reconc distances (now only unrooted is given). This implies in adding vars to reconc structure.
+
+2016.06.27
+	* GNU11: replaced "inline" for "extern" on headers (https://gcc.gnu.org/onlinedocs/gcc/Inline.html)
+	

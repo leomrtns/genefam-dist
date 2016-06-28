@@ -19,40 +19,6 @@ void create_parent_node_from_children (topology tree, int parent, int lchild, in
 /*! \brief recursive function that applies spr (almost always an nni) on a subtree */
 bool topology_apply_shortspr_weighted_subtree (topology tree, topol_node lca, double *prob, double scale, bool update_done);
 
-topology
-new_topology_from_alignment_random (alignment align, bool short_names) 
-{
-  topology tree;
-  tree = new_topology (align->ntax);
-
-  if (!biomcmc_random_number) biomcmc_error ("the program must call function biomcmc_random_number_init()");
-
-  if (short_names) tree->taxlabel = align->taxshort; /* newick-safe taxon names */ 
-  else             tree->taxlabel = align->taxlabel; /* full sequence names (useful in gene/species comparison) */
-  tree->taxlabel->ref_counter++;
-
-  randomize_topology (tree);
-  return (tree);
-}
-
-topology
-new_topology_from_alignment_upgma (alignment align, bool short_names) 
-{ 
-  topology tree;
-  distance_matrix dist;
-
-  tree = new_topology (align->ntax);
-  dist = new_distance_matrix_from_alignment (align);
-
-  if (short_names) tree->taxlabel = align->taxshort; /* newick-safe taxon names */ 
-  else             tree->taxlabel = align->taxlabel; /* full sequence names (useful in gene/species comparison) */
-  tree->taxlabel->ref_counter++;
-
-  upgma_from_distance_matrix (tree, dist, false); /* false=UPGMA; true=single-linkage */
-  del_distance_matrix (dist);
-  return tree;
-}
-
 void
 randomize_topology (topology tree)
 { 

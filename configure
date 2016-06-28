@@ -595,7 +595,6 @@ PACKAGE_STRING='genefam-dist 0.1'
 PACKAGE_BUGREPORT='leomrtns@gmail.com'
 PACKAGE_URL=''
 
-ac_unique_file="src/main_distance.c"
 ac_default_prefix=${HOME}
 # Factoring default headers for most tests.
 ac_includes_default="\
@@ -2418,7 +2417,6 @@ ac_cpp='$CPP $CPPFLAGS'
 ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
 ac_compiler_gnu=$ac_cv_c_compiler_gnu
-
 
 
 
@@ -15890,7 +15888,7 @@ fi
 
 echo \
 "----
-Configuration parameters for gene0fam-dist:
+Configuration parameters for genefam-dist:
 
  Source code location:   ${srcdir}
  Compiler     (library): ${CC}

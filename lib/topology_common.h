@@ -147,6 +147,16 @@ void fill_distance_matrix_from_topology (distance_matrix dist, topology tree, do
  */
 char * topology_to_string_by_id (const topology tree, double *blen);
 
+/*! \brief Print subtree in newick format to string creating names (based on leaf IDs.)
+ *
+ * Stores in string the tree in newick format, using newly-created names based on leaf ID numbers (useful for generating
+ * random trees that must be read by other programs.) Memory allocation is handled by this function, but needs to be freed by the calling function. 
+ * \param[in] tree tree to be printed
+ * \param[in] blen vector with branch lengths (usually tree->blength)
+ * \return a pointer to newly allocated string 
+ */
+char * topology_to_string_create_name (const topology tree, double *blen);
+
 /*! \brief Print subtree in newick format to string using leaf names.
  *
  * Stores in string the tree in newick format, preserving sequence names if available.

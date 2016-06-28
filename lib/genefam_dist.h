@@ -12,8 +12,12 @@
  * details (file "COPYING" or http://www.gnu.org/copyleft/gpl.html).
  */
 
-/*! \file biomcmc.h 
- *  \brief biomcmc library interface to external programs, including random number generation, hash table, etc.
+/*! \file genefam_dist.h 
+ *  \brief biomcmc library interface to external programs, specific to genefam_dist repo.
+ *
+ *  The idea is for biomcmc to be general for several sofware , including guenomu but also parallel projects by
+ *  leomrtns. This particular version of the library is visible to the user as "genefam_dist", but the internal functions 
+ *  treat it as "biomcmc" such that we can more easily export successful snippets to other programs/repositories.
  */
 
 #ifndef _biomcmc_h_
@@ -23,20 +27,17 @@
 #include "topology_space.h"
 #include "topology_mrca.h"
 #include "topology_splitset.h"
-#include "likelihood.h"
+#include "prob_distribution.h" 
 #include "nexus_common.h" // opaque library called by alignment.c, but should also be visible to other progs 
 
 #ifdef THESE_ARE_COMMENTS
 #include "lowlevel.h" // called by bipartition.h, hashtable.h, random_number.h, topology_common.h etc
-#include "hashtable.h"    // called by alignment.h 
+#include "hashtable.h"    // called by alignment.h topology_space.h common.h 
 #include "bipartition.h"  // called by topology_common.h
 #include "topology_common.h" // called by topology_space.h, topology_mrca.h, topology_build.h and topology_splitset.h
 #include "random_number_gen.h" // called by random_number.h
 #include "random_number.h"   // called by topology_build.h
-#include "alignment.h"       // called by topology_build.h and phylogeny.h
 #include "empirical_frequency.h" // called by topology_mrca.h and alignment.h
-#include "prob_distribution.h" // called by phylogeny.h
-#include "phylogeny.h"         // called by likelihood.h
 #endif // of THESE_ARE_COMMENTS
 
 #endif

@@ -21,13 +21,8 @@
 #define _biomcmc_topology_build_h_
 
 #include "topology_common.h"
-#include "alignment.h"
 #include "random_number.h"
 
-/*! \brief create new random topology with taxa information from alignment_struct (with full or newick taxlabels */
-topology new_topology_from_alignment_random (alignment align, bool short_names);
-/*! \brief creates an UPGMA topology (with branch lengths) from alignment_struct (with full or newick taxlabels */
-topology new_topology_from_alignment_upgma (alignment align, bool short_names);
 /*! \brief low level function that generates a random tree (equiv. to random refinement of a star topology) */
 void randomize_topology (topology tree);
 /*! \brief generates a random topology if sample_type==0, but can reuse some info later to create a "correlated" tree */

@@ -1,7 +1,7 @@
 dnl Autoconf init, autoheader output location, config and prefix directories
 AC_INIT([genefam-dist], [0.1], [leomrtns@gmail.com])
 
-AC_CONFIG_SRCDIR([src/main_distance.c])
+dnl AC_CONFIG_SRCDIR([src/main_distance.c])
 AC_CONFIG_HEADER([lib/config.h])
 AC_PREFIX_DEFAULT(${HOME})
 dnl libtoolize recomendation
@@ -108,7 +108,7 @@ AC_OUTPUT
 
 echo \
 "---- 
-Configuration parameters for gene0fam-dist:
+Configuration parameters for genefam-dist:
 
  Source code location:   ${srcdir}
  Compiler     (library): ${CC}
