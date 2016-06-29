@@ -38,8 +38,8 @@ dSPR algortihm.
 Notice that the current implementations of these distances are ***not*** designed to work on mul-trees (that is, both
 trees must have the same leaves.)
 
-(docs/performance_hdist.png)
-(docs/performance_spr_rf.png)
+![](docs/performance_hdist.png)
+![](docs/performance_spr_rf.png)
 
 ## License 
 Copyright (C) 2016-today  [Leonardo de Oliveira Martins](https://github.com/leomrtns)
