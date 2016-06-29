@@ -11,7 +11,7 @@ main (int argc, char **argv)
   time0 = clock ();
   if (argc != 4) {
     fprintf (stderr, "Generate random trees with a given number of SPR operations apart\n");
-    fprintf (stderr, "USAGE: %s <n_leaves> <n_simulations> <n_SPR>",  basename (argv[0])); return EXIT_FAILURE;
+    fprintf (stderr, "USAGE: %s <n_leaves> <n_simulations> <n_SPR>\n",  basename (argv[0])); return EXIT_FAILURE;
   }
 
   topology origtree, randtree; /* these trees don't have taxa labels */
@@ -27,6 +27,7 @@ main (int argc, char **argv)
 
   randomize_topology (randtree);
   s = topology_to_string_create_name (randtree, NULL); /* second parameter is vector with branch lengths */
+  printf ("#NEXUS\nBegin trees;\ntree PAUP_1 = ");
   printf ("%s\n",s); fflush(stdout); free (s);
 
   for (i=0; i < n_iter; i++) {
@@ -34,8 +35,9 @@ main (int argc, char **argv)
     for (j = 0; j < n_spr; j++) topology_apply_spr_unrooted (randtree, false);
 
     s = topology_to_string_create_name (randtree, NULL); /* second parameter is vector with branch lengths */
-    printf ("%s\n",s); fflush(stdout); free (s);
+    printf ("tree PAUP_%d = %s\n", i+2, s); fflush(stdout); free (s);
   }
+  printf ("End;\n");
   biomcmc_random_number_finalize(); /* free the global variable */
   del_topology (randtree);
   del_topology (origtree);
