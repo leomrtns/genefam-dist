@@ -28,6 +28,7 @@ More details to follow,
 - For more details about the calculations and theory, please check the [guenomu software](https://bitbucket.org/leomrtns/guenomu/) and the accompanying publication
   - A Bayesian Supertree Model for Genome-Wide Species Tree Reconstruction, Systematic Biology, 2016 [DOI: 10.1093/sysbio/syu082](http://dx.doi.org/10.1093/sysbio/syu082)
 - If you have any question, comment or request please do not hesitate to contact me at leomrtns@gmail.com
+- For an (not extensive) introduction on tree distances that I will be focusing on, please have a look at [my recent talk at UNIL](http://www.slideshare.net/leomrtns/comparing-phylogenetic-trees-20160616).
 
 ## Performance
 The `dSPR` is an approximation to the unrooted SPR which was used on the [recombination detection model](http://www.plosone.org/article/info%3Adoi%2F10.1371%2Fjournal.pone.0002651)
