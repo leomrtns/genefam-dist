@@ -28,14 +28,16 @@ main (int argc, char **argv)
   randomize_topology (randtree);
   s = topology_to_string_create_name (randtree, NULL); /* second parameter is vector with branch lengths */
   printf ("#NEXUS\nBegin trees;\ntree PAUP_1 = ");
-  printf ("%s\n",s); fflush(stdout); free (s);
+  printf ("%s;\n",s); fflush(stdout); free (s);
 
   for (i=0; i < n_iter; i++) {
     copy_topology_from_topology (origtree, randtree);
-    for (j = 0; j < n_spr; j++) topology_apply_spr_unrooted (randtree, false);
+    do {
+      for (j = 0; j < n_spr; j++) topology_apply_spr_unrooted (randtree, false);
+    } while (topology_is_equal_unrooted (origtree, randtree, split, false));
 
     s = topology_to_string_create_name (randtree, NULL); /* second parameter is vector with branch lengths */
-    printf ("tree PAUP_%d = %s\n", i+2, s); fflush(stdout); free (s);
+    printf ("tree PAUP_%d = %s;\n", i+2, s); fflush(stdout); free (s);
   }
   printf ("End;\n");
   biomcmc_random_number_finalize(); /* free the global variable */
