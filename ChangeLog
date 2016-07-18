@@ -1,4 +1,5 @@
-
+2016.07.18
+	* 
 
 2016.06.28
 	* topology_to_string_create_name(): similar to topology_to_string_by_id() but creates names like "s1", "s2" etc	(instead of 1,2,)

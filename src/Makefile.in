@@ -88,8 +88,8 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-bin_PROGRAMS = distmatrix_genetree_sptree$(EXEEXT) \
-	generate_spr_trees$(EXEEXT) spr_distance$(EXEEXT)
+bin_PROGRAMS = gf_distmatrix_genetree_sptree$(EXEEXT) \
+	gf_generate_spr_trees$(EXEEXT) gf_spr_distance$(EXEEXT)
 subdir = src
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/libtool.m4 \
@@ -105,27 +105,27 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
-am_distmatrix_genetree_sptree_OBJECTS =  \
+am_gf_distmatrix_genetree_sptree_OBJECTS =  \
 	distmatrix_genetree_sptree.$(OBJEXT)
-distmatrix_genetree_sptree_OBJECTS =  \
-	$(am_distmatrix_genetree_sptree_OBJECTS)
-distmatrix_genetree_sptree_LDADD = $(LDADD)
+gf_distmatrix_genetree_sptree_OBJECTS =  \
+	$(am_gf_distmatrix_genetree_sptree_OBJECTS)
+gf_distmatrix_genetree_sptree_LDADD = $(LDADD)
 am__DEPENDENCIES_1 =
-distmatrix_genetree_sptree_DEPENDENCIES = ../lib/libgenefamdist.la \
+gf_distmatrix_genetree_sptree_DEPENDENCIES = ../lib/libgenefamdist.la \
 	$(am__DEPENDENCIES_1)
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
 am__v_lt_0 = --silent
 am__v_lt_1 = 
-am_generate_spr_trees_OBJECTS = generate_spr_trees.$(OBJEXT)
-generate_spr_trees_OBJECTS = $(am_generate_spr_trees_OBJECTS)
-generate_spr_trees_LDADD = $(LDADD)
-generate_spr_trees_DEPENDENCIES = ../lib/libgenefamdist.la \
+am_gf_generate_spr_trees_OBJECTS = generate_spr_trees.$(OBJEXT)
+gf_generate_spr_trees_OBJECTS = $(am_gf_generate_spr_trees_OBJECTS)
+gf_generate_spr_trees_LDADD = $(LDADD)
+gf_generate_spr_trees_DEPENDENCIES = ../lib/libgenefamdist.la \
 	$(am__DEPENDENCIES_1)
-am_spr_distance_OBJECTS = spr_distance.$(OBJEXT)
-spr_distance_OBJECTS = $(am_spr_distance_OBJECTS)
-spr_distance_LDADD = $(LDADD)
-spr_distance_DEPENDENCIES = ../lib/libgenefamdist.la \
+am_gf_spr_distance_OBJECTS = spr_distance.$(OBJEXT)
+gf_spr_distance_OBJECTS = $(am_gf_spr_distance_OBJECTS)
+gf_spr_distance_LDADD = $(LDADD)
+gf_spr_distance_DEPENDENCIES = ../lib/libgenefamdist.la \
 	$(am__DEPENDENCIES_1)
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
@@ -161,10 +161,10 @@ AM_V_CCLD = $(am__v_CCLD_@AM_V@)
 am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
 am__v_CCLD_0 = @echo "  CCLD    " $@;
 am__v_CCLD_1 = 
-SOURCES = $(distmatrix_genetree_sptree_SOURCES) \
-	$(generate_spr_trees_SOURCES) $(spr_distance_SOURCES)
-DIST_SOURCES = $(distmatrix_genetree_sptree_SOURCES) \
-	$(generate_spr_trees_SOURCES) $(spr_distance_SOURCES)
+SOURCES = $(gf_distmatrix_genetree_sptree_SOURCES) \
+	$(gf_generate_spr_trees_SOURCES) $(gf_spr_distance_SOURCES)
+DIST_SOURCES = $(gf_distmatrix_genetree_sptree_SOURCES) \
+	$(gf_generate_spr_trees_SOURCES) $(gf_spr_distance_SOURCES)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -315,9 +315,9 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 AM_CPPFLAGS = $(GTKDEPS_CFLAGS) -I$(srcdir)/../lib @OPENMP_CPPFLAGS@
 LDADD = $(GTKDEPS_LIBS) ../lib/libgenefamdist.la $(AM_LDFLAGS)
-distmatrix_genetree_sptree_SOURCES = distmatrix_genetree_sptree.c 
-generate_spr_trees_SOURCES = generate_spr_trees.c
-spr_distance_SOURCES = spr_distance.c
+gf_distmatrix_genetree_sptree_SOURCES = distmatrix_genetree_sptree.c 
+gf_generate_spr_trees_SOURCES = generate_spr_trees.c
+gf_spr_distance_SOURCES = spr_distance.c
 all: all-am
 
 .SUFFIXES:
@@ -401,17 +401,17 @@ clean-binPROGRAMS:
 	echo " rm -f" $$list; \
 	rm -f $$list
 
-distmatrix_genetree_sptree$(EXEEXT): $(distmatrix_genetree_sptree_OBJECTS) $(distmatrix_genetree_sptree_DEPENDENCIES) $(EXTRA_distmatrix_genetree_sptree_DEPENDENCIES) 
-	@rm -f distmatrix_genetree_sptree$(EXEEXT)
-	$(AM_V_CCLD)$(LINK) $(distmatrix_genetree_sptree_OBJECTS) $(distmatrix_genetree_sptree_LDADD) $(LIBS)
+gf_distmatrix_genetree_sptree$(EXEEXT): $(gf_distmatrix_genetree_sptree_OBJECTS) $(gf_distmatrix_genetree_sptree_DEPENDENCIES) $(EXTRA_gf_distmatrix_genetree_sptree_DEPENDENCIES) 
+	@rm -f gf_distmatrix_genetree_sptree$(EXEEXT)
+	$(AM_V_CCLD)$(LINK) $(gf_distmatrix_genetree_sptree_OBJECTS) $(gf_distmatrix_genetree_sptree_LDADD) $(LIBS)
 
-generate_spr_trees$(EXEEXT): $(generate_spr_trees_OBJECTS) $(generate_spr_trees_DEPENDENCIES) $(EXTRA_generate_spr_trees_DEPENDENCIES) 
-	@rm -f generate_spr_trees$(EXEEXT)
-	$(AM_V_CCLD)$(LINK) $(generate_spr_trees_OBJECTS) $(generate_spr_trees_LDADD) $(LIBS)
+gf_generate_spr_trees$(EXEEXT): $(gf_generate_spr_trees_OBJECTS) $(gf_generate_spr_trees_DEPENDENCIES) $(EXTRA_gf_generate_spr_trees_DEPENDENCIES) 
+	@rm -f gf_generate_spr_trees$(EXEEXT)
+	$(AM_V_CCLD)$(LINK) $(gf_generate_spr_trees_OBJECTS) $(gf_generate_spr_trees_LDADD) $(LIBS)
 
-spr_distance$(EXEEXT): $(spr_distance_OBJECTS) $(spr_distance_DEPENDENCIES) $(EXTRA_spr_distance_DEPENDENCIES) 
-	@rm -f spr_distance$(EXEEXT)
-	$(AM_V_CCLD)$(LINK) $(spr_distance_OBJECTS) $(spr_distance_LDADD) $(LIBS)
+gf_spr_distance$(EXEEXT): $(gf_spr_distance_OBJECTS) $(gf_spr_distance_DEPENDENCIES) $(EXTRA_gf_spr_distance_DEPENDENCIES) 
+	@rm -f gf_spr_distance$(EXEEXT)
+	$(AM_V_CCLD)$(LINK) $(gf_spr_distance_OBJECTS) $(gf_spr_distance_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)

@@ -16,11 +16,15 @@ $ make; make install
 
 ## Programs
 
-- ***distmatrix_genetree_sptree*** given two files, one with a list of gene trees and one with a list of species trees,
+- ***gf_distmatrix_genetree_sptree*** given two files, one with a list of gene trees and one with a list of species trees,
   calculates a set of distances between all tree pairs
 
-- ***generate_spr_trees*** generates a series of random trees with a given number of SPR operations apart from the next
+- ***gf_generate_spr_trees*** generates a series of random trees with a given number of SPR operations apart from the next
   one.
+
+- ***gf_spr_distance*** calculates the approx unrooted SPR distance between consecutive pairs of trees on nexus file
+  (this one assumes single-labelled trees, that is, no paralogs etc. are allowed)
+
 
 ## More info
 More details to follow, 
