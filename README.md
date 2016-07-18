@@ -19,6 +19,9 @@ $ make; make install
 - ***gf_distmatrix_genetree_sptree*** given two files, one with a list of gene trees and one with a list of species trees,
   calculates a set of distances between all tree pairs
 
+- ***gf_distsignal_genetree_sptree*** given two files, like the distmatrix program above, but all distances for one gene
+  tree per line 
+
 - ***gf_generate_spr_trees*** generates a series of random trees with a given number of SPR operations apart from the next
   one.
 
