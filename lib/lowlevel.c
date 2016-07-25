@@ -215,7 +215,6 @@ void
 char_vector_link_string_at_position (char_vector vec, char *string, int position)
 {
   if (position >= vec->nstrings) char_vector_expand_nstrings (vec, position+1);
-
   if (vec->nchars[position]) free (vec->string[position]);
 
   vec->nchars[position] = strlen (string); /* Actually alloc'ed memory may be larger than this (next line fix it) */

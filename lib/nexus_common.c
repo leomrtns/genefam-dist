@@ -59,8 +59,7 @@ remove_oneline_nexus_comments (char *string)
     else if ( *first == ']') count++;
     first--;
   }
-  if (first < string) first = string;
-  *last = '\0'; memmove (first, s, last - s + 1);
+  *last = '\0'; memmove (first+1, s, last - s + 1);
 
   return remove_oneline_nexus_comments (string); /* recursive, to remove other comments before */
 }

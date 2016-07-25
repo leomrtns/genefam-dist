@@ -14,7 +14,7 @@ main (int argc, char **argv)
   if (argc != 3) { 
     fprintf (stderr, "Calculates distance signal between each gene tree and all sptrees\n");
     fprintf (stderr, " (returning one 'spectral signal' per row (gene tree) against all sptrees)\n");
-    fprintf (stderr, " USAGE: %s <nexus gene tree file> <nexus species tree file>", basename (argv[0])); return EXIT_FAILURE; 
+    fprintf (stderr, " USAGE: %s <nexus gene tree file> <nexus species tree file>\n", basename (argv[0])); return EXIT_FAILURE; 
   }
 
   // read and order nexus_tree 
@@ -31,9 +31,10 @@ main (int argc, char **argv)
     for (i=0; i < st->ntrees; i++) {
       init_tree_recon_from_species_topology (gt->tree[j], st->tree[i]);
       dSPR_gene_species (gt->tree[j], st->tree[i], split);
-      printf (" %5d %5d %5d   %5d %5d %5d %6d  ", gt->tree[j]->rec->ndups, gt->tree[j]->rec->nloss, gt->tree[j]->rec->ndcos, 
+      printf (" %5d %5d %5d   %5d %5d %6d  ", gt->tree[j]->rec->ndups, gt->tree[j]->rec->nloss, gt->tree[j]->rec->ndcos, 
               split->spr + split->spr_extra, split->rf, split->hdist); 
     }
+    printf ("\n");
   }
 
   del_splitset (split);

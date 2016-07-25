@@ -30,6 +30,8 @@ main (int argc, char **argv)
   printf ("#NEXUS\nBegin trees;\ntree PAUP_1 = ");
   printf ("%s;\n",s); fflush(stdout); free (s);
 
+  if (!n_spr) n_spr = n_leaves;
+
   for (i=0; i < n_iter; i++) {
     copy_topology_from_topology (origtree, randtree);
     do {
