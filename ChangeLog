@@ -1,5 +1,6 @@
-2016.07.18
-	* 
+2016.08.05
+	* TODO: redo 001 notebook with spr+spr_extra (which may explain why dSPR values are lower...) since current
+	gf_spr_distance program does not take spr_extra into account
 
 2016.06.28
 	* topology_to_string_create_name(): similar to topology_to_string_by_id() but creates names like "s1", "s2" etc	(instead of 1,2,)
