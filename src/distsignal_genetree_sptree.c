@@ -31,8 +31,8 @@ main (int argc, char **argv)
     for (i=0; i < st->ntrees; i++) {
       init_tree_recon_from_species_topology (gt->tree[j], st->tree[i]);
       dSPR_gene_species (gt->tree[j], st->tree[i], split);
-      printf (" %5d %5d %5d   %5d %5d %6d  ", gt->tree[j]->rec->ndups, gt->tree[j]->rec->nloss, gt->tree[j]->rec->ndcos, 
-              split->spr + split->spr_extra, split->rf, split->hdist); 
+      printf (" %5d %5d %5d   %5d %5d %5d %6d  ", gt->tree[j]->rec->ndups, gt->tree[j]->rec->nloss, gt->tree[j]->rec->ndcos, 
+              split->spr, split->spr_extra, split->rf, split->hdist); 
     }
     printf ("\n");
   }

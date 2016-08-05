@@ -24,10 +24,10 @@ main (int argc, char **argv)
   time0 = time1;
   fprintf (stderr, "gene    trees (unique) = %d (%d)\n", gt->ntrees, gt->ndistinct);
 
-  printf ("treeID   dSPR     RF   Hdist\n"); 
+  printf ("treeID   dSPR     dSPR_extra    RF   Hdist\n"); 
   for (i=0; i < gt->ntrees - 1; i++) {
     distance = dSPR_topology (gt->tree[i], gt->tree[i+1], split);
-    printf ("%9d %9d %9d %9d\n", i, distance, split->hdist, split->rf);
+    printf ("%9d %9d %9d %9d %9d\n", i, split->spr, split->spr_extra, split->rf, split->hdist);
   }
 
   del_splitset (split);
