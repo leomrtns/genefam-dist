@@ -1,0 +1,2 @@
+still not working with setup.py, I'm compiling by hand with 
+gcc -lgenefamdist -L/home/leo/local/lib -I/usr/include/python3.5m -c treesignalmodule.c -o o.x
