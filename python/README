@@ -1,6 +1,5 @@
-still not working with setup.py, I'm compiling by hand with 
-gcc -fPIC  -lgenefamdist -L/home/leo/local/lib -I/usr/include/python3.5m -c treesignalmodule.c -o o.x
-gcc -shared o.x -o treesignal.so
+gcc -fPIC  -lgenefamdist -L/home/leo/local/lib -I/usr/include/python3.5m -c treesignalmodule.c -o temp.o
+gcc -shared temp.o -o treesignal.so
 
 
-(by compiling by hand i cannot play with .SO name, since it looks for PyInit_treesignalmodule() at runtime within python)
+(by compiling by hand I cannot play with .SO name, since it looks for PyInit_treesignalmodule() at runtime within python)

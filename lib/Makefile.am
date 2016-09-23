@@ -11,5 +11,6 @@ common_src     = hashtable.c lowlevel.c random_number_gen.c random_number.c nexu
                  topology_splitset.c prob_distribution.c empirical_frequency.c
 
 lib_LTLIBRARIES = libgenefamdist.la
+include_HEADERS = genefam_dist.h
 libgenefamdist_la_SOURCES = $(common_src) $(common_headers) genefam_dist.h
 

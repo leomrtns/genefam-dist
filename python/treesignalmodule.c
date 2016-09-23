@@ -1,24 +1,20 @@
-//#include <genefam_dist.h>  // timestamp 2016.09.22 
-#include <Python.h>
+#include <Python.h>  // timestamp 2016.09.22 
+// #include <genefam_dist.h>  // does not work externally (since genefam_dist.h calls other hidden headers)
 
 static PyObject *TreesignalError;
 
 static PyObject *
-treesignal_fromtrees (PyObject *self, PyObject *gtree, PyObject *splist)
+treesignal_fromtrees (PyObject *self, PyObject *args)
 {
   const char *gtree_str, *splist_str;
-  PyObject *res_tuple;
+  PyObject *arg1, *arg2, *res_tuple;
 
-  if (!PyArg_ParseTuple(gtree,  "s", &gtree_str)) { 
-    PyErr_SetString(TreesignalError, "Problem reading the gene tree string");
-    return NULL; 
-  }
-  if (!PyArg_ParseTuple(splist, "s", &splist_str)) {
-    PyErr_SetString(TreesignalError, "Problem reading the string with species trees");
-    return NULL;
-  }
+  if (!PyArg_ParseTuple(args,  "UU", &arg1, &arg2))  return NULL; 
+  gtree_str  = PyBytes_AsString(PyUnicode_AsUTF8String(arg1));
+  splist_str = PyBytes_AsString(PyUnicode_AsUTF8String(arg2));
 
-  printf("inside C I have %s and %s\n", gtree_str, splist_str);
+  printf ("I got [%s] and [%s] \n", gtree_str, splist_str);
+  // PyErr_SetString(TreesignalError, "Problem reading the string with species trees");
 
   res_tuple = PyTuple_New(2);
   PyTuple_SetItem(res_tuple, 0, PyFloat_FromDouble(0.));

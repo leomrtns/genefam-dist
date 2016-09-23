@@ -2,7 +2,7 @@ from distutils.core import setup, Extension
 
 module1 = Extension('treesignal', 
                      define_macros = [('MAJOR_VERSION', '1'), ('MINOR_VERSION', '0')],
-#                     include_dirs = ['/home/leo/local/include'],
+                     include_dirs = ['/home/leo/local/include'],
 #                     libraries = ['tcl83'],
                      library_dirs = ['/home/leo/local/lib'],
                      runtime_library_dirs = ['/home/leo/local/lib'],
