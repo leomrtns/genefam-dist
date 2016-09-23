@@ -1,5 +1,5 @@
 #include <Python.h>  // timestamp 2016.09.22 
-// #include <genefam_dist.h>  // does not work externally (since genefam_dist.h calls other hidden headers)
+#include <genefam/genefam_dist.h>
 
 static PyObject *TreesignalError;
 
