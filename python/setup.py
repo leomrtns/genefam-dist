@@ -1,6 +1,10 @@
 from distutils.core import setup, Extension
 
-module1 = Extension('treesignal', 
+description_multiline = '''
+This package provide C functions to calculate distances between gene family trees and sets of species trees.
+'''
+
+module_c = Extension('treesignalc', 
                      define_macros = [('MAJOR_VERSION', '1'), ('MINOR_VERSION', '0')],
                      include_dirs = ['/home/leo/local/include'],
 #                     libraries = ['tcl83'],
@@ -15,8 +19,7 @@ setup (name = 'treesignal',
        author = 'Leonardo de Oliveira Martins',
        author_email = 'leomrtns@gmail.com',
        url='https://github.com/leomrtns/genefam-dist',
-       long_description='''
-This package provide C functions to calculate distances between gene family trees and sets of species trees.
-''',
-       ext_modules = [module1])
+       long_description=description_multiline,
+       py_modules=['treesignal'],
+       ext_modules = [module_c])
 

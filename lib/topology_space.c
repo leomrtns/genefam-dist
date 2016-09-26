@@ -42,6 +42,7 @@ struct nexus_tree_struct
   int nnodes;
 };
 
+
 /*! \brief Allocates memory for nexus_tree_struct. */
 nexus_tree new_nexus_tree (int nleaves);
 
@@ -117,6 +118,34 @@ int find_branch_split_newick (char *left_string_ptr, char *right_string_ptr);
 
 /*! \brief string with original file name, with extension stripped -- be caredul not to overwrite it on program */
 void store_filename_in_topology_space (topology_space tre, char *filename);
+
+/*! \brief Auxiliary function for the python module */
+topology
+new_topology_from_string_with_size (const char *long_string, size_t string_size)
+{
+  char *local_string;
+  int i;
+  nexus_tree tree;
+  topology topol;
+
+  local_string = (char*) biomcmc_malloc (sizeof (char) * (string_size + 1));
+  strncpy (local_string, string, string_size + 1); /* adds '\0' to last elements */
+  tree  = new_nexus_tree_from_string (&local_string);
+  if (local_string) free (local_string);
+  topol = new_topology (tree->nleaves);
+  if (tree->has_branches) topology_malloc_blength (topol); /* then it will copy length values from nexus_tree */
+
+  /* tsp->taxlabel will point to names of first tree. This info will be also available at the hashtable */ 
+  topol->taxlabel = new_char_vector (tree->nleaves); 
+  for (i=0; i< tree->nleaves; i++) { 
+    char_vector_link_string_at_position (topol->taxlabel, tree->leaflist[i]->taxlabel, i); 
+    tree->leaflist[i]->taxlabel = NULL; // we don't need this copy anymore
+    tree->leaflist[i]->id = i;
+  }
+  create_node_id_nexus_tree (tree->root, &i);
+  copy_topology_from_nexus_tree (topol, tree);
+  return topol;
+}
 
 topology_space
 read_topology_space_from_file (char *seqfilename, hashtable external_taxhash)
