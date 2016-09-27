@@ -90,7 +90,8 @@ build_triplet = @build@
 host_triplet = @host@
 bin_PROGRAMS = gf_distmatrix_genetree_sptree$(EXEEXT) \
 	gf_generate_spr_trees$(EXEEXT) gf_spr_distance$(EXEEXT) \
-	gf_distsignal_genetree_sptree$(EXEEXT)
+	gf_distsignal_genetree_sptree$(EXEEXT) \
+	test_python_functions$(EXEEXT)
 subdir = src
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/libtool.m4 \
@@ -135,6 +136,11 @@ gf_spr_distance_OBJECTS = $(am_gf_spr_distance_OBJECTS)
 gf_spr_distance_LDADD = $(LDADD)
 gf_spr_distance_DEPENDENCIES = ../lib/libgenefamdist.la \
 	$(am__DEPENDENCIES_1)
+am_test_python_functions_OBJECTS = test_python_functions.$(OBJEXT)
+test_python_functions_OBJECTS = $(am_test_python_functions_OBJECTS)
+test_python_functions_LDADD = $(LDADD)
+test_python_functions_DEPENDENCIES = ../lib/libgenefamdist.la \
+	$(am__DEPENDENCIES_1)
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
 am__v_P_0 = false
@@ -171,10 +177,12 @@ am__v_CCLD_0 = @echo "  CCLD    " $@;
 am__v_CCLD_1 = 
 SOURCES = $(gf_distmatrix_genetree_sptree_SOURCES) \
 	$(gf_distsignal_genetree_sptree_SOURCES) \
-	$(gf_generate_spr_trees_SOURCES) $(gf_spr_distance_SOURCES)
+	$(gf_generate_spr_trees_SOURCES) $(gf_spr_distance_SOURCES) \
+	$(test_python_functions_SOURCES)
 DIST_SOURCES = $(gf_distmatrix_genetree_sptree_SOURCES) \
 	$(gf_distsignal_genetree_sptree_SOURCES) \
-	$(gf_generate_spr_trees_SOURCES) $(gf_spr_distance_SOURCES)
+	$(gf_generate_spr_trees_SOURCES) $(gf_spr_distance_SOURCES) \
+	$(test_python_functions_SOURCES)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -329,6 +337,7 @@ gf_distmatrix_genetree_sptree_SOURCES = distmatrix_genetree_sptree.c
 gf_distsignal_genetree_sptree_SOURCES = distsignal_genetree_sptree.c 
 gf_generate_spr_trees_SOURCES = generate_spr_trees.c
 gf_spr_distance_SOURCES = spr_distance.c
+test_python_functions_SOURCES = test_python_functions.c
 all: all-am
 
 .SUFFIXES:
@@ -428,6 +437,10 @@ gf_spr_distance$(EXEEXT): $(gf_spr_distance_OBJECTS) $(gf_spr_distance_DEPENDENC
 	@rm -f gf_spr_distance$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(gf_spr_distance_OBJECTS) $(gf_spr_distance_LDADD) $(LIBS)
 
+test_python_functions$(EXEEXT): $(test_python_functions_OBJECTS) $(test_python_functions_DEPENDENCIES) $(EXTRA_test_python_functions_DEPENDENCIES) 
+	@rm -f test_python_functions$(EXEEXT)
+	$(AM_V_CCLD)$(LINK) $(test_python_functions_OBJECTS) $(test_python_functions_LDADD) $(LIBS)
+
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
 
@@ -438,6 +451,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/distsignal_genetree_sptree.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/generate_spr_trees.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/spr_distance.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_python_functions.Po@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<

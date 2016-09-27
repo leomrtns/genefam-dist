@@ -16,7 +16,7 @@ treesignalc_fromtrees (PyObject *self, PyObject *args)
   splist_str = PyBytes_AsString(PyUnicode_AsUTF8String(arg2));
 
   printf ("I got [%s] and [%s] \n", gtree_str, splist_str);
-  n_res = genefam_module_treesignal_fromtrees (gtree_str, splist_str, res_doublevector);
+  n_res = genefam_module_treesignal_fromtrees (gtree_str, splist_str, &res_doublevector);
   printf ("%d\n", n_res);
   if (n_res < 2) { PyErr_SetString(TreesignalcError, "Could not find set of species trees"); return NULL; }
 

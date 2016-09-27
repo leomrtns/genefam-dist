@@ -4,7 +4,7 @@ int
 main (int argc, char **argv)
 {
   clock_t time0, time1;
-  int i, distance;  
+  int i;  
   topology_space gt = NULL;
   splitset split;
 
@@ -26,7 +26,7 @@ main (int argc, char **argv)
 
   printf ("treeID   dSPR     dSPR_extra    RF   Hdist\n"); 
   for (i=0; i < gt->ntrees - 1; i++) {
-    distance = dSPR_topology (gt->tree[i], gt->tree[i+1], split);
+    dSPR_topology (gt->tree[i], gt->tree[i+1], split);
     printf ("%9d %9d %9d %9d %9d\n", i, split->spr, split->spr_extra, split->rf, split->hdist);
   }
 

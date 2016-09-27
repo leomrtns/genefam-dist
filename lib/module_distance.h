@@ -15,7 +15,9 @@
 #define _genefam_module_distance_h_
 
 #include "topology_space.h"
+#include "topology_splitset.h"
+#include "topology_mrca.h"
 
-int genefam_module_treesignal_fromtrees (const char *gtree_str, const char *splist_str, double *output_distances);
+int genefam_module_treesignal_fromtrees (const char *gtree_str, const char *splist_str, double **output_distances);
 
 #endif

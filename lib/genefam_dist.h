@@ -25,13 +25,13 @@
 
 #include "module_distance.h"
 #include "topology_build.h"
-#include "topology_mrca.h"
-#include "topology_splitset.h"
 #include "prob_distribution.h" 
 #include "nexus_common.h" // opaque library called by alignment.c, but should also be visible to other progs 
 
 #ifdef THESE_ARE_COMMENTS
 #include "topology_space.h" // called by module_distance.h
+#include "topology_splitset.h" // called by module_distance.h
+#include "topology_mrca.h" // called by module_distance.h
 #include "lowlevel.h" // called by bipartition.h, hashtable.h, random_number.h, topology_common.h etc
 #include "hashtable.h"    // called by alignment.h topology_space.h common.h 
 #include "bipartition.h"  // called by topology_common.h

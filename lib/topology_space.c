@@ -120,31 +120,66 @@ int find_branch_split_newick (char *left_string_ptr, char *right_string_ptr);
 void store_filename_in_topology_space (topology_space tre, char *filename);
 
 /*! \brief Auxiliary function for the python module */
-topology
-new_topology_from_string_with_size (const char *long_string, size_t string_size)
+void
+add_string_with_size_to_topology_space (topology_space *tsp, char *long_string, size_t string_size)
 {
   char *local_string;
-  int i;
+  int i, index;
   nexus_tree tree;
   topology topol;
 
-  local_string = (char*) biomcmc_malloc (sizeof (char) * (string_size + 1));
-  strncpy (local_string, string, string_size + 1); /* adds '\0' to last elements */
+  /* read string into a nexus tree */
+  local_string = (char*) biomcmc_malloc (sizeof (char) * (string_size + 2));
+  strncpy (local_string, long_string, string_size + 2); /* adds '\0' to last elements */
   tree  = new_nexus_tree_from_string (&local_string);
   if (local_string) free (local_string);
   topol = new_topology (tree->nleaves);
-  if (tree->has_branches) topology_malloc_blength (topol); /* then it will copy length values from nexus_tree */
-
-  /* tsp->taxlabel will point to names of first tree. This info will be also available at the hashtable */ 
-  topol->taxlabel = new_char_vector (tree->nleaves); 
-  for (i=0; i< tree->nleaves; i++) { 
-    char_vector_link_string_at_position (topol->taxlabel, tree->leaflist[i]->taxlabel, i); 
-    tree->leaflist[i]->taxlabel = NULL; // we don't need this copy anymore
-    tree->leaflist[i]->id = i;
+  /* create taxlabels (shared across trees) or prepare nexus tree leaves to be reordered */
+  if (!(*tsp)) {
+    (*tsp) = new_topology_space();
+    /* tsp->taxlabel will point to names of first tree. This info will be also available at the hashtable */ 
+    (*tsp)->taxlabel = new_char_vector (tree->nleaves);
+    (*tsp)->taxlabel_hash = new_hashtable (tree->nleaves);
+    for (i=0; i< tree->nleaves; i++) { 
+      char_vector_link_string_at_position ((*tsp)->taxlabel, tree->leaflist[i]->taxlabel, i); 
+      insert_hashtable ((*tsp)->taxlabel_hash, (*tsp)->taxlabel->string[i], i);
+      tree->leaflist[i]->taxlabel = NULL; // we don't need this copy anymore
+      tree->leaflist[i]->id = i;
+    }
   }
+  else {
+    if ((*tsp)->taxlabel->nstrings != tree->nleaves) {
+      del_nexus_tree (tree); del_topology_space (*tsp); del_topology (topol);
+      biomcmc_error ( "All trees must have same number of leaves\n");
+    }
+    for (i=0; i< tree->nleaves; i++) { /* nexus tree leaflist IDs must follow hashtable */
+      index = lookup_hashtable ((*tsp)->taxlabel_hash, tree->leaflist[i]->taxlabel);
+      if (index < 0) {
+        del_nexus_tree (tree); del_topology (topol); del_topology_space (*tsp);
+        biomcmc_error ( "Leaf names are not the same across all trees\n");
+      }
+      if (tree->leaflist[i]->taxlabel) free (tree->leaflist[i]->taxlabel); 
+      tree->leaflist[i]->id = index;
+    }
+  }
+  /* now topology is ready to receive information from nexus tree */
   create_node_id_nexus_tree (tree->root, &i);
+  if (tree->has_branches) topology_malloc_blength (topol); /* then it will copy length values from nexus_tree */
   copy_topology_from_nexus_tree (topol, tree);
-  return topol;
+  topol->taxlabel = (*tsp)->taxlabel; /* taxlabel is shared among all topologies */
+  (*tsp)->taxlabel->ref_counter++;    /* since it is shared, it cannot be deleted if still in use */
+  /* assume all trees are distinct and add topology to space */
+  (*tsp)->distinct = (topology*) biomcmc_realloc ((topology*) (*tsp)->distinct, sizeof (topology) * ((*tsp)->ndistinct+1));
+  (*tsp)->distinct[(*tsp)->ndistinct] = topol;
+  if ((*tsp)->ndistinct > 0) for (i=0; i < tree->nleaves; i++) { /* leaf bipartitions are shared among all topologies */
+    del_bipartition ((*tsp)->distinct[(*tsp)->ndistinct]->nodelist[i]->split);
+    (*tsp)->distinct[(*tsp)->ndistinct]->nodelist[i]->split = (*tsp)->distinct[0]->nodelist[i]->split;
+    (*tsp)->distinct[0]->nodelist[i]->split->ref_counter++;
+  }
+//  char *s; s = topology_to_string_by_name ((*tsp)->distinct[(*tsp)->ndistinct], NULL);  printf ("DEBUG topology_struct: %s\n", s); free(s);
+  (*tsp)->ndistinct++;
+  del_nexus_tree (tree);
+  return;
 }
 
 topology_space
@@ -258,9 +293,6 @@ read_topology_space_from_file (char *seqfilename, hashtable external_taxhash)
     for (i=0; i < treespace->ndistinct; i++) treespace->freq[i] /= (double) treespace->ntrees; /* BUG found in 2013.02.28 (was dividing by ndistinct) */
   }
   if (freq) free (freq);
-  
-  // for (i=0; i < treespace->ntrees; i++) printf (">> %5d  %5d\n", i, treespace->tree[i]->id);   // DEBUG
-  // for (i=0; i < treespace->ndistinct; i++) printf ("..  %5d  %.6lf\n", i, treespace->freq[i]); // DEBUG
   
   store_filename_in_topology_space (treespace, seqfilename);
   return treespace;
@@ -654,7 +686,6 @@ new_nexus_tree_from_string (char **string)
   
   id = 0; /* vector of pointers to the tree leaves */
   create_leaflist_nexus_tree (T, T->root, &id); 
-  //printf ("--->>> %i |  %i\n", id, nleaves); /* DEBUG */
 
   return T;
 }
@@ -774,7 +805,6 @@ number_of_leaves_in_newick (char **string, bool resolve_trifurcation)
   }
   
   if (nopen != nclose || ncommas > 2 || ncommas < 1) biomcmc_error ( "Invalid tree structure: %s", *string);
-  // printf (">>> >>> DEBUG: nopen = %d, ncommas = %d, nbranches = %d\n", nopen, ncommas, has_branches);
   if (ncommas == 2) nopen++; /* trifurcation (unrooted tree, hopefully) */
   if (!resolve_trifurcation) return nopen + 1; /* do not fix trifurcation */
   

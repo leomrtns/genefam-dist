@@ -37,8 +37,8 @@ struct topology_space_struct
   char *filename;            /*! \brief name (without extension) of the originating file from where topology_space was read */
 };
 
-/*! \brief Read tree in newick format until char string_size, returning topology with taxlabels. Auxiliary for python module */
-topology new_topology_from_string_with_size (const char *long_string, size_t string_size);
+/*! \brief Read tree in newick format until char string_size, returning updated topolgy_space. Auxiliary for python module */
+void add_string_with_size_to_topology_space (topology_space *tsp_address, char *long_string, size_t string_size);
 
 /*! \brief Read tree file and store info in topology_space_struct with possible external hashtable to impose the leaf ordering. */
 topology_space read_topology_space_from_file (char *seqfilename, hashtable external_taxhash);
