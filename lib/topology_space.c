@@ -129,8 +129,10 @@ add_string_with_size_to_topology_space (topology_space *tsp, char *long_string, 
   topology topol;
 
   /* read string into a nexus tree */
-  local_string = (char*) biomcmc_malloc (sizeof (char) * (string_size + 2));
-  strncpy (local_string, long_string, string_size + 2); /* adds '\0' to last elements */
+  local_string = (char*) biomcmc_malloc (sizeof (char) * (string_size + 1));
+  strncpy (local_string, long_string, string_size + 1); /* adds '\0' only when long_string is smaller!! */
+  local_string[string_size] = '\0'; /* not null-terminated by default */
+  //printf ("DEBUG received string ::%s::\n", local_string);
   tree  = new_nexus_tree_from_string (&local_string);
   if (local_string) free (local_string);
   topol = new_topology (tree->nleaves);
