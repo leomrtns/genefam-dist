@@ -453,8 +453,8 @@ topology_subtree_to_string_by_id (char *str, const topol_node node, double *blen
     else sprintf (str, "%s)", str);
   } else {
     if (create_name) { /* taxa names will be s1, s2 etc. */
-      if (blen) sprintf (str, "%ss%d:%12.8lf", str, node->id+1, blen[node->id]);
-      else sprintf (str, "%ss%d", str, node->id+1);
+      if (blen) sprintf (str, "%sT%d:%12.8lf", str, node->id+1, blen[node->id]);
+      else sprintf (str, "%sT%d", str, node->id+1);
     } else {
       if (blen) sprintf (str, "%s%d:%12.8lf", str, node->id+1, blen[node->id]);
       else sprintf (str, "%s%d", str, node->id+1);

@@ -1,0 +1,14 @@
+Metadata-Version: 1.0
+Name: treesignal
+Version: 1.0
+Summary: Calculates the signal of gene family trees
+Home-page: https://github.com/leomrtns/genefam-dist
+Author: Leonardo de Oliveira Martins
+Author-email: leomrtns@gmail.com
+License: UNKNOWN
+Description: 
+        This package creates a coordinate system to compare gene trees based on a set of reference species trees, allowing for
+        Machine Learning and Multivariate Analysis of these resulting signals.
+        It includes low-level C functions to calculate distances between gene family trees and sets of species trees.
+        
+Platform: UNKNOWN

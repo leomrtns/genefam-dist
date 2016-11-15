@@ -17,7 +17,6 @@ treesignalc_fromtrees (PyObject *self, PyObject *args)
 
   // printf ("I got [%s] and [%s] \n", gtree_str, splist_str); // DEBUG
   n_res = genefam_module_treesignal_fromtrees (gtree_str, splist_str, &res_doublevector);
-  printf ("%d\n", n_res);
   if (n_res < 2) { PyErr_SetString(TreesignalcError, "Could not find set of species trees"); return NULL; }
 
   res_tuple = PyTuple_New(n_res);
@@ -67,7 +66,7 @@ treesignalc_generate_spr_trees (PyObject *self, PyObject *args)
 }
 
 PyMODINIT_FUNC
-PyInit___treesignalc(void)
+PyInit__treesignalc(void) /* it has to be named PyInit_<module name in python> */
 {
   PyObject *m;
   static PyMethodDef TreesignalcMethods[] = {
@@ -95,7 +94,7 @@ main (int argc, char *argv[])
   wchar_t *program = Py_DecodeLocale(argv[0], NULL);
   if (program == NULL) { fprintf(stderr, "Fatal error: cannot decode argv[0]\n"); exit(1); }
   
-  PyImport_AppendInittab("__treesignalc", PyInit___treesignalc); /* Add a built-in module, before Py_Initialize */
+  PyImport_AppendInittab("_treesignalc", PyInit__treesignalc); /* Add a built-in module, before Py_Initialize */
   Py_SetProgramName(program); /* Pass argv[0] to the Python interpreter */
   Py_Initialize(); /* Initialize the Python interpreter.  Required. */
  

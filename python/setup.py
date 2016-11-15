@@ -1,19 +1,24 @@
-from distutils.core import setup, Extension
+#from distutils.core import setup, Extension
+from setuptools import setup, Extension, find_packages
 
 description_multiline = '''
-This package provide C functions to calculate distances between gene family trees and sets of species trees.
-This is a low-level library that should not be employed by end users -- let the python high-level modules take care of
-them
+This package creates a coordinate system to compare gene trees based on a set of reference species trees, allowing for
+Machine Learning and Multivariate Analysis of these resulting signals.
+It includes low-level C functions to calculate distances between gene family trees and sets of species trees.
 '''
 
-module_c = Extension('__treesignalc', 
+module_c = Extension('_treesignalc', 
                      define_macros = [('MAJOR_VERSION', '1'), ('MINOR_VERSION', '0')],
                      include_dirs = ['/home/leo/local/include'],
 #                     libraries = ['tcl83'],
                      library_dirs = ['/home/leo/local/lib'],
                      runtime_library_dirs = ['/home/leo/local/lib'],
                      libraries = ['genefamdist'],
-                    sources = ['treesignalmodule.c'])
+                    sources = ['src/treesignalmodule.c'])
+
+print(find_packages())
+
+requirements = ["dendropy", "numpy"]
 
 setup (name = 'treesignal', 
        version = '1.0', 
@@ -22,6 +27,8 @@ setup (name = 'treesignal',
        author_email = 'leomrtns@gmail.com',
        url='https://github.com/leomrtns/genefam-dist',
        long_description=description_multiline,
-       py_modules=['treesignal'],
+#       py_modules=['treesignal'],
+       packages=find_packages(),
+       install_requires=requirements,
        ext_modules = [module_c])
 
