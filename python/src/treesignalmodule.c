@@ -32,13 +32,13 @@ treesignalc_fromtrees_pvalue (PyObject *self, PyObject *args)
   const char *gtree_str, *splist_str;
   PyObject *arg1, *arg2, *res_tuple;
   double *res_doublevector=NULL; /* output with distances, allocated by library function and freed here */
-  int i, n_replicates, n_res = -1;
+  int i, n_replicates = 10000, n_res = -1;
 
-  if (!PyArg_ParseTuple(args,  "UUi", &arg1, &arg2, &n_replicates))  return NULL; 
+  if (!PyArg_ParseTuple(args,  "UU|i", &arg1, &arg2, &n_replicates))  return NULL; 
   gtree_str  = PyBytes_AsString(PyUnicode_AsUTF8String(arg1));
   splist_str = PyBytes_AsString(PyUnicode_AsUTF8String(arg2));
   if (n_replicates < 10) n_replicates = 10;
-  // printf ("I got [%s] and [%s] \n", gtree_str, splist_str); // DEBUG
+  //printf ("I got [%s] and [%s] \n n = %d\n", gtree_str, splist_str, n_replicates); // DEBUG
   n_res = genefam_module_treesignal_fromtrees_pvalue (gtree_str, splist_str, n_replicates, &res_doublevector);
   if (n_res < 2) { PyErr_SetString(TreesignalcError, "Could not find set of species trees"); return NULL; }
 

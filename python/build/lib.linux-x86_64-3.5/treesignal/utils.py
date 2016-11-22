@@ -17,3 +17,8 @@ def low_level_calculate_spectrum_from_tree_strings(gene_tree_str, species_tree_s
     """ Direct call to C function that calculates unscaled distances from gene tree (newick string) to set of species
     trees (newick trees) """
     return numpy.array(_treesignalc.fromtrees(gene_tree_str, species_tree_str))
+
+def low_level_calculate_spectrum_from_tree_strings_pvalue(gene_tree_str, species_tree_str, ntrees=1000):
+    """ Direct call to C function that calculates unscaled distances from gene tree (newick string) to set of species
+    trees (newick trees) """
+    return numpy.array(_treesignalc.fromtrees_pvalue(gene_tree_str, species_tree_str, ntrees))

@@ -81,7 +81,7 @@ biomcmc_rng_get_initial_seed (void)
   high = (((uint64_t)(timeseed[0]) * pid2) << 16) & 0xffffffff0000ULL;
   /* highest 16 bits */
   top  = (uint64_t) (biomcmc_hashint_6 (timeseed[0] + timeseed[1])) << 48;
-  fprintf (stderr, "seed %ju\n", (uintmax_t) low|high|top);
+//  fprintf (stderr, "seed %ju\n", (uintmax_t) low|high|top);
 
   return (unsigned long long int) (low | high | top);
 }
