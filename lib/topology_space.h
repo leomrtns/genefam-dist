@@ -42,6 +42,9 @@ void add_string_with_size_to_topology_space (topology_space *tsp_address, char *
 
 /*! \brief Read tree file and store info in topology_space_struct with possible external hashtable to impose the leaf ordering. */
 topology_space read_topology_space_from_file (char *seqfilename, hashtable external_taxhash);
+/*! \brief lower level function where we can specify burnin and thinning factor, in iterations */ 
+topology_space read_topology_space_from_file_with_burnin_thin (char *seqfilename, hashtable external_taxhash, int burnin, int thin);
+{
 /*! \brief Quickly counts the number of leaves in a tree file, without storing any info. Assumes file and trees are well-formed */
 int estimate_treesize_from_file (char *seqfilename);
 

@@ -187,15 +187,24 @@ add_string_with_size_to_topology_space (topology_space *tsp, char *long_string, 
 topology_space
 read_topology_space_from_file (char *seqfilename, hashtable external_taxhash)
 {
+  return read_topology_space_from_file_with_burnin_thin (seqfilename, external_taxhash, 0, 1)
+}
+
+topology_space
+read_topology_space_from_file_with_burnin_thin (char *seqfilename, hashtable external_taxhash, int burnin, int thin)
+{
   topology_space treespace=NULL;
   FILE *seqfile;
   char *line=NULL, *line_read=NULL, *needle_tip=NULL;
   bool option_begin_trees    = false,
        option_translate_perm = false,
-       option_translate_temp = false; 
+       option_translate_temp = false,
+       option_include_tree = false;
   size_t linelength = 0;
   double freq_sum = 0., this_freq, *freq = NULL; /* posterior frequency per tree (if present) */
-  int i = 0, n_freq = 0, *order_external = NULL; // leaves will follow external_taxhash if exists (malloc'ed by add_tree_to_topology_space())
+  int iteration = 1, i = 0, n_freq = 0, *order_external = NULL; // leaves will follow external_taxhash if exists (malloc'ed by add_tree_to_topology_space())
+  if (burnin < 0) burnin = 0;
+  if (thin < 1) thin = 1;
 
   seqfile = biomcmc_fopen (seqfilename, "r");
   
@@ -214,7 +223,10 @@ read_topology_space_from_file (char *seqfilename, hashtable external_taxhash)
   while (biomcmc_getline (&line_read, &linelength, seqfile) != -1) {
     /* read frequency ('posterior distribution) information, in mrbayes' .trprobs format -> before remove_comments */
     needle_tip = line_read;
-    if ( (needle_tip = strcasestr (needle_tip, "TREE")) && 
+    if ((iteration > burnin) && !(iteration%%thin)) option_include_tree = true;
+    else option_include_tree = false;
+
+    if ( option_include_tree && (needle_tip = strcasestr (needle_tip, "TREE")) && 
          (needle_tip = strrchr (needle_tip, '=')) &&
          (sscanf (needle_tip, "= [ &W %lf ]", &this_freq) == 1) ) {
       freq = (double*) biomcmc_realloc ((double*) freq, (n_freq + 1) * sizeof (double));
@@ -238,7 +250,9 @@ read_topology_space_from_file (char *seqfilename, hashtable external_taxhash)
         }
         else if (strcasestr (line, "TREE") && (needle_tip = strcasestr (line, "="))) {
           needle_tip++; /* remove "=" from string */
-          add_tree_to_topology_space (treespace, needle_tip, option_translate_perm, external_taxhash, &order_external);
+          iteration++;
+          if (option_include_tree)
+            add_tree_to_topology_space (treespace, needle_tip, option_translate_perm, external_taxhash, &order_external);
         }
       }
     
