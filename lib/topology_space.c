@@ -75,7 +75,7 @@ void add_tree_to_topology_space (topology_space tsp, const char *string, bool tr
                                  hashtable external_hash, int **order);
 
 /*! \brief Reads translation table (one line) of the form "number = taxa name" in tree file. */
-void translate_taxa_topology_space (topology_space tsp, char *string);
+void translate_taxa_topology_space (topology_space tsp, char *string, hashtable external_hash);
 
 /*! \brief Copy information from nexus_tree struct to topology struct 
  *
@@ -258,7 +258,7 @@ read_topology_space_from_file_with_burnin_thin (char *seqfilename, hashtable ext
     
       if (option_translate_temp) {
         /* we are reading translation table token <-> taxlabel */  
-        translate_taxa_topology_space (treespace, line);
+        translate_taxa_topology_space (treespace, line, external_taxhash);
         if (strchr (line, ';')) option_translate_temp = false;
       }
       
@@ -266,7 +266,6 @@ read_topology_space_from_file_with_burnin_thin (char *seqfilename, hashtable ext
   } //while (biomcmc_getline)
 
   if (external_taxhash) {
-    del_hashtable (treespace->taxlabel_hash);
     treespace->taxlabel_hash = external_taxhash;
     external_taxhash->ref_counter++; /* since we are sharing the hashfunction */
 
@@ -314,6 +313,96 @@ read_topology_space_from_file_with_burnin_thin (char *seqfilename, hashtable ext
   return treespace;
 }
 
+void
+merge_topology_spaces (topology_space ts1, topology_space ts2, double weight_ts1)
+{ /* ts1->tree is not correct anymore, should not be used after calling this function */
+  int i, j, *idx, n_idx = ts1->ndistinct; 
+  double total_freq = 0.;
+
+  // TODO: check if taxlabel_hash is the same; branch lengths; mark where convergence could go.
+  
+  if (weight_ts1 <= 0.) weight_ts1 = 1.; // usually ts1->ntrees/ts2->ntrees
+
+  idx = (int*) biomcmc_malloc (ts1->ndistinct * sizeof (int)); 
+  for (i=0; i < ts1->ndistinct; i++) {
+    ts1->freq[i] *= weight_ts1; // weight (number of trees) of ts1 relative to ts2
+    idx[i] = i; /* index of trees from ts1 not compared to ts2 yet */
+  }
+
+  for (j=0; j < ts2->ndistinct; j++) {
+    int found_id = -1;
+    /* comparison includes root location (faster than unrooted since uses hash) */ 
+    for (i=0; (i < n_idx) && (found_id < 0); i++) if (topology_is_equal (ts2->distinct[j], ts1->distinct[idx[i]] )) found_id = i;
+    if (found_id >= 0) {
+      ts1->freq[ idx[found_id] ] += ts2->freq[j];
+      idx [found_id] = idx[--n_idx]; // assuming each tree from ts1 can be found at most once in ts2 
+    } // if tree not found 
+    else { // tree ts2->distinct[j] is unique to ts2 
+      int new_id = ts1->ndistinct++;
+      ts2->distinct[j]->id = new_id;
+      ts1->freq =     (double*)   biomcmc_realloc ((double*)   ts1->freq,     sizeof (double) * (ts1->ndistinct));
+      ts1->distinct = (topology*) biomcmc_realloc ((topology*) ts1->distinct, sizeof (topology) * (ts1->ndistinct));
+      ts1->freq[new_id] = ts2->freq[j];
+      ts1->distinct[new_id] = ts2->distinct[j];
+      ts2->distinct[j] = NULL;
+      for (i=0; i < ts1->distinct[new_id]->nleaves; i++) {
+        /* the leaf bipartitions never change, so can be shared among all topologies */
+        ts1->distinct[new_id]->nodelist[i]->split = ts1->distinct[0]->nodelist[i]->split;
+        ts1->distinct[0]->nodelist[i]->split->ref_counter++;
+      }
+    }
+  } // for j in ts2->ndistinct
+
+  for (i=0; i < ts1->ndistinct; i++) total_freq += ts1->freq[i];
+  for (i=0; i < ts1->ndistinct; i++) ts1->freq[i] /= total_freq;
+  if (idx) free (idx);
+}
+
+void
+save_topology_space_to_file (topology_space tsp, char *filename)
+{
+  int i;
+  FILE *stream;
+  empfreq ef;
+
+  stream = biomcmc_fopen (filename, "w");
+  fprintf (stream, "#NEXUS\n\nBegin trees;\n Translate\n");
+  fprintf (stream, "\t1  %s", tsp->taxlabel->string[0]);
+  for (i=1; i < tsp->distinct[0]->nleaves; i++) fprintf (stream, ",\n\t%d  %s", i+1, tsp->taxlabel->string[i]);
+  fprintf (stream, "\n;\n");
+
+// STOPHERE (below was copy - paste) empfreq will not work with float frequencies!
+// FIXME: create empfreq for double
+	 ef = new_empfreq_sort_decreasing (sum->trfreq[i], sum->ntrees[i], 2); /* 2 -> vector of ints */
+
+ for (j = 0; j < sum->ntrees[i]; j++) {
+      idx = ef->i[j].idx; /* element ordered by frequency */
+      //for(k = 0; k < sum->tree_size[i]; k++) printf (". %d | %d\n", sum->tree_size[i]*j + k, sum->tree[i][ sum->tree_size[i]*j + k]); // DEBUG
+      intsum += sum->trfreq[i][idx];
+      freq    = (double)(sum->trfreq[i][idx]) / (double)(sum->n_samples);
+      freqsum = (double)             (intsum) / (double)(sum->n_samples);
+
+      copy_intvector_to_topology_by_postorder (topol, sum->tree[i] + (sum->tree_size[i] * idx)); /* from intvector to topol */
+      if (i < sum->n_genes - 1) {
+        stree = topology_to_string_by_id (topol, false); /* from topol to newick */
+        fprintf (stream, "tree tree_%d [p = %.4lf, P = %.4lf] = [&W %.8lf] %s;\n", idx, freq, freqsum, freq, stree);
+        free (stree); /* allocated by topology_to_string_by_id() */
+      }
+      else { /* save strings and original indexes */
+        strsptre[idx] = topology_to_string_by_id (topol, false); /* from topol to newick */
+        /* tree index (idx) must be the same as  sum->sptre_idx[sample] printed by update_summary_struct_double() */
+        fprintf (stream, "tree tree_%d [p = %.4lf, P = %.4lf] = [&W %.8lf] %s;\n", idx, freq, freqsum, freq, strsptre[idx]);
+      }
+    }
+    fprintf (stream, "\nEnd;\n");
+
+    fclose (stream);
+    free (filename);
+    del_empfreq (ef);
+
+
+}
+
 int
 estimate_treesize_from_file (char *seqfilename)
 {
@@ -354,8 +443,8 @@ new_topology_space (void)
   /* tsp->dinstinct vector is increased by add_tree_to_topology_space() while tsp->tree are pointers to dsp->distinct
    * tsp->taxlabel vector is setup by translate_taxa_topology_space() or add_tree_to_topology_space(), whichever 
    * is used
-   * tsp->taxlabel_hash is setup by one of the above and may be replaced by a pointer to an external hastable (from
-   * alignment or another tree file, for instance */
+   * tsp->taxlabel_hash is setup by one of the above in absence of global external_hash -- will be replaced by a pointer to an external hastable (from
+   * alignment or another tree file, for instance) */
   tsp->freq = NULL; /* will be created online (as we read more trees) or when reading "[&W 0.01]" posterior probability data */
   tsp->tlen = NULL; /* created only if trees have branch lengths */
   return tsp;
@@ -439,13 +528,11 @@ add_tree_to_topology_space (topology_space tsp, const char *string, bool transla
 
     /* tsp->taxlabel will point to names of first tree. This info will be also available at the hashtable */ 
     tsp->taxlabel = new_char_vector (tree->nleaves); 
-    tsp->taxlabel_hash = new_hashtable (tree->nleaves);
 
     for (i=0; i< tree->nleaves; i++) { 
       // leaf names of first nexus_tree will be shared by topol_space
       char_vector_link_string_at_position (tsp->taxlabel, tree->leaflist[i]->taxlabel, i); 
       tree->leaflist[i]->taxlabel = NULL; // we don't need this copy anymore
-      insert_hashtable (tsp->taxlabel_hash, tsp->taxlabel->string[i], i);
       tree->leaflist[i]->id = i;
     }
 
@@ -460,6 +547,10 @@ add_tree_to_topology_space (topology_space tsp, const char *string, bool transla
           biomcmc_error ( "tree label %s not found in sequence data\n", tsp->taxlabel->string[i]); 
         }
       }
+    }
+    else { /* no global (external) hash, must create local one */
+      tsp->taxlabel_hash = new_hashtable (tree->nleaves);
+      for (i=0; i< tree->nleaves; i++) insert_hashtable (tsp->taxlabel_hash, tsp->taxlabel->string[i], i);
     }
   }
 
@@ -476,8 +567,8 @@ add_tree_to_topology_space (topology_space tsp, const char *string, bool transla
       tree->leaflist[i]->id = index;
     }
 
-    if (external_hash) { //same as before 
-      /* leaves should be renumbered according to external taxlabel_hash */
+    if (external_hash) { //same as before, remembering that taxlabel_hash doesn't exist 
+      /* leaves should be renumbered according to external_hash */
       *order = (int*) biomcmc_malloc (2 * tsp->taxlabel->nstrings * sizeof (int));
       for (i=0; i < tsp->taxlabel->nstrings; i++) {
         /* map order in which taxlabels appear originally - where hashtable came from, e.g. the alignment file */
@@ -497,7 +588,8 @@ add_tree_to_topology_space (topology_space tsp, const char *string, bool transla
     }
     /* use hashtable to check if names are consistent and point all leaves to taxlabel vector */
     for (i=0; i< tree->nleaves; i++) {
-      index = lookup_hashtable (tsp->taxlabel_hash, tree->leaflist[i]->taxlabel);
+      if (external_hash) index = lookup_hashtable (external_hash, tree->leaflist[i]->taxlabel);
+      else          index = lookup_hashtable (tsp->taxlabel_hash, tree->leaflist[i]->taxlabel);
       if (index < 0) {
         del_nexus_tree (tree); del_topology_space (tsp);
         biomcmc_error ( "leaf names disagree between trees of same file\n");
@@ -594,9 +686,34 @@ add_tree_to_topology_space (topology_space tsp, const char *string, bool transla
   del_nexus_tree (tree);
 }
 
+void
+reorder_topol_space_leaves_from_hash (topology_space tsp, hashtable external_hash)
+{
+  int *order, i;
+  *order = (int*) biomcmc_malloc (2 * tsp->taxlabel->nstrings * sizeof (int)); /* two vecs, second is temporary */
+  for (i=0; i < tsp->taxlabel->nstrings; i++) {
+    /* map order in which taxlabels appear originally - where hashtable came from, e.g. the alignment file */
+    (*order)[i] = lookup_hashtable (external_hash, tsp->taxlabel->string[i]);
+    if ((*order)[i] < 0) {
+      del_topology_space (tsp);
+      biomcmc_error ( "tree label %s not found in global hashtable\n", tsp->taxlabel->string[i]); 
+    }
+  }
+  // STOPHERE -- lines below (tree is nexus) must be replaced by changing all topol pointers 
+  //original_order = (*order) + tsp->taxlabel->nstrings;
+  //for (i=0; i < tree->nleaves; i++) original_order[i] = tree->leaflist[i]->id;
+  //for (i=0; i < tree->nleaves; i++) tree->leaflist[i]->id = (*order)[ original_order[i] ];
+
+  del_hashtable (tsp->taxlabel_hash);
+  tsp->taxlabel_hash = external_hash;
+  external_taxhash->ref_counter++; /* since we are sharing the hashfunction */
+  // reorder taxlabels to conform to hashtable 
+  char_vector_reorder_strings (tsp->taxlabel, order);
+}
+
 /* TODO: create unroot_topol_space() */
 void
-translate_taxa_topology_space (topology_space tsp, char *string) 
+translate_taxa_topology_space (topology_space tsp, char *string, hashtable external_hash) 
 {
   int i, index;
   char *c, *s, *last, *comma_position, seqname[MAX_NAME_LENGTH]="";
@@ -638,7 +755,7 @@ translate_taxa_topology_space (topology_space tsp, char *string)
   }
   
   /* when we finished reading the leaf names (semicolon separated (line below) or not (good_scan) by space) */ 
-  if (strchr (string, ';') || good_scan) {
+  if ((strchr (string, ';') || good_scan) && !external_hash) { /* if external_has is present, do not create local one */
     tsp->taxlabel_hash = new_hashtable (tsp->taxlabel->nstrings);
     for (i=0; i<tsp->taxlabel->nstrings; i++) insert_hashtable (tsp->taxlabel_hash, tsp->taxlabel->string[i], i);
   }

@@ -206,9 +206,9 @@ copy_topology_from_topology (topology to_tree, topology from_tree)
   if (!from_tree->traversal_updated) update_topology_traversal (from_tree);
 
   for (i=0; i < from_tree->nleaves; i++) {
-    to_tree->nodelist[i]->up = to_tree->nodelist[from_tree->nodelist[i]->up->id];
-    to_tree->nodelist[i]->left = to_tree->nodelist[i]->right = NULL; // redundant, but safe
+    to_tree->nodelist[i]->up     = to_tree->nodelist[from_tree->nodelist[i]->up->id];
     to_tree->nodelist[i]->sister = to_tree->nodelist[from_tree->nodelist[i]->sister->id];
+    to_tree->nodelist[i]->left   = to_tree->nodelist[i]->right = NULL; // redundant, but safe
     // to_tree->nodelist[i]->u_done = from_tree->nodelist[i]->u_done; 
     to_tree->nodelist[i]->d_done = true;
   }

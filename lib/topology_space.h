@@ -44,7 +44,11 @@ void add_string_with_size_to_topology_space (topology_space *tsp_address, char *
 topology_space read_topology_space_from_file (char *seqfilename, hashtable external_taxhash);
 /*! \brief lower level function where we can specify burnin and thinning factor, in iterations */ 
 topology_space read_topology_space_from_file_with_burnin_thin (char *seqfilename, hashtable external_taxhash, int burnin, int thin);
-{
+/*!  \brief merge trees from two topology_space objects, assuming names hashtable is the same */ 
+void merge_topology_spaces (topology_space ts1, topology_space ts2, double weight_ts1);
+/*!  \brief reorder topology_space based on external hastable with names -- NOT WORKING, please use external hashtable when reading file */ 
+void reorder_topol_space_leaves_from_hash (topology_space tsp, hashtable external_hash);
+
 /*! \brief Quickly counts the number of leaves in a tree file, without storing any info. Assumes file and trees are well-formed */
 int estimate_treesize_from_file (char *seqfilename);
 
