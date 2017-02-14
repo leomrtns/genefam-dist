@@ -21,8 +21,10 @@
 
 #include "empirical_frequency.h"
 
-int compare_empfreq_element_increasing (const void *a, const void *b);
 int compare_empfreq_element_decreasing (const void *a, const void *b);
+int compare_empfreq_element_increasing (const void *a, const void *b);
+int compare_empfreq_double_element_decreasing (const void *a, const void *b);
+int compare_empfreq_double_element_increasing (const void *a, const void *b);
 empfreq create_empfreq_from_value_sorted_empfreq (empfreq e_idx);
 
 int
@@ -30,8 +32,8 @@ compare_empfreq_element_decreasing (const void *a, const void *b)
 {
   int result = ((empfreq_element *)b)->freq - ((empfreq_element *)a)->freq;
   if (result) return result;
-  /* break ties by position (in increasing order) */
-  return ((empfreq_element *)a)->idx - ((empfreq_element *)b)->idx;
+  /* break ties by position (in decreasing order) */
+  return ((empfreq_element *)b)->idx - ((empfreq_element *)a)->idx;
 }
 
 int
@@ -41,6 +43,20 @@ compare_empfreq_element_increasing (const void *a, const void *b)
   if (result) return result;
   /* break ties by position (in increasing order) */
   return ((empfreq_element *)a)->idx - ((empfreq_element *)b)->idx;
+}
+
+int
+compare_empfreq_double_element_decreasing (const void *a, const void *b)
+{
+  if ( ((empfreq_double_element *)b)->freq > ((empfreq_double_element *)a)->freq ) return 1;
+  else return -1;
+}
+
+int
+compare_empfreq_double_element_increasing (const void *a, const void *b)
+{
+  if ( ((empfreq_double_element *)b)->freq < ((empfreq_double_element *)a)->freq ) return 1;
+  else return -1;
 }
 
 void
@@ -55,20 +71,29 @@ sort_empfreq_increasing (empfreq ef)
   qsort (ef->i, ef->n, sizeof (empfreq_element), compare_empfreq_element_increasing);
 }
 
+void
+sort_empfreq_double_decreasing (empfreq_double efd)
+{
+  qsort (efd->d, efd->n, sizeof (empfreq_double_element), compare_empfreq_double_element_decreasing);
+}
+
+void
+sort_empfreq_double_increasing (empfreq_double efd)
+{
+  qsort (efd->d, efd->n, sizeof (empfreq_double_element), compare_empfreq_double_element_increasing);
+}
+
 empfreq
 new_empfreq (int n_elements)
 {
   empfreq ef;
   int i;
-
   ef =  (empfreq) biomcmc_malloc (sizeof (struct empfreq_struct));
   ef->n = n_elements;
   ef->min = 0;
   ef->max = n_elements - 1;
   ef->i = (empfreq_element*) biomcmc_malloc (n_elements * sizeof (empfreq_element));
-
   for (i=0; i< n_elements; i++) { ef->i[i].freq = 0; ef->i[i].idx  = i; }
-
   return ef;
 }
 
@@ -81,22 +106,16 @@ del_empfreq (empfreq ef)
 }
 
 empfreq_double
-new_empfreq_double (empfreq ef)
-{  
-  int i, sum = 0;
-  empfreq_double efd; 
-
-  efd = (empfreq_double) biomcmc_malloc (sizeof (struct empfreq_double_struct));
-  efd->n = ef->n;
-  efd->min = (double) ef->min;
-  efd->max = (double) ef->max;
-  efd->freq = (double*) biomcmc_malloc (efd->n * sizeof (double));
-  efd->idx  = (double*) biomcmc_malloc (efd->n * sizeof (double));
-  for (i = 0; i < ef->n; i++) sum += ef->i[i].freq;
-  for (i = 0; i < ef->n; i++) {
-    efd->freq[i] = log((double) ef->i[i].freq) - log ((double) sum);
-    efd->idx[i]  = (double) (ef->i[i].idx);
-  }
+new_empfreq_double (int n_elements)
+{
+  empfreq_double efd;
+  int i;
+  efd =  (empfreq_double) biomcmc_malloc (sizeof (struct empfreq_double_struct));
+  efd->n = n_elements;
+  efd->min = 0.;
+  efd->max = (double)(n_elements) - 1.;
+  efd->d = (empfreq_double_element*) biomcmc_malloc (n_elements * sizeof (empfreq_double_element));
+  for (i=0; i< n_elements; i++) { efd->d[i].freq = 0.; efd->d[i].idx  = i; }
   return efd;
 }
 
@@ -104,8 +123,7 @@ void
 del_empfreq_double (empfreq_double efd)
 {
   if (!efd) return;
-  if (efd->freq) free (efd->freq);
-  if (efd->idx)  free (efd->idx);
+  if (efd->d) free (efd->d);
   free (efd);
 }
 
@@ -135,6 +153,26 @@ new_empfreq_sort_increasing (void *vec, int n, char type)
   if (type == 2) for (i=0; i < n; i++) e_idx->i[i].freq = (int) ((int*)vec)[i]; 
 
   sort_empfreq_increasing (e_idx); /* equiv. to qsort (vec, n, sizeof (int), compare_int) but preserving weights. */
+  return e_idx;
+}
+
+empfreq_double
+new_empfreq_double_sort_decreasing (double *vec, int n)
+{
+  int i;
+  empfreq_double e_idx = new_empfreq_double (n);
+  for (i=0; i < n; i++) e_idx->d[i].freq = vec[i];
+  sort_empfreq_double_decreasing (e_idx); /* equiv. to qsort (vec, n, sizeof (int), compare_int) but preserving weights. */
+  return e_idx;
+}
+
+empfreq_double
+new_empfreq_double_sort_increasing (double *vec, int n)
+{
+  int i;
+  empfreq_double e_idx = new_empfreq_double (n);
+  for (i=0; i < n; i++) e_idx->d[i].freq = vec[i];
+  sort_empfreq_double_increasing (e_idx); /* equiv. to qsort (vec, n, sizeof (int), compare_int) but preserving weights. */
   return e_idx;
 }
 

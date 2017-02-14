@@ -88,10 +88,11 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-bin_PROGRAMS = gf_distmatrix_genetree_sptree$(EXEEXT) \
+bin_PROGRAMS = test_python_functions$(EXEEXT) \
+	concatenate_trees$(EXEEXT) \
+	gf_distmatrix_genetree_sptree$(EXEEXT) \
 	gf_generate_spr_trees$(EXEEXT) gf_spr_distance$(EXEEXT) \
-	gf_distsignal_genetree_sptree$(EXEEXT) \
-	test_python_functions$(EXEEXT)
+	gf_distsignal_genetree_sptree$(EXEEXT)
 subdir = src
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/libtool.m4 \
@@ -107,18 +108,23 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
-am_gf_distmatrix_genetree_sptree_OBJECTS =  \
-	distmatrix_genetree_sptree.$(OBJEXT)
-gf_distmatrix_genetree_sptree_OBJECTS =  \
-	$(am_gf_distmatrix_genetree_sptree_OBJECTS)
-gf_distmatrix_genetree_sptree_LDADD = $(LDADD)
+am_concatenate_trees_OBJECTS = concatenate_trees.$(OBJEXT)
+concatenate_trees_OBJECTS = $(am_concatenate_trees_OBJECTS)
+concatenate_trees_LDADD = $(LDADD)
 am__DEPENDENCIES_1 =
-gf_distmatrix_genetree_sptree_DEPENDENCIES = ../lib/libgenefamdist.la \
+concatenate_trees_DEPENDENCIES = ../lib/libgenefamdist.la \
 	$(am__DEPENDENCIES_1)
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
 am__v_lt_0 = --silent
 am__v_lt_1 = 
+am_gf_distmatrix_genetree_sptree_OBJECTS =  \
+	distmatrix_genetree_sptree.$(OBJEXT)
+gf_distmatrix_genetree_sptree_OBJECTS =  \
+	$(am_gf_distmatrix_genetree_sptree_OBJECTS)
+gf_distmatrix_genetree_sptree_LDADD = $(LDADD)
+gf_distmatrix_genetree_sptree_DEPENDENCIES = ../lib/libgenefamdist.la \
+	$(am__DEPENDENCIES_1)
 am_gf_distsignal_genetree_sptree_OBJECTS =  \
 	distsignal_genetree_sptree.$(OBJEXT)
 gf_distsignal_genetree_sptree_OBJECTS =  \
@@ -175,11 +181,13 @@ AM_V_CCLD = $(am__v_CCLD_@AM_V@)
 am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
 am__v_CCLD_0 = @echo "  CCLD    " $@;
 am__v_CCLD_1 = 
-SOURCES = $(gf_distmatrix_genetree_sptree_SOURCES) \
+SOURCES = $(concatenate_trees_SOURCES) \
+	$(gf_distmatrix_genetree_sptree_SOURCES) \
 	$(gf_distsignal_genetree_sptree_SOURCES) \
 	$(gf_generate_spr_trees_SOURCES) $(gf_spr_distance_SOURCES) \
 	$(test_python_functions_SOURCES)
-DIST_SOURCES = $(gf_distmatrix_genetree_sptree_SOURCES) \
+DIST_SOURCES = $(concatenate_trees_SOURCES) \
+	$(gf_distmatrix_genetree_sptree_SOURCES) \
 	$(gf_distsignal_genetree_sptree_SOURCES) \
 	$(gf_generate_spr_trees_SOURCES) $(gf_spr_distance_SOURCES) \
 	$(test_python_functions_SOURCES)
@@ -333,11 +341,12 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 AM_CPPFLAGS = $(GTKDEPS_CFLAGS) -I$(srcdir)/../lib @OPENMP_CPPFLAGS@
 LDADD = $(GTKDEPS_LIBS) ../lib/libgenefamdist.la $(AM_LDFLAGS)
+test_python_functions_SOURCES = test_python_functions.c
+concatenate_trees_SOURCES = concatenate_trees.c
 gf_distmatrix_genetree_sptree_SOURCES = distmatrix_genetree_sptree.c 
 gf_distsignal_genetree_sptree_SOURCES = distsignal_genetree_sptree.c 
 gf_generate_spr_trees_SOURCES = generate_spr_trees.c
 gf_spr_distance_SOURCES = spr_distance.c
-test_python_functions_SOURCES = test_python_functions.c
 all: all-am
 
 .SUFFIXES:
@@ -421,6 +430,10 @@ clean-binPROGRAMS:
 	echo " rm -f" $$list; \
 	rm -f $$list
 
+concatenate_trees$(EXEEXT): $(concatenate_trees_OBJECTS) $(concatenate_trees_DEPENDENCIES) $(EXTRA_concatenate_trees_DEPENDENCIES) 
+	@rm -f concatenate_trees$(EXEEXT)
+	$(AM_V_CCLD)$(LINK) $(concatenate_trees_OBJECTS) $(concatenate_trees_LDADD) $(LIBS)
+
 gf_distmatrix_genetree_sptree$(EXEEXT): $(gf_distmatrix_genetree_sptree_OBJECTS) $(gf_distmatrix_genetree_sptree_DEPENDENCIES) $(EXTRA_gf_distmatrix_genetree_sptree_DEPENDENCIES) 
 	@rm -f gf_distmatrix_genetree_sptree$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(gf_distmatrix_genetree_sptree_OBJECTS) $(gf_distmatrix_genetree_sptree_LDADD) $(LIBS)
@@ -447,6 +460,7 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/concatenate_trees.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/distmatrix_genetree_sptree.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/distsignal_genetree_sptree.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/generate_spr_trees.Po@am__quote@

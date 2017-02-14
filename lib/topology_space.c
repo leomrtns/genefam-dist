@@ -12,6 +12,8 @@
  * details (file "COPYING" or http://www.gnu.org/copyleft/gpl.html).
  */
 
+// OBS: topology_space object should always have <distinct> set, and <freq> scaled to one 
+
 #include "topology_space.h"
 #include "nexus_common.h"
 
@@ -187,7 +189,7 @@ add_string_with_size_to_topology_space (topology_space *tsp, char *long_string, 
 topology_space
 read_topology_space_from_file (char *seqfilename, hashtable external_taxhash)
 {
-  return read_topology_space_from_file_with_burnin_thin (seqfilename, external_taxhash, 0, 1)
+  return read_topology_space_from_file_with_burnin_thin (seqfilename, external_taxhash, 0, 1);
 }
 
 topology_space
@@ -223,7 +225,7 @@ read_topology_space_from_file_with_burnin_thin (char *seqfilename, hashtable ext
   while (biomcmc_getline (&line_read, &linelength, seqfile) != -1) {
     /* read frequency ('posterior distribution) information, in mrbayes' .trprobs format -> before remove_comments */
     needle_tip = line_read;
-    if ((iteration > burnin) && !(iteration%%thin)) option_include_tree = true;
+    if ((iteration > burnin) && !(iteration%thin)) option_include_tree = true;
     else option_include_tree = false;
 
     if ( option_include_tree && (needle_tip = strcasestr (needle_tip, "TREE")) && 
@@ -359,11 +361,13 @@ merge_topology_spaces (topology_space ts1, topology_space ts2, double weight_ts1
 }
 
 void
-save_topology_space_to_file (topology_space tsp, char *filename)
+save_topology_space_to_trprobs_file (topology_space tsp, char *filename)
 {
-  int i;
+  int i, idx;
   FILE *stream;
-  empfreq ef;
+  double part_sum = 0., freq;
+  char *stree;
+  empfreq_double efd;
 
   stream = biomcmc_fopen (filename, "w");
   fprintf (stream, "#NEXUS\n\nBegin trees;\n Translate\n");
@@ -371,36 +375,21 @@ save_topology_space_to_file (topology_space tsp, char *filename)
   for (i=1; i < tsp->distinct[0]->nleaves; i++) fprintf (stream, ",\n\t%d  %s", i+1, tsp->taxlabel->string[i]);
   fprintf (stream, "\n;\n");
 
-// STOPHERE (below was copy - paste) empfreq will not work with float frequencies!
-// FIXME: create empfreq for double
-	 ef = new_empfreq_sort_decreasing (sum->trfreq[i], sum->ntrees[i], 2); /* 2 -> vector of ints */
+  efd = new_empfreq_double_sort_decreasing (tsp->freq, tsp->ndistinct);
 
- for (j = 0; j < sum->ntrees[i]; j++) {
-      idx = ef->i[j].idx; /* element ordered by frequency */
-      //for(k = 0; k < sum->tree_size[i]; k++) printf (". %d | %d\n", sum->tree_size[i]*j + k, sum->tree[i][ sum->tree_size[i]*j + k]); // DEBUG
-      intsum += sum->trfreq[i][idx];
-      freq    = (double)(sum->trfreq[i][idx]) / (double)(sum->n_samples);
-      freqsum = (double)             (intsum) / (double)(sum->n_samples);
+  for (i = 0; i < tsp->ndistinct; i++) {
+    idx = efd->d[i].idx; /* element ordered by frequency */
+    freq = tsp->freq[idx];
+    part_sum += freq; 
+    printf ("%.6lf  ,  %.6lf\n", tsp->freq[i], tsp->freq[idx]); 
+    stree = topology_to_string_by_id (tsp->distinct[idx], false); /* from topol to newick */
+    fprintf (stream, "tree tree_%d \t[p = %.4lf, P = %.4lf] = [&W %.8lf] %s;\n", i, freq, part_sum, freq, stree);
+    free (stree);
+  }
+  fprintf (stream, "\nEnd;\n");
 
-      copy_intvector_to_topology_by_postorder (topol, sum->tree[i] + (sum->tree_size[i] * idx)); /* from intvector to topol */
-      if (i < sum->n_genes - 1) {
-        stree = topology_to_string_by_id (topol, false); /* from topol to newick */
-        fprintf (stream, "tree tree_%d [p = %.4lf, P = %.4lf] = [&W %.8lf] %s;\n", idx, freq, freqsum, freq, stree);
-        free (stree); /* allocated by topology_to_string_by_id() */
-      }
-      else { /* save strings and original indexes */
-        strsptre[idx] = topology_to_string_by_id (topol, false); /* from topol to newick */
-        /* tree index (idx) must be the same as  sum->sptre_idx[sample] printed by update_summary_struct_double() */
-        fprintf (stream, "tree tree_%d [p = %.4lf, P = %.4lf] = [&W %.8lf] %s;\n", idx, freq, freqsum, freq, strsptre[idx]);
-      }
-    }
-    fprintf (stream, "\nEnd;\n");
-
-    fclose (stream);
-    free (filename);
-    del_empfreq (ef);
-
-
+ fclose (stream);
+ del_empfreq_double (efd);
 }
 
 int
@@ -684,31 +673,6 @@ add_tree_to_topology_space (topology_space tsp, const char *string, bool transla
 
   tsp->ntrees++;
   del_nexus_tree (tree);
-}
-
-void
-reorder_topol_space_leaves_from_hash (topology_space tsp, hashtable external_hash)
-{
-  int *order, i;
-  *order = (int*) biomcmc_malloc (2 * tsp->taxlabel->nstrings * sizeof (int)); /* two vecs, second is temporary */
-  for (i=0; i < tsp->taxlabel->nstrings; i++) {
-    /* map order in which taxlabels appear originally - where hashtable came from, e.g. the alignment file */
-    (*order)[i] = lookup_hashtable (external_hash, tsp->taxlabel->string[i]);
-    if ((*order)[i] < 0) {
-      del_topology_space (tsp);
-      biomcmc_error ( "tree label %s not found in global hashtable\n", tsp->taxlabel->string[i]); 
-    }
-  }
-  // STOPHERE -- lines below (tree is nexus) must be replaced by changing all topol pointers 
-  //original_order = (*order) + tsp->taxlabel->nstrings;
-  //for (i=0; i < tree->nleaves; i++) original_order[i] = tree->leaflist[i]->id;
-  //for (i=0; i < tree->nleaves; i++) tree->leaflist[i]->id = (*order)[ original_order[i] ];
-
-  del_hashtable (tsp->taxlabel_hash);
-  tsp->taxlabel_hash = external_hash;
-  external_taxhash->ref_counter++; /* since we are sharing the hashfunction */
-  // reorder taxlabels to conform to hashtable 
-  char_vector_reorder_strings (tsp->taxlabel, order);
 }
 
 /* TODO: create unroot_topol_space() */

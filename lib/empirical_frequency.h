@@ -33,40 +33,43 @@ typedef struct
 	int idx;
 } empfreq_element;
 
+typedef struct
+{
+	double freq;
+	int idx;
+} empfreq_double_element;
+
 struct empfreq_struct
 {
 	empfreq_element *i;
 	int n;
-  /*! \brief Min value for index. */
-  int min; 
-  /*! \brief Max value for index. */
-  int max;
+  int min;   /*! \brief Min value for index. */
+  int max;   /*! \brief Max value for index. */
 };
 
 struct empfreq_double_struct
 {
-  /*! \brief normalized frequencies in log scale, s.t. sum up to one (after exponentiating...). */
-  double *freq;
-  /*! \brief normalized idx values (used in ndups, nloss) */
-  double *idx;
+	empfreq_double_element *d;
 	int n;
-  /*! \brief Min value for index. */
-  double min; 
-  /*! \brief Max value for index. */
-  double max;
+  double min;   /*! \brief Min value for index. */
+  double max;   /*! \brief Max value for index. */
 };
 
 void sort_empfreq_decreasing (empfreq ef);
 void sort_empfreq_increasing (empfreq ef);
+void sort_empfreq_double_decreasing (empfreq_double efd);
+void sort_empfreq_double_increasing (empfreq_double efd);
 
 empfreq new_empfreq (int n_elements);
-void del_empfreq (empfreq ef);
-
-empfreq_double new_empfreq_double (empfreq ef); /* works only with existing empfreq; limited functionality... */
-void del_empfreq_double (empfreq_double efd);
+void    del_empfreq (empfreq ef);
+empfreq_double new_empfreq_double (int n_elements);
+void           del_empfreq_double (empfreq_double efd);
 
 empfreq new_empfreq_sort_decreasing (void *vec, int n, char type);
 empfreq new_empfreq_sort_increasing (void *vec, int n, char type);
+empfreq_double new_empfreq_double_sort_decreasing (double *vec, int n);
+empfreq_double new_empfreq_double_sort_increasing (double *vec, int n);
+
 empfreq new_empfreq_from_int (int *vec, int n);
 empfreq new_empfreq_from_int_weighted (int *vec, int n, int *weight);
 int find_mode_int (int *vec, int n);

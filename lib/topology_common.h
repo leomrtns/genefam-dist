@@ -27,6 +27,7 @@
 
 #include "bipartition.h"
 #include "hashtable.h"
+#include "empirical_frequency.h"
 
 typedef struct topol_node_struct* topol_node;
 typedef struct topology_struct* topology;
