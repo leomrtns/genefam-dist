@@ -40,6 +40,8 @@
 
 /*! \brief given a gene tree and a group of species trees, both in newick format, return the spectrum of unnormalized distances */
 int genefam_module_treesignal_fromtrees (const char *gtree_str, const char *splist_str, double **output_distances);
+/*! \brief given a gene tree and a group of species trees, both in newick format, return the spectrum of rescaled distances */
+int genefam_module_treesignal_fromtrees_rescale (const char *gtree_str, const char *splist_str, double **output_distances);
 /*! \brief given a gene tree and a group of species trees, both in newick format, return frequencies of random sptrees with distances smaller than group */
 int genefam_module_treesignal_fromtrees_pvalue (const char *gtree_str, const char *splist_str, int n_reps, double **output_distances);
 /*! \brief generate a set of trees (as newick string), all separated from previous one by a number of SPR moves */

@@ -1,8 +1,9 @@
-#include <Python.h>  // timestamp 2016.09.22 
+#include <Python.h>  // timestamp 2017.03.06 
 #include <genefam/genefam_dist.h>
 
 static PyObject *TreesignalcError;
 
+// TODO: replace three versions with one that accepts option about scaling
 static PyObject *
 treesignalc_fromtrees (PyObject *self, PyObject *args)
 {
@@ -17,6 +18,28 @@ treesignalc_fromtrees (PyObject *self, PyObject *args)
 
   // printf ("I got [%s] and [%s] \n", gtree_str, splist_str); // DEBUG
   n_res = genefam_module_treesignal_fromtrees (gtree_str, splist_str, &res_doublevector);
+  if (n_res < 2) { PyErr_SetString(TreesignalcError, "Could not find set of species trees"); return NULL; }
+
+  res_tuple = PyTuple_New(n_res);
+  for (i = 0; i < n_res; i++) PyTuple_SetItem(res_tuple, i, PyFloat_FromDouble (res_doublevector[i]));
+  if (res_doublevector) free (res_doublevector);
+
+  return res_tuple;
+}
+
+static PyObject *
+treesignalc_fromtrees_rescale (PyObject *self, PyObject *args)
+{
+  const char *gtree_str, *splist_str;
+  PyObject *arg1, *arg2, *res_tuple;
+  double *res_doublevector=NULL; /* output with distances, allocated by library function and freed here */
+  int i, n_res = -1;
+
+  if (!PyArg_ParseTuple(args,  "UU", &arg1, &arg2))  return NULL; 
+  gtree_str  = PyBytes_AsString(PyUnicode_AsUTF8String(arg1));
+  splist_str = PyBytes_AsString(PyUnicode_AsUTF8String(arg2));
+  // printf ("I got [%s] and [%s] \n", gtree_str, splist_str); // DEBUG
+  n_res = genefam_module_treesignal_fromtrees_rescale (gtree_str, splist_str, &res_doublevector);
   if (n_res < 2) { PyErr_SetString(TreesignalcError, "Could not find set of species trees"); return NULL; }
 
   res_tuple = PyTuple_New(n_res);
@@ -71,6 +94,7 @@ PyInit__treesignalc(void) /* it has to be named PyInit_<module name in python> *
   PyObject *m;
   static PyMethodDef TreesignalcMethods[] = {
      {"fromtrees", (PyCFunction) treesignalc_fromtrees, METH_VARARGS, "calculates distances given sptrees."},
+     {"fromtrees_rescale", (PyCFunction) treesignalc_fromtrees_rescale, METH_VARARGS, "calculates normalized (rescaled) distances given sptrees."},
      {"fromtrees_pvalue", (PyCFunction) treesignalc_fromtrees_pvalue, METH_VARARGS, "calculates p-values from distances given sptrees."},
      {"generate_spr_trees", (PyCFunction) treesignalc_generate_spr_trees, METH_VARARGS, "creates a chain of trees with given SPR step."},
      {NULL, NULL, 0, NULL}        /* Sentinel */

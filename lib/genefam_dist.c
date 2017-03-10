@@ -16,7 +16,7 @@
 /*! \brief create a new topology_space from string with list of trees in newick format */
 topology_space topology_space_from_newick_string (const char *treelist_string);
 /*! \brief calculate distances between gene tree and collection of sptrees, and storing into newly allocated distances[] */ 
-void generate_output_distances (topology_space gtree, topology_space stree, double **distances, int *n);
+void generate_output_distances (topology_space gtree, topology_space stree, double **distances, int *n, bool rescale);
 /*! \brief calculate distances between gene tree and random sptrees, accumulating into previously allocated pvalues[] */ 
 int update_randomized_distances (topology gtree, topology stree, int n_obs, double *obs_dist, int *pvalues, int n_reps);
 
@@ -28,6 +28,7 @@ genefam_module_treesignal_fromtrees (const char *gtree_str, const char *splist_s
 
   genetree = topology_space_from_newick_string (gtree_str);
   sptree = topology_space_from_newick_string (splist_str);
+  // TODO: reduce sptrees to genetree species here (and notice that afterwards some sptrees may be same)
   /* 
   int i;
   char *s; s = topology_to_string_by_id (genetree->distinct[0], NULL);  printf ("DEBUG2 g: %s\n", s); free(s); 
@@ -35,7 +36,22 @@ genefam_module_treesignal_fromtrees (const char *gtree_str, const char *splist_s
     s = topology_to_string_by_id (sptree->distinct[i], NULL);    printf ("DEBUG2 s[%d]: %s\n", i, s); free(s); 
   } */
 
-  generate_output_distances (genetree, sptree, output_distances, &n_output);
+  generate_output_distances (genetree, sptree, output_distances, &n_output, false);
+  del_topology_space (genetree);
+  del_topology_space (sptree);
+  return n_output;
+}
+
+int
+genefam_module_treesignal_fromtrees_rescale (const char *gtree_str, const char *splist_str, double **output_distances)
+{
+  int n_output = 0;
+  topology_space genetree = NULL, sptree = NULL;
+
+  genetree = topology_space_from_newick_string (gtree_str);
+  sptree = topology_space_from_newick_string (splist_str);
+
+  generate_output_distances (genetree, sptree, output_distances, &n_output, true);
   del_topology_space (genetree);
   del_topology_space (sptree);
   return n_output;
@@ -52,7 +68,7 @@ genefam_module_treesignal_fromtrees_pvalue (const char *gtree_str, const char *s
   sptree = topology_space_from_newick_string (splist_str);
   biomcmc_random_number_init(0ULL);
 
-  generate_output_distances (genetree, sptree, &obs_distances, &n_output);
+  generate_output_distances (genetree, sptree, &obs_distances, &n_output, false);
   pvalues = (int*) biomcmc_malloc (sizeof (int) * n_output); /* for openMP this should be a 2D matrix */
   for (i=0; i < n_output; i++) pvalues[i] = 0;
   for (i=0; i < sptree->ndistinct; i++) for (j=0; j < sptree->ndistinct; j++) for (k=0; k < 7; k++) 
@@ -122,9 +138,9 @@ genefam_module_generate_spr_trees (int n_leaves, int n_iter, int n_spr)
 }
 
 void
-generate_output_distances (topology_space gtree, topology_space stree, double **distances, int *n)
+generate_output_distances (topology_space gtree, topology_space stree, double **distances, int *n, bool rescale)
 {
-  int i;
+  int i, j=0;
   splitset split;
 
   *n = stree->ndistinct * 7;
@@ -140,8 +156,13 @@ generate_output_distances (topology_space gtree, topology_space stree, double **
     (*distances)[7 * i + 4] = (double) split->spr_extra;
     (*distances)[7 * i + 5] = (double) split->rf;
     (*distances)[7 * i + 6] = (double) split->hdist;
+    if (rescale) { // rec->sp_size is the effective number of species
+      double maxvalue = 2. * (double)(gtree->distinct[0]->rec->sp_size + gtree->distinct[0]->nleaves) - 3.;
+      for (j = 0; j < 7; j++) (*distances)[7 * i + j] /= maxvalue; 
+    }
   }
   del_splitset (split);
+  // TODO: If sptrees are repeated, we must transform distances[distinct] into distances_new[tree]
   return;
 }
 

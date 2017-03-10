@@ -47,8 +47,8 @@ topology_space read_topology_space_from_file_with_burnin_thin (char *seqfilename
 /*!  \brief merge trees from two topology_space objects, assuming names hashtable is the same */ 
 void merge_topology_spaces (topology_space ts1, topology_space ts2, double weight_ts1);
 
-/*! \brief Save topology_space to a file, in format nexus w/ trprobs */
-void save_topology_space_to_trprobs_file (topology_space tsp, char *filename);
+/*! \brief Save topology_space to a file, in format nexus w/ trprobs, up to "credible" cummul frequency */
+void save_topology_space_to_trprobs_file (topology_space tsp, char *filename, double credible);
 /*! \brief Quickly counts the number of leaves in a tree file, without storing any info. Assumes file and trees are well-formed */
 int estimate_treesize_from_file (char *seqfilename);
 

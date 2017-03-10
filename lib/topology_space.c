@@ -361,7 +361,7 @@ merge_topology_spaces (topology_space ts1, topology_space ts2, double weight_ts1
 }
 
 void
-save_topology_space_to_trprobs_file (topology_space tsp, char *filename)
+save_topology_space_to_trprobs_file (topology_space tsp, char *filename, double credible)
 {
   int i, idx;
   FILE *stream;
@@ -369,21 +369,24 @@ save_topology_space_to_trprobs_file (topology_space tsp, char *filename)
   char *stree;
   empfreq_double efd;
 
+  if (credible > 1.) credible = 1.;
+
   stream = biomcmc_fopen (filename, "w");
-  fprintf (stream, "#NEXUS\n\nBegin trees;\n Translate\n");
+  fprintf (stream, "#NEXUS\n[While frequency 'p' is unscaled, 'P' and 'W' are scaled by credible=%.4lf]\n", credible);
+  fprintf (stream, "\n\nBegin trees;\n Translate\n");
   fprintf (stream, "\t1  %s", tsp->taxlabel->string[0]);
   for (i=1; i < tsp->distinct[0]->nleaves; i++) fprintf (stream, ",\n\t%d  %s", i+1, tsp->taxlabel->string[i]);
   fprintf (stream, "\n;\n");
 
   efd = new_empfreq_double_sort_decreasing (tsp->freq, tsp->ndistinct);
 
-  for (i = 0; i < tsp->ndistinct; i++) {
+  for (i = 0; (i < tsp->ndistinct) && (part_sum < 1.); i++) {
     idx = efd->d[i].idx; /* element ordered by frequency */
-    freq = tsp->freq[idx];
+    freq = tsp->freq[idx] / credible; /* rescaling s.t. new frequencies sum to one (and not to "credible") */
     part_sum += freq; 
-    printf ("%.6lf  ,  %.6lf\n", tsp->freq[i], tsp->freq[idx]); 
+    // printf ("%.6lf  ,  %.6lf\n", tsp->freq[i], tsp->freq[idx]); // DEBUG 
     stree = topology_to_string_by_id (tsp->distinct[idx], false); /* from topol to newick */
-    fprintf (stream, "tree tree_%d \t[p = %.4lf, P = %.4lf] = [&W %.8lf] %s;\n", i, freq, part_sum, freq, stree);
+    fprintf (stream, "tree tree_%d \t[p= %.5lf, P= %.5lf] = [&W %.8lf] %s;\n", i, tsp->freq[idx], part_sum, freq, stree);
     free (stree);
   }
   fprintf (stream, "\nEnd;\n");
