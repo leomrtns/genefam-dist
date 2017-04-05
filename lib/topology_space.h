@@ -19,7 +19,7 @@
 #define _biomcmc_topology_space_h_
 
 #include "hashtable.h"
-#include "topology_common.h"
+#include "topology_splitset.h"
 
 typedef struct topology_space_struct* topology_space;
 

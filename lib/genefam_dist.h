@@ -22,7 +22,6 @@
 #define _genefam_dist_h_
 
 #include "topology_space.h"
-#include "topology_splitset.h"
 #include "topology_mrca.h"
 #include "topology_build.h"
 #include "prob_distribution.h" 
@@ -32,7 +31,8 @@
 #include "lowlevel.h" // called by bipartition.h, hashtable.h, random_number.h, topology_common.h etc
 #include "hashtable.h"    // called by alignment.h topology_space.h common.h 
 #include "bipartition.h"  // called by topology_common.h
-#include "topology_common.h" // called by topology_space.h, topology_mrca.h, topology_build.h and topology_splitset.h
+#include "topology_common.h" // called by topology_mrca.h, topology_build.h and topology_splitset.h
+#include "topology_splitset.h" // called by topology_space.h
 #include "random_number_gen.h" // called by random_number.h
 #include "random_number.h"   // called by topology_build.h
 #include "empirical_frequency.h" // called by topology_mrca.h and alignment.h
