@@ -897,26 +897,6 @@ double biomcmc_expm1 (double x)
   return (y - ((1. + y) * (biomcmc_log1p (y) - x)));
 }
 
-bool biomcmc_isfinite (double x)
-{
-  return ((x != NaN) & (x != pInf) & (x != mInf));
-}
-
-/* Compute log (exp (logx) + exp (logy)) without overflow and without loss of accuracy. */
-double 
-biomcmc_logspace_add (double logx, double logy)
-{
-  if (logx > logy) return logx + biomcmc_log1p (exp (logy - logx));
-  else             return logy + biomcmc_log1p (exp (logx - logy));
-}
-
-/* Compute log (exp (logx) - exp (logy)) without overflow and without loss of accuracy. */
-double 
-biomcmc_logspace_sub (double logx, double logy)
-{
-  return logx + biomcmc_log1p (-exp (logy - logx));
-}
-
 /* code from Gnu Scientific Library gsl-1.14/randist/discrete.c [http://www.gnu.org/software/gsl/]
  * original Copyright (C) 1996 - 2009 James Theiler, Brian Gough (GNU public license)
 

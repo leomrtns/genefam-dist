@@ -87,10 +87,6 @@ double biomcmc_rng_pois (double mu);
 double biomcmc_lgammafn (double x, int *sgn);
 /*  This function computes the value of the gamma function. */
 double biomcmc_gammafn (double x);
-/* Compute log (exp (logx) + exp (logy)) without overflow and without loss of accuracy. */
-double biomcmc_logspace_add (double logx, double logy);
-/* Compute log (exp (logx) - exp (logy)) without overflow and without loss of accuracy. */
-double biomcmc_logspace_sub (double logx, double logy);
 
 /*! \brief compute the relative error logarithm \f$ \log(1 + x)\f$ (C99 standard) */
 double biomcmc_log1p (double x);
@@ -98,8 +94,6 @@ double biomcmc_log1p (double x);
 double biomcmc_log1pmx (double x);
 /*! \brief compute \f$ \exp(x) - 1\f$ accurately also when x is close to zero, i.e. \f$|x| \ll 1 \f$ */
 double biomcmc_expm1 (double x);
-/*! \brief check if number is between minus infinity and plus infinity, or NaN */
-bool biomcmc_isfinite(double x);
 
 /* create the struct for sampling from an arbitrary empirical frequency vector */
 discrete_sample new_discrete_sample_from_frequencies (double *prob, size_t size);

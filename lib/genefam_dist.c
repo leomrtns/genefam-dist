@@ -146,6 +146,7 @@ generate_output_distances (topology_space gtree, topology_space stree, double **
   *n = stree->ndistinct * 7;
   (*distances) = (double*) biomcmc_malloc (sizeof (double) * *n);
   split = create_splitset_dSPR_genespecies (gtree->distinct[0], stree->distinct[0]);
+  // here is ideal to call calculate_max_distance() since split will have "original" number of edges
   for (i=0; i < stree->ndistinct; i++) {
     init_tree_recon_from_species_topology (gtree->distinct[0], stree->distinct[i]);
     dSPR_gene_species (gtree->distinct[0], stree->distinct[i], split);

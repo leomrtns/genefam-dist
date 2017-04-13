@@ -19,7 +19,6 @@
 #include "lowlevel.h"
 
 /* error-safe memory allocation functions */
-
 void *
 biomcmc_malloc (size_t size)
 {
@@ -607,6 +606,26 @@ done:
   for (k = 0; k < nrows; ++k) for (l = 0; l < ncols; ++l) p->cost[k][l] = p->cost[k][l] - p->row_dec[k] + p->col_inc[l];
   for (i = 0; i < nrows; i++) p->final_cost += p->row_dec[i];
   for (i = 0; i < ncols; i++) p->final_cost -= p->col_inc[i]; // fprintf(stderr, "Cost is %d\n",cost);
+}
+
+/* Compute log (exp (logx) + exp (logy)) without overflow and without loss of accuracy. */
+double 
+biomcmc_logspace_add (double logx, double logy)
+{
+  if (logx > logy) return logx + biomcmc_log1p (exp (logy - logx));
+  else             return logy + biomcmc_log1p (exp (logx - logy));
+}
+
+/* Compute log (exp (logx) - exp (logy)) without overflow and without loss of accuracy. */
+double 
+biomcmc_logspace_sub (double logx, double logy)
+{
+  return logx + biomcmc_log1p (-exp (logy - logx));
+}
+
+bool biomcmc_isfinite (double x)
+{
+  return ((x != NaN) & (x != pInf) & (x != mInf));
 }
 
 
