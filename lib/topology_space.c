@@ -129,7 +129,7 @@ add_string_with_size_to_topology_space (topology_space *tsp, char *long_string, 
   int i, index;
   nexus_tree tree;
   topology topol;
-
+  // FIXME this function must create tsp->tree vector (since later we'll call add_topol_if_distinct)
   /* read string into a nexus tree */
   local_string = (char*) biomcmc_malloc (sizeof (char) * (string_size + 1));
   strncpy (local_string, long_string, string_size + 1); /* adds '\0' only when long_string is smaller!! */
@@ -172,6 +172,7 @@ add_string_with_size_to_topology_space (topology_space *tsp, char *long_string, 
   copy_topology_from_nexus_tree (topol, tree);
   topol->taxlabel = (*tsp)->taxlabel; /* taxlabel is shared among all topologies */
   (*tsp)->taxlabel->ref_counter++;    /* since it is shared, it cannot be deleted if still in use */
+
   /* assume all trees are distinct and add topology to space */
   (*tsp)->distinct = (topology*) biomcmc_realloc ((topology*) (*tsp)->distinct, sizeof (topology) * ((*tsp)->ndistinct+1));
   (*tsp)->distinct[(*tsp)->ndistinct] = topol;
@@ -184,6 +185,41 @@ add_string_with_size_to_topology_space (topology_space *tsp, char *long_string, 
   (*tsp)->ndistinct++;
   del_nexus_tree (tree);
   return;
+}
+
+void
+add_topology_to_topology_space_if_distinct (topology topol, topology_space tsp)
+{ // Assumes freqs are counts, not normalized to one (currently this function is used by other functions that dont care for freqs) 
+  int i, found_id = -1;
+  tsp->tree = (topology*) biomcmc_realloc ((topology*) tsp->tree, sizeof (topology) * (tsp->ntrees+1));
+
+  /* comparison includes root location (faster than unrooted since uses hash) */ 
+  for (i=0; (i < tsp->ndistinct) && (found_id < 0); i++) if (topology_is_equal (topol, tsp->distinct[i])) found_id = i;
+  if (found_id < 0) { /* if they look distinct (different root), then do slower unrooted calculation */ 
+    splitset split = new_splitset (topol->nleaves);
+    for (i=0; (i < tsp->ndistinct) && (found_id < 0); i++) if (topology_is_equal_unrooted (topol, tsp->distinct[i], split, i)) found_id = i;
+    del_splitset (split);
+  }
+
+  if (found_id >= 0) {
+    tsp->freq[found_id] += 1.;
+    del_topology (topol);
+  } // if tree found 
+  else { // topol is unique // STOPHERE 
+    int new_id = ts1->ndistinct++;
+    ts2->distinct[j]->id = new_id;
+    ts1->freq =     (double*)   biomcmc_realloc ((double*)   ts1->freq,     sizeof (double) * (ts1->ndistinct));
+    ts1->distinct = (topology*) biomcmc_realloc ((topology*) ts1->distinct, sizeof (topology) * (ts1->ndistinct));
+    ts1->freq[new_id] = ts2->freq[j];
+    ts1->distinct[new_id] = ts2->distinct[j];
+    ts2->distinct[j] = NULL;
+    for (i=0; i < ts1->distinct[new_id]->nleaves; i++) {
+      /* the leaf bipartitions never change, so can be shared among all topologies */
+      ts1->distinct[new_id]->nodelist[i]->split = ts1->distinct[0]->nodelist[i]->split;
+      ts1->distinct[0]->nodelist[i]->split->ref_counter++;
+    }
+  }
+
 }
 
 topology_space
