@@ -55,7 +55,7 @@ treesignalc_fromtrees_pvalue (PyObject *self, PyObject *args)
   const char *gtree_str, *splist_str;
   PyObject *arg1, *arg2, *res_tuple;
   double *res_doublevector=NULL; /* output with distances, allocated by library function and freed here */
-  int i, n_replicates = 10000, n_res = -1;
+  int i, n_replicates = 1000, n_res = -1;
 
   if (!PyArg_ParseTuple(args,  "UU|i", &arg1, &arg2, &n_replicates))  return NULL; 
   gtree_str  = PyBytes_AsString(PyUnicode_AsUTF8String(arg1));
@@ -73,6 +73,24 @@ treesignalc_fromtrees_pvalue (PyObject *self, PyObject *args)
 }
 
 static PyObject *
+treesignalc_randomise_trees_with_spr (PyObject *self, PyObject *args)
+{
+  char *output_trees = NULL;
+  const char *splist_str;
+  PyObject *arg1, *res_string;
+  int n_copies = 2, n_spr = 1;  
+
+  if (!PyArg_ParseTuple(args,  "U|ii", &arg1, &n_copies, &n_spr))  return NULL; 
+  splist_str = PyBytes_AsString(PyUnicode_AsUTF8String(arg1));
+  output_trees = genefam_module_randomise_trees_with_spr (splist_str, n_copies, n_spr);
+  if (!output_trees) { PyErr_SetString(TreesignalcError, "Could not expand trees with SPR neighbours"); return NULL; }
+  
+  res_string = PyUnicode_FromString ((const char *)output_trees);
+  if (output_trees) free (output_trees);
+  return res_string;
+}
+
+static PyObject *
 treesignalc_generate_spr_trees (PyObject *self, PyObject *args)
 {
   char *output_trees = NULL;
@@ -84,7 +102,7 @@ treesignalc_generate_spr_trees (PyObject *self, PyObject *args)
   if (!output_trees) { PyErr_SetString(TreesignalcError, "Could not create chain of SPR trees"); return NULL; }
   
   res_string = PyUnicode_FromString ((const char *)output_trees);
-  //if (output_trees) free (output_trees);
+  if (output_trees) free (output_trees);
   return res_string;
 }
 
@@ -93,10 +111,16 @@ PyInit__treesignalc(void) /* it has to be named PyInit_<module name in python> *
 {
   PyObject *m;
   static PyMethodDef TreesignalcMethods[] = {
-     {"fromtrees", (PyCFunction) treesignalc_fromtrees, METH_VARARGS, "calculates distances given sptrees."},
-     {"fromtrees_rescale", (PyCFunction) treesignalc_fromtrees_rescale, METH_VARARGS, "calculates normalized (rescaled) distances given sptrees."},
-     {"fromtrees_pvalue", (PyCFunction) treesignalc_fromtrees_pvalue, METH_VARARGS, "calculates p-values from distances given sptrees."},
-     {"generate_spr_trees", (PyCFunction) treesignalc_generate_spr_trees, METH_VARARGS, "creates a chain of trees with given SPR step."},
+     {"fromtrees", (PyCFunction) treesignalc_fromtrees, METH_VARARGS, 
+      "given a set of sptrees and a gene tree, calculates a set of distances."},
+     {"fromtrees_rescale", (PyCFunction) treesignalc_fromtrees_rescale, METH_VARARGS, 
+      "given a set of sptrees and a gene tree, calculates a set of distances and normalise them through division by theoretical upper bounds."},
+     {"fromtrees_pvalue", (PyCFunction) treesignalc_fromtrees_pvalue, METH_VARARGS, 
+      "given sptrees and a genetree, returns concatenated vectors of p-values (% trees more similar) and distances rescaled to 0-1 using empirical bounds."},
+     {"randomise_trees_with_spr", (PyCFunction) treesignalc_randomise_trees_with_spr, METH_VARARGS, 
+      "expands set of give trees by generating SPR neighbours."},
+     {"generate_spr_trees", (PyCFunction) treesignalc_generate_spr_trees, METH_VARARGS, 
+      "creates a chain of trees with given SPR step."},
      {NULL, NULL, 0, NULL}        /* Sentinel */
   };
   PyDoc_STRVAR(treesignalc__doc__,"lowlevel functions in C for treesignal module");

@@ -13,17 +13,22 @@ def lowlevel_generate_spr_trees_string(n_species=8, chain_size=10, n_spr=1):
         chain_zise = 2
     return _treesignalc.generate_spr_trees(n_species, chain_size, n_spr)
 
-def low_level_calculate_spectrum_from_tree_strings(gene_tree_str, species_tree_str):
+def lowlevel_randomise_trees_with_spr_string(tree_str, n_copies=2, n_spr=1):
+    """ Direct call to C function that will generate a string with a neighbourhood of SPR-derived trees, given newick
+    string of current trees. Useful for creating noise around optimal sptrees  """
+    return _treesignalc.randomise_trees_with_spr(tree_str, n_copies, n_spr)
+
+def lowlevel_calculate_spectrum_from_tree_strings(gene_tree_str, species_tree_str):
     """ Direct call to C function that calculates unscaled distances from gene tree (newick string) to set of species
     trees (newick trees) """
     return numpy.array(_treesignalc.fromtrees(gene_tree_str, species_tree_str))
 
-def low_level_calculate_spectrum_from_tree_strings_rescale(gene_tree_str, species_tree_str):
+def lowlevel_calculate_spectrum_from_tree_strings_rescale(gene_tree_str, species_tree_str):
     """ Direct call to C function that calculates scaled distances from gene tree (newick string) to set of species
     trees (newick trees) """
     return numpy.array(_treesignalc.fromtrees_pvalue(gene_tree_str, species_tree_str, ntrees))
 
-def low_level_calculate_spectrum_from_tree_strings_pvalue(gene_tree_str, species_tree_str, ntrees=1000):
+def lowlevel_calculate_spectrum_from_tree_strings_pvalue(gene_tree_str, species_tree_str, ntrees=100):
     """ Direct call to C function that calculates p-valued distances from gene tree (newick string) to set of species
     trees (newick trees) """
     return numpy.array(_treesignalc.fromtrees_pvalue(gene_tree_str, species_tree_str, ntrees))

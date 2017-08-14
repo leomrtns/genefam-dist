@@ -1084,3 +1084,24 @@ biomcmc_discrete_sample_pdf (discrete_sample g, size_t k)
 
   return p/(double)(g->K);
 }
+
+/* Compute log (exp (logx) + exp (logy)) without overflow and without loss of accuracy. */
+double 
+biomcmc_logspace_add (double logx, double logy)
+{
+  if (logx > logy) return logx + biomcmc_log1p (exp (logy - logx));
+  else             return logy + biomcmc_log1p (exp (logx - logy));
+}
+
+/* Compute log (exp (logx) - exp (logy)) without overflow and without loss of accuracy. */
+double 
+biomcmc_logspace_sub (double logx, double logy)
+{
+  return logx + biomcmc_log1p (-exp (logy - logx));
+}
+
+bool biomcmc_isfinite (double x)
+{
+  return ((x != NaN) & (x != pInf) & (x != mInf));
+}
+

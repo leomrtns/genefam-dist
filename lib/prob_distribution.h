@@ -104,4 +104,11 @@ size_t biomcmc_rng_discrete (discrete_sample g);
 /* density from empirical frequency vector (that is, original values from vector) */
 double biomcmc_discrete_sample_pdf (discrete_sample g, size_t k);
 
+/* Compute log (exp (logx) + exp (logy)) without overflow and without loss of accuracy. */
+double biomcmc_logspace_add (double logx, double logy);
+/* Compute log (exp (logx) - exp (logy)) without overflow and without loss of accuracy. */
+double biomcmc_logspace_sub (double logx, double logy);
+/*! \brief check if number is between minus infinity and plus infinity, or NaN */
+bool biomcmc_isfinite(double x);
+
 #endif

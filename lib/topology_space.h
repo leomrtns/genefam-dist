@@ -39,6 +39,8 @@ struct topology_space_struct
 
 /*! \brief Read tree in newick format until char string_size, returning updated topolgy_space. Auxiliary for python module */
 void add_string_with_size_to_topology_space (topology_space *tsp_address, char *long_string, size_t string_size);
+/*! \brief Add topology to topology_space only if unrooted version is distinct, updating freqs, trees[] etc. Aux for python module */
+void add_topology_to_topology_space_if_distinct (topology topol, topology_space tsp);
 
 /*! \brief Read tree file and store info in topology_space_struct with possible external hashtable to impose the leaf ordering. */
 topology_space read_topology_space_from_file (char *seqfilename, hashtable external_taxhash);

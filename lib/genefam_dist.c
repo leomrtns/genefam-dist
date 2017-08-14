@@ -65,28 +65,35 @@ genefam_module_treesignal_fromtrees_pvalue (const char *gtree_str, const char *s
 {
   int n_output = 0, i, j, k, *pvalues, n_samples = 0;
   double *obs_distances;
-  double maxdistance[NDISTS];
+  double dist_bounds[2 * NDISTS]; // min and max values (first and last values, respect.)
   topology_space genetree = NULL, sptree = NULL;
 
   genetree = topology_space_from_newick_string (gtree_str);
   sptree = topology_space_from_newick_string (splist_str);
   biomcmc_random_number_init(0ULL);
 
+  generate_output_distances (genetree, sptree, &obs_distances, &n_output, false);
   *output_distances = (double*) biomcmc_malloc (sizeof (double) * 2 * n_output); /* pointer used (and freed) by calling function */
   pvalues = (int*) biomcmc_malloc (sizeof (int) * n_output); /* for openMP this should be a 2D matrix */
-  generate_output_distances (genetree, sptree, &obs_distances, &n_output, false);
 
   for (i=0; i < n_output; i++) pvalues[i] = 0;
   for (i=0; i < sptree->ndistinct; i++) for (j=0; j < sptree->ndistinct; j++) for (k=0; k < NDISTS; k++) 
     if ((i != j ) && (obs_distances[NDISTS*j + k] >= obs_distances[NDISTS*i + k])) pvalues[NDISTS*j + k]++;
 
+  for (k=0; k < NDISTS; k++) dist_bounds[k] = dist_bounds[k + NDISTS] = obs_distances[k]; // initial values for min and max
+  for (i=1; i < sptree->ndistinct; i++) for (k=0; k < NDISTS; k++) {
+    if (dist_bounds[k] > obs_distances[NDISTS*i + k]) dist_bounds[k] = obs_distances[NDISTS*i + k]; // min 
+    if (dist_bounds[NDISTS+k] < obs_distances[NDISTS*i + k]) dist_bounds[NDISTS+k] = obs_distances[NDISTS*i + k]; // max
+  }
+
   n_samples = sptree->ndistinct - 1; /* number of comparisons per tree, for calculating p-value */
-  for (i=0;i<NDISTS;i++) maxdistance[i]=0.;
-  n_samples += update_randomized_distances (genetree->distinct[0], sptree->distinct[0], sptree->ndistinct, obs_distances, pvalues, n_reps, maxdistance);
+  n_samples += update_randomized_distances (genetree->distinct[0], sptree->distinct[0], sptree->ndistinct, obs_distances, pvalues, n_reps, dist_bounds);
   for (i=0; i < n_output; i++) (*output_distances)[i] = ((double)pvalues[i])/(double)(n_samples); /* first trees X NDISTS are p-values */
 
-  /* second half of output vector has tree-distance pairs, scaled to max observed values */
-  for (i=0; i < sptree->ndistinct; i++) for (k=0; k < NDISTS; k++) (*obs_distances)[n_output + NDISTS * i + k] /= maxdistance[k];
+  /* second half of output vector has tree-distance pairs, scaled to min and max observed values */
+  for (k=0; k < NDISTS; k++) if (dist_bounds[k] == dist_bounds[k + NDISTS]) dist_bounds[k] = -1.; // min==max, then make all values = 1
+  for (i=0; i < sptree->ndistinct; i++) for (k=0; k < NDISTS; k++) // y = (x-min)/(max-min)
+    (*output_distances)[n_output + NDISTS * i + k] = ((*output_distances)[n_output + NDISTS * i + k] - dist_bounds[k])/(dist_bounds[NDISTS+k] - dist_bounds[k]);
 
   del_topology_space (genetree);
   del_topology_space (sptree);
@@ -95,7 +102,7 @@ genefam_module_treesignal_fromtrees_pvalue (const char *gtree_str, const char *s
   biomcmc_random_number_finalize(); /* free the global variable */
   return 2 * n_output;
 }
-
+// TODO check if all functions use ndistinct or ntrees
 void
 generate_output_distances (topology_space gtree, topology_space stree, double **distances, int *n, bool rescale)
 {
@@ -124,7 +131,7 @@ generate_output_distances (topology_space gtree, topology_space stree, double **
 }
 
 int
-update_randomized_distances (topology gtree, topology stree, int n_obs, double *obs_dist, int *pvalues, int n_reps, double *maxdist)
+update_randomized_distances (topology gtree, topology stree, int n_obs, double *obs_dist, int *pvalues, int n_reps, double *bounds)
 {
   int i, j, k;
   splitset split;
@@ -146,7 +153,9 @@ update_randomized_distances (topology gtree, topology stree, int n_obs, double *
     tmp_dist[5] = (double) split->hdist;
     /* pvalues[] is freq of distances as low as observed */
     for (j=0; j < n_obs; j++) for (k=0; k < NDISTS; k++) if (obs_dist[NDISTS*j + k] >= tmp_dist[k]) pvalues[NDISTS*j + k]++;
-    for (k=0; k < NDISTS; k++) if (maxdist[k] < tmp_dist[k]) maxdist[k] = tmp_dist[k];
+    for (k=0; k < NDISTS; k++) {
+      if (bounds[k] > tmp_dist[k]) bounds[k] = tmp_dist[k]; if (bounds[NDISTS+k] < tmp_dist[k]) bounds[NDISTS+k] = tmp_dist[k];
+    }
   }
 
   if (tmp_dist) free (tmp_dist);
@@ -172,22 +181,47 @@ calculate_max_distances (topology gt, double *maxd, splitset split)
 }
 
 char*
-genefam_module_randomise_trees_with_spr (const char *splist_str, int n_iter, int n_spr)
+genefam_module_randomise_trees_with_spr (const char *splist_str, int n_copies, int n_spr)
 {
   topology_space strees = NULL;
   topology randtree;
   int n_strees, i, j, k;
-  char *s, *output_tree_string;
+  size_t  new_str_size;
+  char *s, *output_tree_string, *tmp_string;
 
+  biomcmc_random_number_init(0ULL);
   strees = topology_space_from_newick_string (splist_str);
   n_strees = strees->ndistinct;
 
-  for (i=0; i < n_strees; i++) for (j = 0; j < n_iter; j++) {
-    randtree = new_topology (strees->nleaves);
-    copy_topology_from_topology (strees->distinct[i], randtree);
+  for (i=0; i < n_strees; i++) for (j = 0; j < n_copies; j++) {
+    randtree = new_topology (strees->distinct[0]->nleaves);
+    copy_topology_from_topology (randtree, strees->distinct[i]);
+    randtree->taxlabel = strees->taxlabel; /* taxlabel is shared among all topologies */
+    strees->taxlabel->ref_counter++;    /* since it is shared, it cannot be deleted if still in use */
+
     for (k = 0; k < n_spr; k++) topology_apply_spr_unrooted (randtree, false);
-    add_topology_to_space_if_distinct (randtree, strees); // FIXME: this function doesnt exist yet
+    printf ("new tree [ %d  ;  %d ] \n", i, j); // DEBUG
+    add_topology_to_topology_space_if_distinct (randtree, strees);
   }
+
+  s = topology_to_string_by_name (strees->distinct[0], NULL); /* second parameter is vector with branch lengths */
+  new_str_size = strlen (s);
+  output_tree_string = (char*) biomcmc_malloc (sizeof(char) * strlen(s));
+  sprintf (output_tree_string, "%s;", s); free (s); /* s[] is recycled (malloc'ed again when new topol string is created) */
+  for (i=1; i < strees->ndistinct; i++) {
+    new_str_size = strrchr (output_tree_string, ';') - output_tree_string + 1; // size of output_tree_string[] with extra '\0'
+    tmp_string = (char*) biomcmc_malloc (sizeof(char) * new_str_size + 1);
+    strncpy (tmp_string, output_tree_string, new_str_size); /* adds '\0' only if output_tree_string is smaller!! */
+    tmp_string[new_str_size] = '\0'; /* one after the semicolon */
+    s = topology_to_string_by_name (strees->distinct[i], NULL); /* second parameter is vector with branch lengths */
+    new_str_size += strlen (s) + 3;
+    output_tree_string = (char*) biomcmc_realloc ((char*) output_tree_string, sizeof(char) * new_str_size);
+    sprintf (output_tree_string, "%s %s;", tmp_string, s);  if (s) free (s); if (tmp_string) free (tmp_string); 
+  }
+
+  biomcmc_random_number_finalize(); /* free the global variable */
+  del_topology (randtree);
+  del_topology_space (strees);
 
   return output_tree_string;
 }
@@ -249,7 +283,7 @@ topology_space_from_newick_string (const char *treelist_string)
   topology_space ts = NULL;
 
   str_start = strchr (treelist_string, '(');
-  if (!str_start) biomcmc_error ("Couldn't read first tree (from potential list) in newick format");
+  if (!str_start) biomcmc_error ("Couldn't read first tree (single or from list) in newick format");
   while (str_start) {
     str_end = strchr (str_start, ';');
     if (str_end == NULL) str_size = strlen (str_start); /* function strchrnul() does this, but may not be portable? */

@@ -16,6 +16,10 @@
 
 int BitStringSize = 8 * sizeof (uint64_t);
 
+/* Aux functios for hashtable of bipartitions */
+inline uint32_t bhash1 (bip_hashtable ht);
+inline uint32_t bhash2 (bip_hashtable ht);
+
 bipartition
 new_bipartition (int size)
 {
@@ -368,6 +372,8 @@ bipartition_resize_vector (bipartition *bvec, int n_b)
   for (k = 0; k < n_b; k++) { bvec[k]->bs[i] &= bvec[0]->n->mask; bipartition_count_n_ones (bvec[k]); }
 }
 
+/* * Functions to work with hashtable of bipartitions * */
+
 uint32_t 
 bipartition_hash (bipartition bip) 
 { // assumes bipartition is flipped to smaller set
@@ -376,9 +382,6 @@ bipartition_hash (bipartition bip)
   for (i=0; i < bip->n->ints; i++) h = biomcmc_hashint_5 (h) ^ biomcmc_hashint_64to32 ( bip->bs[i]);
   return h;
 }
-
-inline uint32_t bhash1 (bip_hashtable ht);
-inline uint32_t bhash2 (bip_hashtable ht);
 
 bip_hashtable 
 new_bip_hashtable (int size)
@@ -401,6 +404,7 @@ new_bip_hashtable (int size)
   for(i = 0; i < ht->size; i++) ht->table[i] = NULL; 
   ht->P = 2147483647; /* initialize P (large prime)*/
   ht->probelength = 0;
+  ht->maxfreq = 1; // will store count of most frequent bipartition, to normalize frequency 
   
   /*initialize hash1 and hash2 variables*/
   srand (time(0)); /* the GSL library would be overkill... */
@@ -429,52 +433,53 @@ del_bip_hashtable (bip_hashtable ht)
   }
 }
 
-uint32_t hash1 (hashtable ht) { return ((((ht->a1 * ht->h) + ht->b1) % ht->P) % ht->size) ; }
-uint32_t hash2 (hashtable ht) { return ((((ht->a2 * ht->h + ht->b2) % ht->P) % (ht->size - 3)) | 1); }
-//STOPHERE
+uint32_t bhash1 (bip_hashtable ht) { return ((((ht->a1 * ht->h) + ht->b1) % ht->P) % ht->size) ; }
+
+uint32_t bhash2 (bip_hashtable ht) { return ((((ht->a2 * ht->h + ht->b2) % ht->P) % (ht->size - 3)) | 1); }
+
 void 
-insert_hashtable (hashtable ht, char* key, int value) 
+bip_hashtable_insert (bip_hashtable ht, bipartition key) 
 {
   uint32_t i;
   int h1, h2;
   
-  ht->h = bipartition_hash (key);
-  h1 = hash1 (ht);
-  h2 = hash2 (ht);
+  ht->h = bipartition_hash (key) % ht->P; /*P_ is a large prime*/
+  h1 = bhash1 (ht);
+  h2 = bhash2 (ht);
 
   ht->probelength = 0;
   
   for (i = h1; ht->table[i]; i = (i + h2) % ht->size) {
     ht->probelength++;
-    if (!strcmp (ht->table[i]->key, key)) /* key was already inserted */
+    if (bipartition_is_equal (ht->table[i]->key, key)) {  // already observed
+      if (ht->maxfreq < ++ht->table[i]->count) ht->maxfreq = ht->table[i]->count; // notice the "count++" 
       return; 
+    }
   }
   /* alloc space for new key */
   ht->table[i] = biomcmc_malloc (sizeof (struct hashtable_item_struct));
-  ht->table[i]->key = (char*) biomcmc_malloc((strlen (key)+1) * sizeof (char));
-  strcpy(ht->table[i]->key, key);
-  ht->table[i]->value = value;
+  ht->table[i]->key = new_bipartition_copy_from (key); 
+  ht->table[i]->count = 1;
   return;
 }
 
-int 
-lookup_hashtable (hashtable ht, char* key) 
+double
+bip_hashtable_get_frequency (bip_hashtable ht, bipartition key) 
 {
   uint32_t i;
   int h1, h2;
   
-  hash (ht, key);
-  h1 = hash1 (ht);
-  h2 = hash2 (ht);
+  ht->h = bipartition_hash (key) % ht->P; /*P_ is a large prime*/
+  h1 = bhash1 (ht);
+  h2 = bhash2 (ht);
   
   ht->probelength = 0;
 
   for (i = h1; ht->table[i]; i = (i + h2) % ht->size) {
     ht->probelength++;
-    if (!(ht->table[i])) return -1;
-    else if ( (ht->table[i]) && (!strcmp (ht->table[i]->key, key)) ) 
-      return ht->table[i]->value;
+    if (!(ht->table[i])) return 0.;
+    else if ( (ht->table[i]) && (bipartition_is_equal (ht->table[i]->key, key)) ) return (double)(ht->table[i]->count)/(double)(ht->maxfreq);
   }
-  return -2;
+  return -1.;
 }
 

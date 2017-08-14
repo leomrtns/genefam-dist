@@ -44,6 +44,8 @@ int genefam_module_treesignal_fromtrees (const char *gtree_str, const char *spli
 int genefam_module_treesignal_fromtrees_rescale (const char *gtree_str, const char *splist_str, double **output_distances);
 /*! \brief given a gene tree and a group of species trees, both in newick format, return frequencies of random sptrees with distances smaller than group */
 int genefam_module_treesignal_fromtrees_pvalue (const char *gtree_str, const char *splist_str, int n_reps, double **output_distances);
+/*! \brief given set of trees, return trees with SPR neighbours (as newick string). Useful for generating reference sptrees */
+char* genefam_module_randomise_trees_with_spr (const char *splist_str, int n_copies, int n_spr);
 /*! \brief generate a set of trees (as newick string), all separated from previous one by a number of SPR moves */
 char* genefam_module_generate_spr_trees (int n_leaves, int n_iter, int n_spr);
 
