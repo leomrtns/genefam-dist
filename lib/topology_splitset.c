@@ -201,6 +201,11 @@ create_splitset_dSPR_genespecies (topology gene, topology species)
     bipartition_zero (split->sp0[i]);
     for (j = 0; j < gene->nleaves; j++) if (gene->rec->sp_id[j] == i) bipartition_set (split->sp0[i], j);
   }
+  /* temporarily store (total, not reduced) number of bipartitions on both trees (to available to max_distance calcs etc.)*/
+  split->n_g = gene->nleaves - 3;
+  split->n_s = gene->rec->sp_size - 3;
+  for (i=0; i < species->nleaves; i++) if (gene->rec->sp_count[i] > 1) split->n_s++; // species not a leaf, but a cherry actually
+
   /* we could exclude species absent from gene tree (more memory efficient) [1], but it's easier to leave them since indexes
    * are preserved (when calling postorder[]->left->id for instance), otherwise we should need a index vector to map tree
    * IDs to positions here.  [1] means swap_bipartition, s_split -= removed_leaves, realloc (sp0, smaller_size)  

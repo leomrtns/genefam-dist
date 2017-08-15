@@ -18,7 +18,7 @@ treesignalc_fromtrees (PyObject *self, PyObject *args)
 
   // printf ("I got [%s] and [%s] \n", gtree_str, splist_str); // DEBUG
   n_res = genefam_module_treesignal_fromtrees (gtree_str, splist_str, &res_doublevector);
-  if (n_res < 2) { PyErr_SetString(TreesignalcError, "Could not find set of species trees"); return NULL; }
+  if (n_res < 1) { PyErr_SetString(TreesignalcError, "gene and species trees can't be compared"); return NULL; }
 
   res_tuple = PyTuple_New(n_res);
   for (i = 0; i < n_res; i++) PyTuple_SetItem(res_tuple, i, PyFloat_FromDouble (res_doublevector[i]));
@@ -40,7 +40,7 @@ treesignalc_fromtrees_rescale (PyObject *self, PyObject *args)
   splist_str = PyBytes_AsString(PyUnicode_AsUTF8String(arg2));
   // printf ("I got [%s] and [%s] \n", gtree_str, splist_str); // DEBUG
   n_res = genefam_module_treesignal_fromtrees_rescale (gtree_str, splist_str, &res_doublevector);
-  if (n_res < 2) { PyErr_SetString(TreesignalcError, "Could not find set of species trees"); return NULL; }
+  if (n_res < 1) { PyErr_SetString(TreesignalcError, "gene and species trees can't be compared"); return NULL; }
 
   res_tuple = PyTuple_New(n_res);
   for (i = 0; i < n_res; i++) PyTuple_SetItem(res_tuple, i, PyFloat_FromDouble (res_doublevector[i]));
@@ -63,7 +63,7 @@ treesignalc_fromtrees_pvalue (PyObject *self, PyObject *args)
   if (n_replicates < 10) n_replicates = 10;
   //printf ("I got [%s] and [%s] \n n = %d\n", gtree_str, splist_str, n_replicates); // DEBUG
   n_res = genefam_module_treesignal_fromtrees_pvalue (gtree_str, splist_str, n_replicates, &res_doublevector);
-  if (n_res < 2) { PyErr_SetString(TreesignalcError, "Could not find set of species trees"); return NULL; }
+  if (n_res < 1) { PyErr_SetString(TreesignalcError, "gene and species trees can't be compared"); return NULL; }
 
   res_tuple = PyTuple_New(n_res);
   for (i = 0; i < n_res; i++) PyTuple_SetItem(res_tuple, i, PyFloat_FromDouble (res_doublevector[i]));

@@ -53,7 +53,7 @@ biomcmc_error (const char *template, ...)
 {
   va_list ap;
 
-  fprintf (stderr, "biomcmc error: ");
+  fprintf (stderr, "genefam error: ");
   va_start (ap, template);
   vfprintf (stderr, template, ap);
   va_end (ap);

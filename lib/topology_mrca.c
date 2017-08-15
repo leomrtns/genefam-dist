@@ -80,7 +80,7 @@ init_tree_recon_from_species_topology (topology gene, topology species)
 void
 init_tree_recon_from_species_names (topology gene, char_vector sptaxlabel)
 {
-  /* currently not used, not even in ../src directory, but will be used by dSPR (topology_splitset) */ 
+  /* used by dSPR (topology_splitset) only (for now) */ 
   if (!gene->rec) gene->rec = new_reconciliation (gene->nleaves, sptaxlabel->nstrings);
   index_sptaxa_to_genetaxa (sptaxlabel, gene->taxlabel, gene->rec->sp_id, NULL);
   initialize_reconciliation_sp_count (gene->rec, sptaxlabel->nstrings, gene->nleaves);
@@ -169,6 +169,7 @@ void
 initialize_reconciliation_from_species_tree (topology gene, topology species)
 {
   int i;
+  if (!species->mrca) new_mrca_for_topology (species);
   for (i=0; i < gene->nleaves; i++) gene->rec->map_d[i] = species->nodelist[ gene->rec->sp_id[i] ];
   gene->rec->current_sptree = species;
 }
