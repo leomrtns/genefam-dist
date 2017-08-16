@@ -7,7 +7,6 @@ main (int argc, char **argv)
   int burnin = 0, thin = 1;  
   double credible = 1.;
   topology_space gt1 = NULL, gt2 = NULL;
-  splitset split;
 
   biomcmc_random_number_init(0ULL);
   time0 = clock ();

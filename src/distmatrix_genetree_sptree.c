@@ -26,13 +26,13 @@ main (int argc, char **argv)
   fprintf (stderr, "species trees (unique) = %d (%d)\n", st->ntrees, st->ndistinct);
 
   split = create_splitset_dSPR_genespecies (gt->distinct[0], st->distinct[0]);
-  printf ("genetree sptree  ndups  nloss ndeepcoals dSPR_lower dSPR_extra  RF   Hdist\n"); 
+  printf ("genetree sptree  ndups  nloss ndeepcoals dSPR  RF   Hdist\n"); 
   for (i=0; i < st->ntrees; i++) {
     for (j = 0; j < gt->ntrees; j++) { 
       init_tree_recon_from_species_topology (gt->tree[j], st->tree[i]);
       dSPR_gene_species (gt->tree[j], st->tree[i], split);
-      printf ("%6d %6d   %5d %5d %5d   %5d %5d %5d %6d\n", j, i, gt->tree[j]->rec->ndups, gt->tree[j]->rec->nloss, gt->tree[j]->rec->ndcos, 
-              split->spr, split->spr_extra, split->rf, split->hdist); 
+      printf ("%6d %6d   %5d %5d %5d   %5d %5d %6d\n", j, i, gt->tree[j]->rec->ndups, gt->tree[j]->rec->nloss, gt->tree[j]->rec->ndcos, 
+              split->spr + split->spr_extra, split->rf, split->hdist); 
     }
   }
 

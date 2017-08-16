@@ -189,8 +189,8 @@ create_splitset_dSPR_genespecies (topology gene, topology species)
   /* species tree before removal of missing species, has at most 2*sp_nleaves-1 bipartitions, and after their removal _but_
    * considering subtrees spanned by gene tree (the mul-tree) has at most 2*gene_nleaves-1 bipartitions. We don't need
    * the leaves (trivial bipartitions) -- therefore the 2 x nleaves is overkill --, but sp0[] needs sp_nleaves. */
-  if (gene->nleaves > species->nleaves) split->spsize = species->nleaves + gene->nleaves;
-  else                                  split->spsize = 2 * species->nleaves; /* +sp leaves for the first elems */
+  if (gene->nleaves > species->nleaves) split->spsize = 2 * species->nleaves + gene->nleaves; 
+  else                                  split->spsize = 3 * species->nleaves; /* +sp leaves for the first elems */
 
   split->s_split = (bipartition*) biomcmc_realloc ((bipartition*) split->s_split, split->spsize * sizeof (bipartition));
   for (i = split->size; i < split->spsize; i++) split->s_split[i] = new_bipartition_from_bipsize (split->s_split[0]->n);
@@ -240,12 +240,15 @@ prepare_genetree_sptree_split (topology gene, topology species, splitset split)
     bipartition_flip_to_smaller_set (split->s_split[i]);
     if (split->s_split[i]->n_ones < 2) { split->n_s--; split_swap_position (split->s_split, i, split->n_s); i--; }
   }
+
   split_remove_duplicates (split->s_split, &(split->n_s));
   for (i=0; i < species->nleaves; i++) if (split->sp0[i]->n_ones > 1) { /* add multifurcations representing species on gene tree */
     bipartition_copy (split->s_split[split->n_s], split->sp0[i]); /* idea from RF distance (arxiv.1210.2665) */
     bipartition_flip_to_smaller_set (split->s_split[split->n_s++]); /* this species has many many copies, that is most of leaves are same species... */
   }
-  //for (i = 0; i < split->n_s; i++) bipartition_print_to_stdout (split->s_split[i]); printf ("S after\n");
+  split_remove_duplicates (split->s_split, &(split->n_s));
+  //for (i = 0; i < split->n_s; i++) { bipartition_print_to_stdout (split->s_split[i]); } printf ("::removed::DEBUG::prepare_genetree\n");
+
   /* gene tree bipartitions are simpler */
   split->n_g = gene->nleaves - 3;
   for (i=0; i < split->n_g; i++) {
@@ -345,17 +348,17 @@ dSPR_topology_lowlevel (splitset split, int rf_or_hdist)
   split->n_agree = split->n_disagree = 0;
   bipsize_resize (split->disagree[0]->n, split->g_split[0]->n->bits); 
   bipsize_resize (split->agree[0]->n,    split->g_split[0]->n->bits); 
-  //for (i = 0; i < split->n_g; i++) bipartition_print_to_stdout (split->g_split[i]); printf ("G   ::DEBUG 0 ::\n");
-  //for (i = 0; i < split->n_s; i++) bipartition_print_to_stdout (split->s_split[i]); printf ("S\n");
+  //for (i = 0; i < split->n_g; i++) { bipartition_print_to_stdout (split->g_split[i]); } printf ("G   start::DEBUG::\n");
+  //for (i = 0; i < split->n_s; i++) { bipartition_print_to_stdout (split->s_split[i]); } printf ("S\n");
 
   i++; /* to trick -Werror, since we don't use it unless for debug */
   while (mismatch) {
     split_create_agreement_list (split);  // vector of identical bipartitions
     split_compress_agreement (split);     // iterative replacement of cherry by new leaf
 
-//    for (i = 0; i < split->n_g; i++) bipartition_print_to_stdout (split->g_split[i]); printf ("G   ::DEBUG::\n");
-//    for (i = 0; i < split->n_s; i++) bipartition_print_to_stdout (split->s_split[i]); printf ("S\n");
-//    for (i = 0; i < split->n_agree; i++) bipartition_print_to_stdout (split->agree[i]); printf ("A\n");
+    //for (i = 0; i < split->n_g; i++)     { bipartition_print_to_stdout (split->g_split[i]); } printf ("G   ::DEBUG::\n");
+    //for (i = 0; i < split->n_s; i++)     { bipartition_print_to_stdout (split->s_split[i]); } printf ("S\n");
+    //for (i = 0; i < split->n_agree; i++) { bipartition_print_to_stdout (split->agree[i]);   } printf ("A\n");
 
     if (mismatch == -1) split->rf = split->n_g + split->n_s;
     if (rf_or_hdist == 1) return split->rf; /* do not calculate SPR, exit now  (1=RF, 2=hdist) */
@@ -450,10 +453,7 @@ void
 split_create_disagreement_list (splitset split)
 {
   int g, s;
-
   for (g = 0; g < split->n_g; g++) for (s = 0; s < split->n_s; s++) { 
-    //bipartition_XOR (split->disagree[split->n_disagree], split->g_split[g], split->s_split[s], true); /* true means to calculate n_ones */
-    //bipartition_flip_to_smaller_set (split->disagree[split->n_disagree++]);
     bipartition_XOR (split->disagree[g * split->n_s + s], split->g_split[g], split->s_split[s], true); /* true means to calculate n_ones */
     bipartition_flip_to_smaller_set (split->disagree[g * split->n_s + s]);
   }

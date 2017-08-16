@@ -51,6 +51,8 @@ genefam_module_treesignal_fromtrees_rescale (const char *gtree_str, const char *
   int n_output = 0;
   topology_space genetree = NULL, sptree = NULL;
 
+  //printf("genetree::DEBUG %s", gtree_str);
+
   genetree = topology_space_from_newick_string (gtree_str);
   sptree = topology_space_from_newick_string (splist_str);
 
@@ -98,9 +100,10 @@ genefam_module_treesignal_fromtrees_pvalue (const char *gtree_str, const char *s
   for (i=0; i < n_output; i++) (*output_distances)[i] = ((double)pvalues[i])/(double)(n_samples); /* first trees X NDISTS are p-values */
 
   /* second half of output vector has tree-distance pairs, scaled to min and max observed values */
-  for (k=0; k < NDISTS; k++) if (dist_bounds[k] == dist_bounds[k + NDISTS]) dist_bounds[k] = -1.; // min==max, then make all values = 1
+  for (k=0; k < NDISTS; k++) if (dist_bounds[NDISTS+k] - dist_bounds[k] < 0.00001) dist_bounds[k] = -1.; // min==max, then make all values = 1
+  //for (k=0; k < NDISTS; k++) { printf ("%3.0lf %4.0lf | ", dist_bounds[k], dist_bounds[NDISTS+k]); } printf (" bounds::DEBUG \n"); 
   for (i=0; i < sptree->ndistinct; i++) for (k=0; k < NDISTS; k++) // y = (x-min)/(max-min)
-    (*output_distances)[n_output + NDISTS * i + k] = ((*output_distances)[n_output + NDISTS * i + k] - dist_bounds[k])/(dist_bounds[NDISTS+k] - dist_bounds[k]);
+    (*output_distances)[n_output + NDISTS * i + k] = (obs_distances[NDISTS * i + k] - dist_bounds[k])/(dist_bounds[NDISTS+k] - dist_bounds[k]);
 
   del_topology_space (genetree);
   del_topology_space (sptree);
@@ -121,15 +124,17 @@ generate_output_distances (topology_space gtree, topology_space stree, double **
   (*distances) = (double*) biomcmc_malloc (sizeof (double) * *n);
 
   split = create_splitset_dSPR_genespecies (gtree->distinct[0], stree->distinct[0]);
+  init_tree_recon_from_species_topology (gtree->distinct[0], stree->distinct[0]);
   if (! calculate_max_distances (gtree->distinct[0], maxdistance, split)) { // one of the trees is too small 
     for (j = 0; j < *n; j++) (*distances)[j] = -1.;
     fprintf (stderr, "WARNING: one of the trees is too small, or they do not have enough species in common; setting whole spectrum to '-1'\n");
     del_splitset (split);
     return false;
   }
-  for (j = 0; j < NDISTS; j++) printf ("%.1lf | ", maxdistance[j]); printf (" max::DEBUG \n"); 
+  //for (j = 0; j < NDISTS; j++) { printf ("%.1lf | ", maxdistance[j]); } printf (" max::DEBUG \n"); 
 
   for (i=0; i < stree->ndistinct; i++) {
+    //printf ("%d ", i); fflush(stdout);  // ::DEBUG::
     gene_tree_reconcile (gtree->distinct[0], stree->distinct[i]);
     dSPR_gene_species (gtree->distinct[0], stree->distinct[i], split);
     (*distances)[NDISTS * i + 0] = (double) gtree->distinct[0]->rec->ndups; 
@@ -140,6 +145,7 @@ generate_output_distances (topology_space gtree, topology_space stree, double **
     (*distances)[NDISTS * i + 5] = (double) split->hdist;
     if (rescale) for (j = 0; j < NDISTS; j++) (*distances)[NDISTS * i + j] /= maxdistance[j]; 
   }
+  //printf ("sptrees::DEBUG \n"); 
   del_splitset (split);
   // TODO: If sptrees are repeated, we must transform distances[distinct] into distances_new[tree] and then re-map later to avoid repeated computations
   return true;
@@ -173,7 +179,6 @@ update_randomized_distances (topology gtree, topology stree, int n_obs, double *
       if (bounds[NDISTS+k] < tmp_dist[k]) bounds[NDISTS+k] = tmp_dist[k];
     }
   }
-  for (k=0; k<NDISTS; k++) printf ("%.1lf %.1lf || ", bounds[k], bounds[NDISTS+k]); printf (" bounds::DEBUG \n"); 
 
   del_splitset (split);
   return n_reps;
