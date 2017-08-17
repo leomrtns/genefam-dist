@@ -34,16 +34,16 @@ class TreeSignal(object):
             feat_matrix = []
             if (self.replicates > 1): # p-value needs an extra term
                 for gtree in self.sp_trees: # dendropy adds quotes whenever there's underscores
-                    gt_string = gtree.as_string(schema="newick",suppress_edge_lengths=True).replace("'","")
+                    gt_string = gtree.as_string(schema="newick",suppress_edge_lengths=True).rstrip().replace("'","")
                     feat_matrix.append(self.spectrum_fromtrees(gt_string, self.sp_string, self.replicates))
             else: # unscaled or divided by theoretical maximum
                 for gtree in self.sp_trees: # dendropy adds quotes whenever there's underscores
-                    gt_string = gtree.as_string(schema="newick",suppress_edge_lengths=True).replace("'","")
+                    gt_string = gtree.as_string(schema="newick",suppress_edge_lengths=True).rstrip().replace("'","")
                     feat_matrix.append(self.spectrum_fromtrees(gt_string, self.sp_string))
             return numpy.array(feat_matrix)
         else:
             if not string: # dendropy Tree object
-                genetree = genetree.as_string(schema="newick",suppress_edge_lengths=True).replace("'", "")
+                genetree = genetree.as_string(schema="newick",suppress_edge_lengths=True).rstrip().replace("'", "")
             if (self.replicates > 1): # p-value needs an extra term
                 return numpy.array(self.spectrum_fromtrees(genetree, self.sp_string, self.replicates))
             else:

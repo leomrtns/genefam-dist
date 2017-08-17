@@ -51,10 +51,9 @@ genefam_module_treesignal_fromtrees_rescale (const char *gtree_str, const char *
   int n_output = 0;
   topology_space genetree = NULL, sptree = NULL;
 
-  //printf("genetree::DEBUG %s", gtree_str);
 
-  genetree = topology_space_from_newick_string (gtree_str);
   sptree = topology_space_from_newick_string (splist_str);
+  genetree = topology_space_from_newick_string (gtree_str);
 
   generate_output_distances (genetree, sptree, output_distances, &n_output, true);
   del_topology_space (genetree);

@@ -133,7 +133,7 @@ add_string_with_size_to_topology_space (topology_space *tsp, char *long_string, 
   local_string = (char*) biomcmc_malloc (sizeof (char) * (string_size + 1));
   strncpy (local_string, long_string, string_size + 1); /* adds '\0' only when long_string is smaller!! */
   local_string[string_size] = '\0'; /* not null-terminated by default */
-  //printf ("DEBUG received string ::%s::\n", local_string);
+  printf ("::DEBUG:: received string ::%s::\n", local_string);
   tree  = new_nexus_tree_from_string (&local_string);
   if (local_string) free (local_string);
   topol = new_topology (tree->nleaves);
@@ -942,12 +942,14 @@ number_of_leaves_in_newick (char **string, bool resolve_trifurcation)
     else if (current == ')') nclose++;
     else if (current == ':') has_branches++;
   }
-  
+  printf (" ::DEBUG::last::%s \n", *string + len - 2);
+ //FIXME:: bug with notebook 010 
   if (nopen != nclose || ncommas > 2 || ncommas < 1) biomcmc_error ( "Invalid tree structure: %s", *string);
   if (ncommas == 2) nopen++; /* trifurcation (unrooted tree, hopefully) */
   if (!resolve_trifurcation) return nopen + 1; /* do not fix trifurcation */
   
   if (ncommas == 2) { /* try to root an unrooted tree (assuming that the trifurcation means an unrooted tree) */
+    printf (" ::DEBUG::foundunrooted:: \n");
     char *tstring = NULL;
     int add = 3;
     if (has_branches) add = 7;
