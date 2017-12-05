@@ -27,6 +27,7 @@ typedef struct bipartition_struct* bipartition;
 typedef struct bipsize_struct* bipsize;
 typedef struct bip_hashtable_struct* bip_hashtable;
 typedef struct bip_hashitem_struct* bip_hashitem;
+typedef bipartition* tripartition; /* just a vector of size 3 */
 
 /*! \brief Bit-string representation of splits. */
 struct bipartition_struct 
@@ -147,5 +148,19 @@ void  del_bip_hashtable (bip_hashtable ht);
 void bip_hashtable_insert (bip_hashtable ht, bipartition key);
 /*! \brief Return frequency of bipartition (count/maxfreq) or zero if not found. */
 double bip_hashtable_get_frequency (bip_hashtable ht, bipartition key);
+
+/*! \brief tripartition of a node (a vector with 3 bipartitions, that should not be 'flipped' to smaller set, however) */
+tripartition new_tripartition (int nleaves);
+/*! \brief free tripartition space (just 3 bipartitions) */
+void del_tripartition (tripartition trip);
+/*! \brief from node, create tripartition from node->left and node->right (assuming bipartitions were not 'flipped' yet) */
+void store_tripartition_from_bipartitions (tripartition tri, bipartition b1, bipartition b2);
+/*! \brief sort order of bipartitions s.t. smallest is first */
+void sort_tripartition (tripartition tri);
+/*! \brief  match bipartitions between two nodes and return optimal score (min disagreement) */
+int align_tripartitions (tripartition tp1, tripartition tp2, hungarian h);
+/*! \brief  assuming tripartitions are ordered, check if nodes (represented by tripartitions) are the same */
+bool tripartition_is_equal (tripartition tp1, tripartition tp2);
+
 
 #endif

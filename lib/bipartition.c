@@ -204,6 +204,16 @@ bipartition_ANDNOT (bipartition result, const bipartition b1, const bipartition 
   else result->n_ones = 0;// update_count = false should be used only when you don't care about this value (temp var)
 }
 
+void 
+bipartition_NOTOR (bipartition result, const bipartition b1, const bipartition b2, bool update_count)
+{ /* complement of b1 and b2, used e.g. by tripartitions  */
+  int i;
+  for (i=0; i < result->n->ints; i++) result->bs[i] = ~(b1->bs[i] | b2->bs[i]);
+  result->bs[i-1] &= b1->n->mask; /* do not change last bits (do not belong to bipartition) */
+  if (update_count) bipartition_count_n_ones (result);
+  else result->n_ones = b1->n->bits - b1->n_ones - b2->n_ones ; // works if b1 and b2 are disjoint and bitstrings are not reduced 
+}
+
 void
 bipartition_XOR (bipartition result, const bipartition b1, const bipartition b2, bool update_count)
 {
@@ -481,5 +491,79 @@ bip_hashtable_get_frequency (bip_hashtable ht, bipartition key)
     else if ( (ht->table[i]) && (bipartition_is_equal (ht->table[i]->key, key)) ) return (double)(ht->table[i]->count)/(double)(ht->maxfreq);
   }
   return -1.;
+}
+
+
+/* Functions that work with tripartitions (associated to nodes instead of edges) */
+
+tripartition
+new_tripartition (int nleaves)
+{
+  int i;
+  tripartition trip;
+  trip = (tripartition) biomcmc_malloc (3 * sizeof (bipartition));
+  trip[0] = new_bipartition (nleaves);
+  for (i = 1; i < 3; i++) trip[i] = new_bipartition_from_bipsize (trip[0]->n);
+  return trip;
+}
+
+void
+del_tripartition (tripartition trip)
+{
+  int i;
+  for (i=2; i >= 0; i--) del_bipartition (trip[i]);
+  if (trip) free (trip);
+}
+
+void
+store_tripartition_from_bipartitions (tripartition tri, bipartition b1, bipartition b2)
+{
+  bipartition_copy (tri[0], b1);
+  bipartition_copy (tri[1], b2);
+  bipartition_NOTOR (tri[2], b1, b2, false); // false->do not calc from scratch, use guess from NOTOR function
+  sort_tripartition (tri);
+}
+
+void
+sort_tripartition (tripartition tri)
+{
+  bipartition tmp;
+  // https://stackoverflow.com/questions/4793251/sorting-int-array-with-only-3-elements 
+  if (bipartition_is_larger (tri[1],tri[0])) {
+    if (bipartition_is_larger (tri[1], tri[2])) {
+      if (bipartition_is_larger (tri[2], tri[0])) { tmp = tri[1]; tri[1] = tri[2]; tri[2] = tmp; }
+      else { tmp = tri[0]; tri[0] = tri[2]; tri[2] = tri[1]; tri[1] = tmp; }
+    }
+  }
+  else {
+    if (bipartition_is_larger (tri[2], tri[1])) {
+      if (bipartition_is_larger (tri[2], tri[0])) { tmp = tri[0]; tri[0] = tri[1]; tri[1] = tmp; }
+      else { tmp = tri[0]; tri[0] = tri[1]; tri[1] = tri[2]; tri[2] = tmp; }
+    }
+    else { tmp = tri[0]; tri[0] = tri[2]; tri[2] = tmp; }
+  }
+}
+
+int
+align_tripartitions (tripartition tp1, tripartition tp2, hungarian h)
+{
+  int i, j;
+  bipartition disagree = new_bipartition_from_bipsize (tp1[0]->n);
+  hungarian_reset (h); // assumes has correct size of three
+  for (i=0; i<3; i++) for (j=0; j<3; j++) {
+    bipartition_XOR (disagree, tp1[i], tp2[j], true); // true-> calculate n_ones
+    hungarian_update_cost (h, i, j, disagree->n_ones);
+  }
+  hungarian_solve (h, 3);
+  del_bipartition (disagree);
+  return h->final_cost + h->initial_cost; // best alignment for i is at h->col_mate[i]
+}
+
+bool
+tripartition_is_equal (tripartition tp1, tripartition tp2)
+{ // tripartitions should be always sorted (right now 20171205 no function modifies it so we're good)
+  int i;
+  for (i=0; i<3; i++) if (!bipartition_is_equal (tp1[i], tp2[i])) return false;
+  return true;
 }
 

@@ -153,10 +153,12 @@ prepare_split_from_topologies (topology t1, topology t2, splitset split, int rec
      * left child of root  - in which case right child is leaf and left bipartition will be singleton; OR
      * right child of root - which will have same info as (previously visited) left child and therefore redundant */
     bipartition_copy (split->s_split[i], t2->postorder[i]->split);
+    /* TODO this is where tripartition is updated BUT must go to nleaves-2 (both children of root are used)*/
     bipartition_flip_to_smaller_set (split->s_split[i]);
   }
   if (!recycle_t1) for (i=0; i < t1->nleaves-3; i++) {  /* Q: why i from 0 to nleaves-4 ? --> same as above */ 
     bipartition_copy (split->g_split[i], t1->postorder[i]->split);
+    /* TODO this is where tripartition is updated BUT must go to nleaves-2 (both children of root are used)*/
     bipartition_flip_to_smaller_set (split->g_split[i]);
   }
 
@@ -231,6 +233,7 @@ prepare_genetree_sptree_split (topology gene, topology species, splitset split)
                     split->sp0[species->postorder[i]->left->id], /* sp0 has elems not accessible by s_split (w/ leaves info) */
                     split->sp0[species->postorder[i]->right->id], false);
     //printf ("DEBUG:: %4d %4d %4d\n", species->postorder[i]->id, species->postorder[i]->left->id, species->postorder[i]->right->id); 
+    /* TODO this is where tripartition is updated */
   }
   split->n_s = species->nleaves - 1;
   /* some spleaves may be zero (absent on gene) leading to internal nodes with < 2 elems, thus we need to "minimize" the species subtrees 
@@ -253,6 +256,7 @@ prepare_genetree_sptree_split (topology gene, topology species, splitset split)
   split->n_g = gene->nleaves - 3;
   for (i=0; i < split->n_g; i++) {
     bipartition_copy (split->g_split[i], gene->postorder[i]->split);
+    /* TODO this is where tripartition is updated */
     bipartition_flip_to_smaller_set (split->g_split[i]);
   }
   /* recreate gene subtree on sptree  -- use disagree[] vector temporarily */
