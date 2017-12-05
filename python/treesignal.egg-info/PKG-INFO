@@ -6,6 +6,7 @@ Home-page: https://github.com/leomrtns/genefam-dist
 Author: Leonardo de Oliveira Martins
 Author-email: leomrtns@gmail.com
 License: UNKNOWN
+Description-Content-Type: UNKNOWN
 Description: 
         This package creates a coordinate system to compare gene trees based on a set of reference species trees, allowing for
         Machine Learning and Multivariate Analysis of these resulting signals.

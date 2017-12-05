@@ -65,4 +65,5 @@ class TreeSignal(object):
         if chain_size < 2:
             chain_size = 2
         self.sp_string = _treesignalc.generate_spr_trees(n_species, chain_size, n_spr)
-        self.sp_trees = dendropy.TreeList.get( data=self.sp_string, schema="newick", preserve_underscores=True, quote_underscores=False)
+        #self.sp_trees = dendropy.TreeList.get( data=self.sp_string, schema="newick", preserve_underscores=True, quote_underscores=False)
+        self.sp_trees = dendropy.TreeList.get( data=self.sp_string, schema="newick", preserve_underscores=True)
