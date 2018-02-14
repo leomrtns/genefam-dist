@@ -343,6 +343,10 @@ dSPR_gene_species_hdist (topology gene, topology species, splitset split)
   split->match = true;  return dSPR_topology_lowlevel (split, 2);
 }
 
+// FIXME: Hdist must use _all_ leaves, not SPR-reduced (but SPR can keep using Hungarian on reduced tree...)
+// 1. which means I need to create vector of "weights" of each leaf in reduced tree (with original sizes...), then
+// recalculate optimal cost).   2. also implies that another Hdist is possible, without reducing the tree.
+
 int
 dSPR_topology_lowlevel (splitset split, int rf_or_hdist)
 {
