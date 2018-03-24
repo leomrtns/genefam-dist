@@ -1,3 +1,5 @@
+2018.02.20
+		* bug on lowlevel_randomise_trees_with_spr_string: can't handle same tree repeated, as input, it seems 
 2016.08.05
 	* spr distances: both distsignal and spr_distance programs now report SPR and SPR_extra separately
 	* TODO: redo 001 notebook with spr+spr_extra (which may explain why dSPR values are lower...) since 

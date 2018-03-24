@@ -223,6 +223,109 @@ upgma_from_distance_matrix (topology tree, distance_matrix dist, bool single_lin
 }
 
 void
+bionj_from_distance_matrix (topology tree, distance_matrix dist) 
+{ /* always use upper diagonal of distance_matrix(that is, only i < j in d[i][j]) */
+  int i, j, parent = tree->nleaves, n_idx = tree->nleaves, i1, i2, b1, b2, // b1, b2 are best, b1 < b2
+      *idx = tree->index,                            /* indexes in UPGMA */
+      *idxtree = tree->index + tree->nleaves;        /* indexes in tree (since have values > nleaves) */
+  double **delta, Q_min, Q_ij, var_1_2, diff_1_2, blen_1, blen_2, lambda;
+
+  /* tree->index is also used by quasi_randomize_topology(), and here we tell it the info was destroyed */
+  tree->quasirandom = false;
+  
+  if (!tree->blength) topology_malloc_blength (tree);
+
+  delta = (double **) biomcmc_malloc (n_idx * sizeof (double*)); /* delta matrix with dists, variances and sums of distances */
+  for (i=0; i < n_idx; i++) delta[i] = (double *) biomcmc_malloc (n_idx * sizeof (double));
+  /* delta has distances in upper diag, var in lower diag and sum in diagonal (opposite of original BIONJ C program!) */
+  for (i=0; i < n_idx; i++) for (j=i+1; j<n_idx; j++) delta[i][j] = delta[j][i] = dist->d[i][j]; // only upper diagonal of dist is used 
+  for (i=0; i < n_idx; i++) delta[i][i] = 0.; 
+
+  for (i=0; i < n_idx; i++) { 
+    idx[i]     = i; /* index to actual vector element for UPGMA distance matrix */
+    idxtree[i] = i; /* index to actual vector element for tree nodes */
+  }
+
+  while (n_idx > 2) { /* choose two nodes to be connected */
+    /* update sums: diagonal values of delta will be the sum of distances */
+    for (i=0; i < n_idx; i++) {
+      delta[idx[i]][idx[i]] = 0;
+      for (j=0; j < n_idx; j++) if (j!=i) { // idx(i) < idx(j) for dissimilarities
+        if (idx[i] < idx[j]) delta[idx[i]][idx[i]] += delta[idx[i]][idx[j]]; 
+        else                 delta[idx[i]][idx[i]] += delta[idx[j]][idx[i]];
+      }
+    }
+    /* find pair that minimises agglomerative criterion -- matrix Q_ij */ 
+    Q_min = 1.e64;
+    for (i=0; i < n_idx; i++) for (j=0; j < i; j++) {
+      if (idx[i] < idx[j]) { i1 = i; i2 = j; } // idx[i1] < idx[i2] always
+      else                 { i1 = j; i2 = i; }
+      Q_ij = (double)(n_idx - 2) * delta[idx[i1]][idx[i2]] - delta[idx[i1]][idx[i1]] - delta[idx[i2]][idx[i2]];
+      if (Q_ij < Q_min - 1.e-8) { Q_min = Q_ij; b1 = i1; b2 = i2; }
+    }
+    //for (i=0; i < n_idx; i++) {
+    //  for (j=0; j < n_idx; j++) { printf ("%9.8lf ", delta[idx[i]][idx[j]]); } printf (" <-- \n");
+    //}
+    //printf ("chosen: %d %d\n", b1, b2);
+    diff_1_2 = (delta[idx[b1]][idx[b1]] - delta[idx[b2]][idx[b2]])/(double)(n_idx-2);
+    blen_1 = 0.5 * (delta[idx[b1]][idx[b2]] + diff_1_2);
+    blen_2 = 0.5 * (delta[idx[b1]][idx[b2]] - diff_1_2);
+    /* calculate lambda */
+    var_1_2 = delta[idx[b2]][idx[b1]];  // variance between b1 and b2
+    if(var_1_2 < 1.e-12) lambda=0.5; // delta[b2][b1] is var between b1 and b2
+    else {
+      lambda = 0.;
+      for (i=0; i< n_idx; i++) if(b1 != i && b2 != i) {
+        if (idx[i] < idx[b1]) lambda += delta[idx[b1]][idx[i]]; // lambda += (var(b1,i) - var(b2,i)
+        else                  lambda += delta[idx[i]][idx[b1]];
+        if (idx[i] < idx[b2]) lambda -= delta[idx[b2]][idx[i]];
+        else                  lambda -= delta[idx[i]][idx[b2]];
+      }
+      lambda = 0.5 + lambda/(2.*(double)(n_idx-2)* delta[idx[b2]][idx[b1]]);
+    }
+    if(lambda > 1.0) lambda = 1.0;
+    if(lambda < 0.0) lambda = 0.0;
+    /* update distances and variances of b1, which will be new node (b2 will be replaced) */
+    for (i=0; i< n_idx; i++) if(b1 != i && b2 != i) {
+      if (idx[b1] < idx[i]) {i1 = b1; i2 = i;}
+      else                  {i2 = b1; i1 = i;} // idx[i1] < idx[i2] always
+      /* Distance update --> i<j in delta[i][j] */
+      delta[idx[i1]][idx[i2]] = lambda * (delta[idx[i1]][idx[i2]] - blen_1);
+      if (idx[b2] < idx[i]) delta[idx[i1]][idx[i2]] += (1. - lambda) * (delta[idx[b2]][idx[i]] - blen_2); // distance(b2,i)
+      else                  delta[idx[i1]][idx[i2]] += (1. - lambda) * (delta[idx[i]][idx[b2]] - blen_2);
+      /* Variance update --> i > j in delta[i][j] */
+      delta[idx[i2]][idx[i1]] =  lambda * (delta[idx[i2]][idx[i1]] - (1.-lambda) * var_1_2);
+      if (idx[b2] < idx[i]) delta[idx[i2]][idx[i1]] += (1. - lambda) * (delta[idx[i]][idx[b2]]); // variance(b2,i)
+      else                  delta[idx[i2]][idx[i1]] += (1. - lambda) * (delta[idx[b2]][idx[i]]); // variance(b2,i)
+    }
+    // do we need to make sure that b1 < b2 (not only idx[b1]<idx[b2]) otherwise we may be updating last index n_idx-1 which will  be  neglected ??
+    /* tree node creation */
+    create_parent_node_from_children (tree, parent, idxtree[b1], idxtree[b2]);
+    tree->blength[idxtree[b1]] = blen_1;
+    tree->blength[idxtree[b2]] = blen_2;
+    idxtree[b1] = parent; /* new node we just created (available to sampling on next iteration) */
+    idxtree[b2] = idxtree[--n_idx]; /* avoid replacement (should come last since we may have i == n_idx-1 */
+    parent++; /* parent on next iteration */
+    idx[b2]    = idx[n_idx]; /* avoid replacement */
+
+  } // while (n_idx > 2)
+
+  /* now idx[] has only two elements and "parent" is now (2*ntax - 2) */
+  create_parent_node_from_children (tree, parent, idxtree[0], idxtree[1]);
+  tree->root = tree->nodelist[parent];
+
+  if (idx[0] < idx[1]) tree->blength[idxtree[0]] = tree->blength[idxtree[1]] = delta[idx[0]][idx[1]];
+  else                 tree->blength[idxtree[0]] = tree->blength[idxtree[1]] = delta[idx[1]][idx[0]];
+
+  update_topology_sisters   (tree);
+  update_topology_traversal (tree);
+  if (delta) {
+    for (i = n_idx - 1; i >= 0; i--) if (delta[i]) free (delta[i]);
+    free (delta);
+  }
+}
+
+void
 fill_species_dists_from_gene_dists (distance_matrix spdist, distance_matrix gendist, int *sp_id, bool use_upper_gene)
 {
   int i, j, k, row, col, *freq;
@@ -262,6 +365,7 @@ update_species_dists_from_spdist (distance_matrix global, distance_matrix local,
   for (i = 0; i < local->size; i++) for (j = 0; j < i; j++) if (spexist[i] && spexist[j]) { 
     if (global->d[j][i] > local->d[j][i]) global->d[j][i] = local->d[j][i]; /* upper triangular => minimum */
     global->d[i][j] += local->d[i][j]; /* just the sum; to have the mean we need to divide by representativity of each species across loci */
+    // // guenomu receives another matrix // if (counter) { counter->d[i][j] += 1.; counter->d[j][i] += 1.; }
   }
 }
 

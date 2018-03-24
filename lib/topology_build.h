@@ -29,6 +29,8 @@ void randomize_topology (topology tree);
 void quasi_randomize_topology (topology tree, int sample_type);
 /*! \brief lowlevel UPGMA (or single-linkage) function that depends on a topology and a matrix_distance */
 void upgma_from_distance_matrix (topology tree, distance_matrix dist, bool single_linkage);
+/*! \brief lowlevel bioNJ function (Gascuel and Cuong implementation) that depends on a topology and a matrix_distance */
+void bionj_from_distance_matrix (topology tree, distance_matrix dist) ;
 /*! \brief updates distances between species based on genes and gene-to-species mapping, with min on upper and mean on lower diagonal  */
 void fill_species_dists_from_gene_dists (distance_matrix spdist, distance_matrix gendist, int *sp_id, bool use_upper_gene);
 /*! \brief update global (over loci) species distances besed on local (within locus) species distances */
