@@ -369,6 +369,57 @@ update_species_dists_from_spdist (distance_matrix global, distance_matrix local,
   }
 }
 
+int
+prepare_spdistmatrix_from_gene_species_map (spdist_matrix spdist, int *sp_id, int n_sp_id)
+{
+  int i, number_of_species_present_in_gene = 0;
+  for (i = 0; i < spdist->size; i++) spdist->species_present[i] = false; // update presence mask of species in gene 
+  for (i = 0; i < n_sp_id; i++) spdist->species_present[ sp_id[i] ] = true;
+  for (i = 0; i < spdist->size; i++) if (spdist->species_present[i]) number_of_species_present_in_gene++;
+  return number_of_species_present_in_gene;
+}
+
+void
+fill_spdistmatrix_from_gene_dists (spdist_matrix spdist, distance_matrix gendist, int *sp_id, bool use_upper_gene)
+{ // more compact than functions above (which could be eliminated in future versions)
+  int i, j, i2, j2, idx, row, col, n_pairs = spdist->size*(spdist->size-1)/2;
+
+  for (i = 0; i < n_pairs; i++) {
+    spdist->mean[i] = 0;
+    spdist->min[i] = 1.e35;
+    spdist->count[i] = 0;
+  }
+  
+  for (j=1; j < gendist->size; j++) for (i=0; i < j; i++) if (sp_id[i] != sp_id[j]) {
+    if (sp_id[i] < sp_id[j]) { row = sp_id[i]; col = sp_id[j]; } /* make sure that row < col */
+    else                     { row = sp_id[j]; col = sp_id[i]; }
+    i2 = i; j2 = j;  // i2 < j2 if upper and i2 > j2 if lower diag is used
+    if (!use_upper_gene) { i2 = j; j2 = i; } /* then i2 should be larger than j2 -- swap values */
+    idx = col * (col-1)/2 + row; /* index in spdist */
+    if (gendist->d[i2][j2] < spdist->min[idx]) spdist->min[idx] = gendist->d[i2][j2];
+    spdist->mean[idx] += gendist->d[i2][j2];
+    spdist->count[idx]++;
+  }
+
+  for (i = 0; i < n_pairs; i++) if (spdist->count[i]) spdist->mean[i] /= spdist->count[i];
+  return;
+}
+
+void
+update_spdistmatrix_from_spdistmatrix (spdist_matrix global, spdist_matrix local)
+{ 
+  int i, j, idx;
+  if (global->size != local->size) biomcmc_error ("species spdist matrices have different sizes within and across loci");
+
+  for (j = 1; j < local->size; j++) for (i = 0; i < j; i++) if (local->species_present[i] && local->species_present[j]) { 
+    idx = j * (j-1) /2 + i; // index in 1D vector without diagonals (for diagonals replace -1 for +1 BTW) 
+    global->mean[idx] += local->mean[idx]; // global only stores average across locals (min => within locus)
+    global->min[idx] += local->min[idx];
+    global->count[idx]++;
+  }
+  for (i = 0; i < global->size; i++) global->species_present[i] |= local->species_present[i]; // overall presence of species 
+}
+
 void
 create_parent_node_from_children (topology tree, int parent, int lchild, int rchild)
 {

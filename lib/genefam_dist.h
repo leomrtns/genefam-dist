@@ -35,7 +35,7 @@
 #include "topology_splitset.h" // called by topology_space.h
 #include "random_number_gen.h" // called by random_number.h
 #include "random_number.h"   // called by topology_build.h
-#include "empirical_frequency.h" // called by topology_mrca.h and alignment.h
+#include "empirical_frequency.h" // called by topology_mrca.h, nexus_common.h  and alignment.h 
 #endif // of THESE_ARE_COMMENTS
 
 /*! \brief given a gene tree and a group of species trees, both in newick format, return the spectrum of unnormalized distances */

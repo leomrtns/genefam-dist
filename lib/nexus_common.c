@@ -19,6 +19,53 @@ int   count_nested_nexus_comments (char *string);
 /*! \brief Remove comments that start on this line (we need to guarantee that they also finish on this line). */
 char* remove_oneline_nexus_comments (char *string);
 
+char_vector
+new_char_vector_from_file (char *filename)
+{
+  FILE *infile;
+  char *line = NULL, *line_read = NULL, *start = NULL;
+  size_t linelength = 0;
+  int i;
+  char_vector vec = new_char_vector (1);
+
+  /* start reading file */
+  infile = biomcmc_fopen (filename, "r");
+  while (biomcmc_getline (&line_read, &linelength, infile) != -1) {
+    line = remove_nexus_comments (&line_read, &linelength, infile);
+    if (nonempty_fasta_line (line)) {
+      for (start = line; (*start != '\0') && isspace (*start); start++); /* skip leading spaces */
+      if (*start == '\0') biomcmc_error ("found EOL while reading non-empty line in file \"%s\"\n", filename);
+      char_vector_add_string (vec, start);
+    }
+  }
+  fclose (infile);
+  if (line) free (line);
+
+  for (i = 0; i < vec->nstrings; i++) {
+    linelength = strcspn (vec->string[i], "#;"); /* string length until beginning of comments (if any) */
+    if (linelength < vec->nchars[i]) *(vec->string[i]+linelength) = '\0'; /* EOL here; space released below */
+  }
+  /* this function will remove comments (by releasing the memory after EOL) and update nchars[] */
+  if (char_vector_remove_empty_strings (vec)) biomcmc_error ("illegal empty lines in file \"%s\"", filename);
+  return vec;
+}
+
+void
+char_vector_longer_first_order (char_vector vec) 
+{
+  empfreq ef;
+  int i, *order;
+
+  order = (int*) biomcmc_malloc (vec->nstrings * sizeof (int));
+  ef = new_empfreq_sort_decreasing (vec->nchars, vec->nstrings, 1); /*1 = size_t (0=char, 2=int) */
+  for (i = 0; i < vec->nstrings; i++) order[i] = ef->i[i].idx;
+
+  char_vector_reorder_strings (vec, order);
+
+  del_empfreq (ef);
+  if (order) free (order);
+}
+
 char*
 remove_nexus_comments (char **string, size_t *stringsize, FILE *stream)
 { /* shouldn't change address **string points to (like string++ or similar), since it is reallocated by readline */

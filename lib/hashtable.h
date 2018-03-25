@@ -29,6 +29,7 @@
 typedef struct hashtable_struct* hashtable;
 typedef struct hashtable_item_struct* hashtable_item;
 typedef struct distance_matrix_struct* distance_matrix;
+typedef struct spdist_matrix_struct* spdist_matrix;
 
 /*! \brief key/value pair for hash table */
 struct hashtable_item_struct {
@@ -73,6 +74,15 @@ struct distance_matrix_struct
   int ref_counter;
 };
 
+struct spdist_matrix_struct
+{
+  int size, n_missing;
+  double *mean, *min; /*! \brief mean or min distances across possibilities (within loci) */
+  int *count; /*! \brief how many times this pairwise comparison appears (between or within loci) */
+  bool *species_present; /*! \brief boolean marking if species is present at all in this matrix */
+  int ref_counter;
+};
+
 /*! \brief Insert key/value pair into hashtable. */
 void insert_hashtable (hashtable ht, char* key, int value);
 /*! \brief Return location (value) of corresponding key (string) or negative value if not found. */
@@ -110,5 +120,13 @@ void zero_lower_distance_matrix (distance_matrix dist);
 void transpose_distance_matrix (distance_matrix dist);
 /*! \brief releases memory allocated to distance_matrix (this structure has no smart ref_counter) */
 void del_distance_matrix (distance_matrix dist);
+
+
+spdist_matrix new_spdist_matrix (int n_species);
+void zero_all_spdist_matrix (spdist_matrix dist); /* zero both mean[] and min[] since we only look at AVERAGE across loci (never the min) */
+void finalise_spdist_matrix (spdist_matrix dist);
+void complete_missing_spdist_from_global_spdist (spdist_matrix local, spdist_matrix global);
+void copy_spdist_matrix_to_distance_matrix_upper (spdist_matrix spd, distance_matrix dist, bool use_means);
+void del_spdist_matrix (spdist_matrix dist);
 
 #endif

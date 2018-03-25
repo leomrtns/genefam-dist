@@ -15,7 +15,7 @@
 #define NDISTS 6
 
 /*! \brief create a new topology_space from string with list of trees in newick format */
-topology_space topology_space_from_newick_string (const char *treelist_string);
+topology_space topology_space_from_newick_string (const char *treelist_string, bool use_root_location);
 /*! \brief calculate distances between gene tree and collection of sptrees, and storing into newly allocated distances[] */ 
 bool generate_output_distances (topology_space gtree, topology_space stree, double **distances, int *n, bool rescale);
 /*! \brief calculate distances between gene tree and random sptrees, accumulating into previously allocated pvalues[] */ 
@@ -29,8 +29,8 @@ genefam_module_treesignal_fromtrees (const char *gtree_str, const char *splist_s
   int n_output = 0;
   topology_space genetree = NULL, sptree = NULL;
 
-  genetree = topology_space_from_newick_string (gtree_str);
-  sptree = topology_space_from_newick_string (splist_str);
+  genetree = topology_space_from_newick_string (gtree_str, false); /* bool -> use_root_location */
+  sptree = topology_space_from_newick_string (splist_str, true);
   // TODO: reduce sptrees to genetree species here (and notice that afterwards some sptrees may be same)
   /* 
   int i;
@@ -52,8 +52,8 @@ genefam_module_treesignal_fromtrees_rescale (const char *gtree_str, const char *
   topology_space genetree = NULL, sptree = NULL;
 
 
-  sptree = topology_space_from_newick_string (splist_str);
-  genetree = topology_space_from_newick_string (gtree_str);
+  sptree = topology_space_from_newick_string (splist_str, true);
+  genetree = topology_space_from_newick_string (gtree_str, false);
 
   generate_output_distances (genetree, sptree, output_distances, &n_output, true);
   del_topology_space (genetree);
@@ -70,8 +70,8 @@ genefam_module_treesignal_fromtrees_pvalue (const char *gtree_str, const char *s
   bool valid_trees = true;
   topology_space genetree = NULL, sptree = NULL;
 
-  genetree = topology_space_from_newick_string (gtree_str);
-  sptree = topology_space_from_newick_string (splist_str);
+  genetree = topology_space_from_newick_string (gtree_str, false);
+  sptree = topology_space_from_newick_string (splist_str, true);
 
   valid_trees = generate_output_distances (genetree, sptree, &obs_distances, &n_output, false);
   *output_distances = (double*) biomcmc_malloc (sizeof (double) * 2 * n_output); /* pointer used (and freed) by calling function */
@@ -212,7 +212,7 @@ genefam_module_randomise_trees_with_spr (const char *splist_str, int n_copies, i
   char *s, *output_tree_string, *tmp_string;
 
   biomcmc_random_number_init(0ULL);
-  strees = topology_space_from_newick_string (splist_str);
+  strees = topology_space_from_newick_string (splist_str, true);
   n_strees = strees->ndistinct;
 
   for (i=0; i < n_strees; i++) for (j = 0; j < n_copies; j++) {
@@ -221,8 +221,8 @@ genefam_module_randomise_trees_with_spr (const char *splist_str, int n_copies, i
     randtree->taxlabel = strees->taxlabel; /* taxlabel is shared among all topologies */
     strees->taxlabel->ref_counter++;    /* since it is shared, it cannot be deleted if still in use */
 
-    for (k = 0; k < n_spr; k++) topology_apply_spr_unrooted (randtree, false);
-    add_topology_to_topology_space_if_distinct (randtree, strees);
+    for (k = 0; k < n_spr; k++) topology_apply_spr_unrooted (randtree, false); /* SPR that does NOT preserve root location */
+    add_topology_to_topology_space_if_distinct (randtree, strees, true); /* 'true' means that different rootings are treated as distinct trees */
   }
 
   s = topology_to_string_by_name (strees->distinct[0], NULL); /* second parameter is vector with branch lengths */
@@ -297,7 +297,7 @@ genefam_module_generate_spr_trees (int n_leaves, int n_iter, int n_spr)
 }
 
 topology_space
-topology_space_from_newick_string (const char *treelist_string)
+topology_space_from_newick_string (const char *treelist_string, bool use_root_location)
 {
   size_t str_size;
   char *str_start, *str_end;
@@ -309,7 +309,7 @@ topology_space_from_newick_string (const char *treelist_string)
     str_end = strchr (str_start, ';');
     if (str_end == NULL) str_size = strlen (str_start); /* function strchrnul() does this, but may not be portable? */
     else str_size = str_end - str_start; 
-    add_string_with_size_to_topology_space (&ts, str_start, str_size);
+    add_string_with_size_to_topology_space (&ts, str_start, str_size, use_root_location);
     if (str_end) str_start = strchr (str_end, '('); 
     else str_start = NULL;
   }

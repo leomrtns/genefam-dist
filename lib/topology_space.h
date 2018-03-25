@@ -38,9 +38,9 @@ struct topology_space_struct
 };
 
 /*! \brief Read tree in newick format until char string_size, returning updated topolgy_space. Auxiliary for python module */
-void add_string_with_size_to_topology_space (topology_space *tsp_address, char *long_string, size_t string_size);
+void add_string_with_size_to_topology_space (topology_space *tsp_address, char *long_string, size_t string_size, bool use_root_location);
 /*! \brief Add topology to topology_space only if unrooted version is distinct, updating freqs, trees[] etc. Aux for python module */
-void add_topology_to_topology_space_if_distinct (topology topol, topology_space tsp);
+void add_topology_to_topology_space_if_distinct (topology topol, topology_space tsp, bool use_root_location);
 
 /*! \brief Read tree file and store info in topology_space_struct with possible external hashtable to impose the leaf ordering. */
 topology_space read_topology_space_from_file (char *seqfilename, hashtable external_taxhash);
@@ -54,6 +54,8 @@ void save_topology_space_to_trprobs_file (topology_space tsp, char *filename, do
 /*! \brief Quickly counts the number of leaves in a tree file, without storing any info. Assumes file and trees are well-formed */
 int estimate_treesize_from_file (char *seqfilename);
 
+/*! \brief Allocates memory for topology_space_struct (set of trees present in nexus file).  */
+topology_space new_topology_space (void);
 /*! \brief Free memory from topology_space_struct. */
 void del_topology_space (topology_space tsp);
 

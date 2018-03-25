@@ -36,6 +36,10 @@ void fill_species_dists_from_gene_dists (distance_matrix spdist, distance_matrix
 /*! \brief update global (over loci) species distances besed on local (within locus) species distances */
 void update_species_dists_from_spdist (distance_matrix global, distance_matrix local, int *spexist);
 
+int prepare_spdistmatrix_from_gene_species_map (spdist_matrix spdist, int *sp_id, int n_sp_id);
+void fill_spdistmatrix_from_gene_dists (spdist_matrix spdist, distance_matrix gendist, int *sp_id, bool use_upper_gene);
+void update_spdistmatrix_from_spdistmatrix (spdist_matrix global, spdist_matrix local);
+
 /*! \brief random rerooting */
 void topology_apply_rerooting (topology tree, bool update_done);
 /*! \brief recursive SPR over all internal nodes, assuming common prob of swap  per node */

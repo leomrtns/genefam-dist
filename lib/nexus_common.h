@@ -20,9 +20,17 @@
 #define _biomcmc_nexus_common_h_
 
 #include "lowlevel.h"
+#include "empirical_frequency.h"
 
 /*! \brief maximum name length for taxa (alignment and tree files). */
 #define MAX_NAME_LENGTH 4096 
+
+/*! \brief General function that stores file content into char_vector_struct, removing shell-type comments */
+char_vector new_char_vector_from_file (char *filename);
+/*! \brief Order the elements of char_vector_struct from longer string to smaller; can be used after calling
+ * new_char_vector_from_file() but not on topology-associated char_vectors since other structures may depend on current
+ * ordering (like alignment or tree leaves) */
+void char_vector_longer_first_order (char_vector vec);
 
 /*! \brief Removes (possible nested/multiline) nexus comments of the form [] (brackets). */
 char* remove_nexus_comments (char **string, size_t *stringsize, FILE *stream);

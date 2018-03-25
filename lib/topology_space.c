@@ -123,7 +123,7 @@ void store_filename_in_topology_space (topology_space tre, char *filename);
 
 /*! \brief Auxiliary function for the python module */
 void
-add_string_with_size_to_topology_space (topology_space *tsp, char *long_string, size_t string_size)
+add_string_with_size_to_topology_space (topology_space *tsp, char *long_string, size_t string_size, bool use_root_location)
 {
   char *local_string;
   int i, index;
@@ -171,21 +171,22 @@ add_string_with_size_to_topology_space (topology_space *tsp, char *long_string, 
   topol->taxlabel = (*tsp)->taxlabel; /* taxlabel is shared among all topologies */
   (*tsp)->taxlabel->ref_counter++;    /* since it is shared, it cannot be deleted if still in use */
 
-  add_topology_to_topology_space_if_distinct (topol, (*tsp));
+  add_topology_to_topology_space_if_distinct (topol, (*tsp), use_root_location);
 
   del_nexus_tree (tree);
   return;
 }
 
 void
-add_topology_to_topology_space_if_distinct (topology topol, topology_space tsp)
-{ // Assumes freqs are counts, not normalized to one (currently this function is used by other functions that dont care for freqs) 
+add_topology_to_topology_space_if_distinct (topology topol, topology_space tsp, bool use_root_location)
+{ // Assumes freqs are counts, not normalized to one (currently this function is used by other functions that dont care for freqs)
+ // Also, (1) doesn't update branch lengths; and (2) doesn't care about tsp->taxlabel
   int i, found_id = -1;
   tsp->tree = (topology*) biomcmc_realloc ((topology*) tsp->tree, sizeof (topology) * (tsp->ntrees+1));
 
   /* comparison includes root location (faster than unrooted since uses hash) */ 
   for (i=0; (i < tsp->ndistinct) && (found_id < 0); i++) if (topology_is_equal (topol, tsp->distinct[i])) found_id = i;
-  if ((tsp->ndistinct) && (found_id < 0)) { /* if they look distinct (different root), then do slower unrooted calculation */ 
+  if ((!use_root_location) && (tsp->ndistinct) && (found_id < 0)) { /* if they look distinct (different root), then do slower unrooted calculation */ 
     splitset split = new_splitset (topol->nleaves);
     for (i=0; (i < tsp->ndistinct) && (found_id < 0); i++) if (topology_is_equal_unrooted (topol, tsp->distinct[i], split, i)) found_id = i;
     del_splitset (split);
@@ -393,10 +394,10 @@ merge_topology_spaces (topology_space ts1, topology_space ts2, double weight_ts1
 
 void
 save_topology_space_to_trprobs_file (topology_space tsp, char *filename, double credible)
-{
+{ // works even if tsp->freq is unscaled (i.e. total counts and not frequencies summing to one)
   int i, idx;
   FILE *stream;
-  double part_sum = 0., freq;
+  double part_sum = 0., freq, *scaled_freqs;
   char *stree;
   empfreq_double efd;
 
@@ -409,21 +410,26 @@ save_topology_space_to_trprobs_file (topology_space tsp, char *filename, double 
   for (i=1; i < tsp->distinct[0]->nleaves; i++) fprintf (stream, ",\n\t%d  %s", i+1, tsp->taxlabel->string[i]);
   fprintf (stream, "\n;\n");
 
-  efd = new_empfreq_double_sort_decreasing (tsp->freq, tsp->ndistinct);
+  scaled_freqs = (double*) biomcmc_malloc (sizeof (double) * tsp->ndistinct);
+  for (i = 0; i < tsp->ndistinct; i++) part_sum += tsp->freq[i];
+  for (i = 0; i < tsp->ndistinct; i++) scaled_freqs[i] = tsp->freq[i]/part_sum;
 
+  efd = new_empfreq_double_sort_decreasing (scaled_freqs, tsp->ndistinct);
+
+  part_sum = 0.;
   for (i = 0; (i < tsp->ndistinct) && (part_sum < 1.); i++) {
     idx = efd->d[i].idx; /* element ordered by frequency */
-    freq = tsp->freq[idx] / credible; /* rescaling s.t. new frequencies sum to one (and not to "credible") */
-    part_sum += freq; 
-    // printf ("%.6lf  ,  %.6lf\n", tsp->freq[i], tsp->freq[idx]); // DEBUG 
+    freq = scaled_freqs[idx] / credible; /* rescaling s.t. new frequencies sum to one (and not to "credible") */
+    part_sum += freq;
     stree = topology_to_string_by_id (tsp->distinct[idx], false); /* from topol to newick */
     fprintf (stream, "tree tree_%d \t[p= %.5lf, P= %.5lf] = [&W %.8lf] %s;\n", i, tsp->freq[idx], part_sum, freq, stree);
     free (stree);
   }
   fprintf (stream, "\nEnd;\n");
 
- fclose (stream);
- del_empfreq_double (efd);
+  fclose (stream);
+  del_empfreq_double (efd);
+  if (scaled_freqs) free (scaled_freqs);
 }
 
 int
@@ -461,6 +467,7 @@ new_topology_space (void)
   tsp->ndistinct = tsp->ntrees = 0;
   tsp->tree = tsp->distinct = NULL;
   tsp->taxlabel = NULL;
+  tsp->taxlabel_hash = NULL;
   tsp->filename = NULL;
   tsp->has_branch_lengths = false;
   /* tsp->dinstinct vector is increased by add_tree_to_topology_space() while tsp->tree are pointers to dsp->distinct

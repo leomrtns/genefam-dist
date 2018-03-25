@@ -12,7 +12,7 @@ main (int argc, char **argv)
   time0 = clock ();
 
   if (argc != 6) { 
-    fprintf (stderr, "Concatenate two nexus tree files into one\n"); // TODO: include burnin, thinning, and remove outliers  
+    fprintf (stderr, "Concatenate two nexus tree files into one\n"); 
     fprintf (stderr, "   USAGE: %s <first tree file> <second tree file> <burnin> <thin> <credible interval>\n", basename (argv[0])); 
     fprintf (stderr, "(where 'thin' is the frequency at which we sample, and 'credible'<=1 is the cutoff for the cummulative posterior)\n"); 
     return EXIT_FAILURE; 

@@ -362,3 +362,102 @@ del_distance_matrix (distance_matrix dist)
   free (dist);
 }
 
+
+/* species-based distance matrix functions */
+
+spdist_matrix
+new_spdist_matrix (int n_species)
+{
+  spdist_matrix dist;
+  int i, n_pairs = (n_species - 1)*(n_species)/2;
+
+  dist = (spdist_matrix) biomcmc_malloc (sizeof (struct spdist_matrix_struct));
+  dist->ref_counter = 1;
+  dist->size = n_species;
+  dist->n_missing = n_pairs; // number of missing comparisons
+  dist->mean  = (double*) biomcmc_malloc (n_pairs * sizeof (double));
+  dist->min   = (double*) biomcmc_malloc (n_pairs * sizeof (double));
+  dist->count = (int*)    biomcmc_malloc (n_pairs * sizeof (int));
+  dist->species_present = (bool*) biomcmc_malloc (n_species * sizeof (bool));
+  for (i=0; i < n_pairs; i++) {
+    dist->mean[i] = 0.; dist->min[i] = 1.e35; dist->count[i] = 0;
+  }
+  for (i=0; i < n_species; i++) dist->species_present[i] = false;
+  return dist;
+}
+
+void
+zero_all_spdist_matrix (spdist_matrix dist)
+{ /* zero both mean and min, since assumes this is across loci (and only means are accounted) */
+  int i, n_pairs = (dist->size - 1)*(dist->size)/2;
+  dist->n_missing = n_pairs; // number of missing comparisons
+  for (i=0; i < n_pairs; i++) {
+    dist->mean[i] = 0.; dist->min[i] = 0.; dist->count[i] = 0;
+  }
+  for (i=0; i < dist->size; i++) dist->species_present[i] = false;
+  return;
+}
+
+void
+finalise_spdist_matrix (spdist_matrix dist)
+{ /* calculate averages across loci over within-locus means and within-locus mins */
+  int i, n_pairs = (dist->size - 1)*(dist->size)/2;
+  double max_mean = -1.e35, max_min = -1.e35;
+  for (i=0; i < n_pairs; i++) if (dist->count[i]) {
+    dist->n_missing--; // one less missing pairwise comparison
+    dist->mean[i] /= (double)(dist->count[i]);
+    dist->min[i]  /= (double)(dist->count[i]); /* reminder: min is within locus, b/c across loci is always average */
+    if (max_mean < dist->mean[i]) max_mean = dist->mean[i];
+    if (max_min < dist->min[i]) max_min = dist->min[i];
+    dist->count[i] = 1; /* we don't need to know it anymore, but may use when resampling/avergaring several matrices */
+  }
+  for (i=0; i < n_pairs; i++) if (dist->count[i]) { // rescale all values to one (except missing values, which will be 1.00001)
+    dist->mean[i] /= max_mean;
+    dist->min[i] /= max_min;
+  }
+  if (dist->n_missing) for (i=0; i < n_pairs; i++) if (! dist->count[i]) {
+    dist->mean[i] = 1.00001;
+    dist->min[i]  = 1.00001;
+  }
+}
+
+void
+complete_missing_spdist_from_global_spdist (spdist_matrix local, spdist_matrix global)
+{
+  int i, n_pairs = (local->size - 1)*(local->size)/2;
+  for (i = 0; i < n_pairs; i++) if (! local->count[i]) {
+    local->mean[i] = global->mean[i];
+    local->min[i] = global->min[i];
+    local->count[i] = global->count[i];  // could also be zero BTW
+    if (local->count[i]) local->n_missing--;
+  }
+  for (i=0; i < local->size; i++) if (!local->species_present[i]) local->species_present[i] = global->species_present[i];
+}
+
+void
+copy_spdist_matrix_to_distance_matrix_upper (spdist_matrix spd, distance_matrix dist, bool use_means)
+{ /* UPGMA< bioNJ work with upper diagonal of a square distance matrix */
+// upper diagonal --> i < j in d[i][j]; index in 1d vector--> j(j-1)/2 + i 
+  int i,j;
+  double *sp_dist = spd->min; // default is to use min dists
+
+  if (spd->size != dist->size) biomcmc_error ("distance matrix for NJ and species-based spdist_matrix have different sizes\n");
+  if (use_means) sp_dist = spd->mean; /* alternative to use one or another would be to fill both lower and upper of dist (but a biy more expensive later to transpose) */
+  for (j = 1; j < spd->size; j++) for (i = 0; i < j; i++) dist->d[i][j] = sp_dist[ (j * (j-1) / 2 + i) ];
+  return;
+}
+
+// TODO: create update_spdist() to get missing vals from outside matrix; also create average_spdist(dist1, dist2)
+
+void
+del_spdist_matrix (spdist_matrix dist)
+{
+  if (!dist) return;
+  if (--dist->ref_counter) return;
+  if (dist->mean) free (dist->mean); 
+  if (dist->min) free (dist->min); 
+  if (dist->count) free (dist->count); 
+  if (dist->species_present) free (dist->species_present);
+  free (dist);
+}
+
