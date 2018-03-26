@@ -1,13 +1,37 @@
 #include <genefam_dist.h> 
 /* based on guenomu/maxtree but also implementing elements from guenomu in ML mode */
 
-typedef struct pooled_matrix_struct* pooled_matrix;
+#define NDISTS 6
 
+typedef struct pooled_matrix_struct* pooled_matrix;
+typedef struct genetree_struct* genetree;
+typedef struct gene_sptrees_struct* gene_sptrees;
+
+/* idea: store bad  topologies and reject those close to them (RF between sptrees cheaper) <- too many?
+ * 'bad' in the sense that appeared in proposal (i.e. not random) but rejected (worse than any in ratchet?); we can even output these at end */
+
+// unlike genefam_dist library, here we do not have ref_counter 
 struct pooled_matrix_struct
 {
   int n_sptrees, n_species, n_sets_per_gene, next; 
   spdist_matrix *d, d_total, this_gene_spdist;
   distance_matrix square_matrix;
+};
+
+struct genetree_struct
+{
+  topology tree;
+  double minmax[2 * NDISTS], dist[NDISTS]; // values are integers; might have a variable "scale" to allow for quick or no scaling 
+  splitset split;
+};
+
+struct gene_sptrees_struct
+{ // we may need to have something like genetree_struct since trees must have pointer to distances/score (to sort in locu) or we use empfreq
+  int n_genes, n_ratchet, n_proposal;
+  int next_proposal, next_free; // idx to ratchet elements
+  genetree *gene;
+  topology *ratchet, *proposal; // may need vector of distances
+  double best_score; // I'm forgetting other vars like minmax etc...
 };
 
 void print_usage (char *progname);
@@ -56,6 +80,51 @@ print_usage (char *progname)
   fprintf (stderr, "\n  - remember that the species names should be found within the gene names\n");
   exit (EXIT_FAILURE);
 }
+
+topology_space
+maxtrees_from_subsamples (char_vector sptaxa, char **arg_filename, int arg_nfiles, char_vector gfilename)
+{
+  int i, *idx_gene_to_sp = NULL, valid_species_size = 0;
+  topology_space tsp, genetre;
+  pooled_matrix pool;
+  /* order species names from longer names to shorter (so that EColi is searched only after EColiII, e.g.) */
+  empfreq ef = new_empfreq_sort_decreasing (sptaxa->nchars, sptaxa->nstrings, 1); /* 1=size_t (0=char, 2=int)*/
+
+  pool = new_pooled_matrix ((int)(arg_nfiles/100), sptaxa->nstrings);
+
+  for (i = 0; i < arg_nfiles; i++) { /* scan through gene files */
+    genetre  = read_topology_space_from_file (arg_filename[i], NULL);/* read i-th gene family */
+    
+    idx_gene_to_sp = (int *) biomcmc_realloc ((int*) idx_gene_to_sp, genetre->distinct[0]->nleaves * sizeof (int));/* for each gene leaf, index of species */
+    index_sptaxa_to_genetaxa (sptaxa, genetre->taxlabel, idx_gene_to_sp, ef);/* map species names to gene names and store into idx[] */
+    valid_species_size = prepare_spdistmatrix_from_gene_species_map (pool->this_gene_spdist, idx_gene_to_sp, genetre->distinct[0]->nleaves);
+    if (valid_species_size > 4) {
+      char_vector_add_string (gfilename, arg_filename[1]);
+      update_pooled_matrix_from_gene_tree (pool, genetre->distinct[0], idx_gene_to_sp);
+    }
+    del_topology_space (genetre); 
+  }
+
+  finalise_pooled_matrix (pool, sptaxa);
+
+  tsp = new_topology_space ();
+  tsp->taxlabel = sptaxa; sptaxa->ref_counter++; /* sptaxa is shared here as well */
+  for (i =0; i < 3; i++) {
+    find_maxtree_and_add_to_topol_space (pool->d_total, pool, tsp, sptaxa, i, true);  // mean length within gene family (locus)
+    find_maxtree_and_add_to_topol_space (pool->d_total, pool, tsp, sptaxa, i, false); // min lengths within gene family
+  }
+  for (i = 0; i < pool->n_sptrees; i++) {
+    find_maxtree_and_add_to_topol_space (pool->d[i], pool, tsp, sptaxa, 0, true); // bionj/upgma/singlelinkage, means/mins
+    find_maxtree_and_add_to_topol_space (pool->d[i], pool, tsp, sptaxa, 1, false); // upgma on mins 
+    find_maxtree_and_add_to_topol_space (pool->d[i], pool, tsp, sptaxa, 2, false); // single linkage on mins 
+  }
+  del_empfreq (ef);
+  del_pooled_matrix (pool);
+  if (idx_gene_to_sp) free (idx_gene_to_sp);
+  return tsp;
+}
+
+/* pooled_matrix_struct functions */
 
 pooled_matrix
 new_pooled_matrix (int n_sets, int n_species)
@@ -162,46 +231,66 @@ find_maxtree_and_add_to_topol_space (spdist_matrix dist, pooled_matrix pool, top
   return;
 }
 
-topology_space
-maxtrees_from_subsamples (char_vector sptaxa, char **arg_filename, int arg_nfiles, char_vector gfilename)
+/* genetree_struct functions */
+
+genetree 
+new_genetree (topology g_tree, topology s_tree)
 {
-  int i, *idx_gene_to_sp = NULL, valid_species_size = 0;
-  topology_space tsp, genetre;
-  pooled_matrix pool;
-  /* order species names from longer names to shorter (so that EColi is searched only after EColiII, e.g.) */
-  empfreq ef = new_empfreq_sort_decreasing (sptaxa->nchars, sptaxa->nstrings, 1); /* 1=size_t (0=char, 2=int)*/
+  int i;
+  genetree gt;
+  gt = (genetree) biomcmc_malloc (sizeof (struct genetree_struct));
+  gt->tree = g_tree; gt->tree->ref_counter++; // point to element of topology_space (usually)
 
-  pool = new_pooled_matrix ((int)(arg_nfiles/100), sptaxa->nstrings);
-
-  for (i = 0; i < arg_nfiles; i++) { /* scan through gene files */
-    genetre  = read_topology_space_from_file (arg_filename[i], NULL);/* read i-th gene family */
-    
-    idx_gene_to_sp = (int *) biomcmc_realloc ((int*) idx_gene_to_sp, genetre->distinct[0]->nleaves * sizeof (int));/* for each gene leaf, index of species */
-    index_sptaxa_to_genetaxa (sptaxa, genetre->taxlabel, idx_gene_to_sp, ef);/* map species names to gene names and store into idx[] */
-    valid_species_size = prepare_spdistmatrix_from_gene_species_map (pool->this_gene_spdist, idx_gene_to_sp, genetre->distinct[0]->nleaves);
-    if (valid_species_size > 4) {
-      char_vector_add_string (gfilename, arg_filename[1]);
-      update_pooled_matrix_from_gene_tree (pool, genetre->distinct[0], idx_gene_to_sp);
-    }
-    del_topology_space (genetre); 
+  gt->split = create_splitset_dSPR_genespecies (gt->tree, s_tree);
+  init_tree_recon_from_species_topology (gt->tree, s_tree);
+  for (i = 0; i < NDISTS; i++) {
+    gs->minmax[i] = 1.e35;
+    gs->minmax[i+NDISTS] = -1.e35;
+    gs->dist[i] = -1.;
   }
-
-  finalise_pooled_matrix (pool, sptaxa);
-
-  tsp = new_topology_space ();
-  tsp->taxlabel = sptaxa; sptaxa->ref_counter++; /* sptaxa is shared here as well */
-  for (i =0; i < 3; i++) {
-    find_maxtree_and_add_to_topol_space (pool->d_total, pool, tsp, sptaxa, i, true);  // mean length within gene family (locus)
-    find_maxtree_and_add_to_topol_space (pool->d_total, pool, tsp, sptaxa, i, false); // min lengths within gene family
-  }
-  for (i = 0; i < pool->n_sptrees; i++) {
-    find_maxtree_and_add_to_topol_space (pool->d[i], pool, tsp, sptaxa, 0, true); // bionj/upgma/singlelinkage, means/mins
-    find_maxtree_and_add_to_topol_space (pool->d[i], pool, tsp, sptaxa, 1, false); // upgma on mins 
-    find_maxtree_and_add_to_topol_space (pool->d[i], pool, tsp, sptaxa, 2, false); // single linkage on mins 
-  }
-  del_empfreq (ef);
-  del_pooled_matrix (pool);
-  if (idx_gene_to_sp) free (idx_gene_to_sp);
-  return tsp;
+  del_char_vector (g_tree->taxlabel); // should just decrease ref_counter and then delete together with topology_space, later
+  return gt;
 }
+
+void
+del_genetree (genetree gt)
+{
+  if (!gt) return;
+  del_splitset (split);
+  del_topology (gt->tree);
+  free (gt);
+  return;
+}
+
+gene_sptrees
+new_gene_sptrees (int n_genes, int n_ratchet, int n_proposal)
+{
+  gene_sptrees gs;
+  gs = (gene_sptrees) biomcmc_malloc (sizeof (struct gene_sptrees_struct));
+  gs->n_genes = n_genes;
+  gs->n_ratchet = n_ratchet;
+  gs->n_proposal = n_proposal;
+  gs->next_proposal = 0; // idx of topol to fill proposal (and therefore to be modified)
+  gs->next_free = 0; // idx of currently worse tree (which is just after best tree in a ratchet)
+  gs->best_score = 1.e35;
+  gs->gene = (genetree*) biomcmc_malloc (gs->n_genes * sizeof (genetree*)); 
+  gs->ratchet  = (topology*) biomcmc_malloc (gs->n_ratchet * sizeof (topology*)); 
+  gs->proposal = (topology*) biomcmc_malloc (gs->n_proposal * sizeof (topology*));
+  // for i in ... malloc
+  return gs;
+}
+
+void
+del_gene_sptrees (gene_sptrees gs)
+{
+  int i;
+  if (!gs) return;
+  for (i = gs->n_genes - 1; i >= 0 ; i--) del_genetree (gs->gene);
+  for (i = gs->n_ratchet- 1; i >= 0 ; i--) del_topology (gs->ratchet);
+  for (i = gs->n_proposal - 1; i >= 0 ; i--) del_topology (gs->proposal);
+  free (gs);
+  return;
+}
+
+
 
