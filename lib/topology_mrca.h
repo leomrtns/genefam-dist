@@ -63,7 +63,7 @@ void index_sptaxa_to_genetaxa (char_vector species, char_vector gene, int *sp_id
 /*! \brief find occurences of ordered species->string[] inside gene->string[] filling indexes in rec->sp_id[] and updating
  * rec->sp_count[]. 
  *
- *  This function can only be used whe we know that the species names are ordered from longer to shorter. This happens
+ *  This function can only be used whe wen know that the species names are ordered from longer to shorter. This happens
  *  only when there are no topologies (where the leaves are the indexes of taxlabel) associated with the species'
  *  taxlabels. So they cannot be used within a topology_space_struct but can be used if our primary data is only these
  *  taxlabels (like in the guenomu MCMC algrithm). Calls initialize_reconciliation_sp_count() automatically. */

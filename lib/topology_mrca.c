@@ -69,7 +69,7 @@ mrca_between_nodes (topology topol, int i, int j)
 
 void
 init_tree_recon_from_species_topology (topology gene, topology species)
-{
+{  /* safe, since uses index_sptaxa_to_genetaxa() which does not assume sorted spnames */
   if (!gene->rec) gene->rec = new_reconciliation (gene->nleaves, species->nleaves);
   if (!species->mrca) new_mrca_for_topology (species);
   index_sptaxa_to_genetaxa (species->taxlabel, gene->taxlabel, gene->rec->sp_id, NULL);
@@ -79,7 +79,7 @@ init_tree_recon_from_species_topology (topology gene, topology species)
 
 void
 init_tree_recon_from_species_names (topology gene, char_vector sptaxlabel)
-{
+{  /* safe, since uses index_sptaxa_to_genetaxa() which does not assume sorted spnames */
   /* used by dSPR (topology_splitset) only (for now) */ 
   if (!gene->rec) gene->rec = new_reconciliation (gene->nleaves, sptaxlabel->nstrings);
   index_sptaxa_to_genetaxa (sptaxlabel, gene->taxlabel, gene->rec->sp_id, NULL);

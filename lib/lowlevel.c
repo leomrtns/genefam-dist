@@ -313,8 +313,8 @@ char_vector_reorder_strings (char_vector vec, int *order)
     ptr_i[i] = vec->nchars[i];
   }
   for (i=0; i < vec->nstrings; i++) { 
-    vec->string[order[i]] = ptr_c[i]; 
-    vec->nchars[order[i]] = ptr_i[i];
+    vec->string[i] = ptr_c[order[i]]; 
+    vec->nchars[i] = ptr_i[order[i]];
   }
   if (ptr_c) free (ptr_c);
   if (ptr_i) free (ptr_i);

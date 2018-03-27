@@ -162,7 +162,7 @@ new_empfreq_double_sort_decreasing (double *vec, int n)
   int i;
   empfreq_double e_idx = new_empfreq_double (n);
   for (i=0; i < n; i++) e_idx->d[i].freq = vec[i];
-  sort_empfreq_double_decreasing (e_idx); /* equiv. to qsort (vec, n, sizeof (int), compare_int) but preserving weights. */
+  sort_empfreq_double_decreasing (e_idx); /* equiv. to qsort (vec, n, sizeof (double), compare_double) but preserving weights. */
   return e_idx;
 }
 
@@ -172,7 +172,7 @@ new_empfreq_double_sort_increasing (double *vec, int n)
   int i;
   empfreq_double e_idx = new_empfreq_double (n);
   for (i=0; i < n; i++) e_idx->d[i].freq = vec[i];
-  sort_empfreq_double_increasing (e_idx); /* equiv. to qsort (vec, n, sizeof (int), compare_int) but preserving weights. */
+  sort_empfreq_double_increasing (e_idx); /* equiv. to qsort (vec, n, sizeof (double), compare_double) but preserving weights. */
   return e_idx;
 }
 
