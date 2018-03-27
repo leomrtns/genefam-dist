@@ -28,7 +28,7 @@ struct genetree_struct
 struct gene_sptrees_struct
 {
   int n_genes, n_ratchet, n_proposal;
-  int next_proposal, next_free; // idx to ratchet elements
+  int next_proposal, next_avail; // idx to ratchet elements 
   genetree *gene;
   topology *ratchet, *proposal; // may need vector of distances
   double best_score; // I'm forgetting other vars like minmax etc. but for now we will use simple score (gene dists are rescaled)
@@ -44,10 +44,13 @@ void finalise_pooled_matrix (pooled_matrix pool, char_vector sptaxa);
 void find_maxtree_and_add_to_topol_space (spdist_matrix dist, pooled_matrix pool, topology_space tsp, int tree_method, bool use_within_gf_means);
 
 genetree new_genetree (topology g_tree, topology s_tree);
+double calculate_genetree_distance (genetree gt, topology s_tree, bool update_minmax);
 void del_genetree (genetree gt);
 
 gene_sptrees new_gene_sptrees (int n_genes, int n_ratchet, int n_proposal, topology_space sptree);
-void init_topol_for_new_gene_sptrees (topology tree, topology original);
+topology init_topol_for_new_gene_sptrees (topology original);
+void initialise_ratchet_from_topol_space (gene_sptrees gs, topology_space sptree);
+void initialise_gene_sptrees_with_genetree_filenames (gene_sptrees gs, char_vector gene_files);
 void del_gene_sptrees (gene_sptrees gs);
 void initial_sorting_of_gene_sptree_ratchet (gene_sptrees gs);
 double calculate_species_tree_score();
@@ -58,24 +61,27 @@ main (int argc, char **argv)
   clock_t time0, time1;
   char_vector species, genefiles;
   topology_space tsp;
+  gene_sptrees gs;
 
   time0 = clock ();
   if (argc < 3) print_usage (argv[0]);
   biomcmc_random_number_init(0);
 
   species = new_char_vector_from_file (argv[1]);
-  int i;
-  for (i = 0; i < species->nstrings; i++) printf ("DEBUG::before:: %d - %d | %s\n", i, species->nchars[i], species->string[i]);
   genefiles = new_char_vector (1); // updated by maxtrees_from_subsamples()
   char_vector_remove_duplicate_strings (species); /* duplicate names */
   char_vector_longer_first_order (species); // order species names from longest to shortest (speed up gene/spnames comparison) 
-  for (i = 0; i < species->nstrings; i++) printf ("DEBUG::after :: %d - %d | %s\n", i, species->nchars[i], species->string[i]);
   tsp = maxtrees_from_subsamples (species, argv + 2, argc - 2, genefiles); 
   save_topology_space_to_trprobs_file (tsp, "patristic.tre", 1.);
+
+  gs = new_gene_sptrees (10, 20, 10, tsp);
+  initialise_gene_sptrees_with_genetree_filenames (gs, genefiles);
+  initial_sorting_of_gene_sptree_ratchet (gs);
 
   del_char_vector (species);
   del_char_vector (genefiles);
   del_topology_space (tsp);
+  del_gene_sptrees (gs);
   biomcmc_random_number_finalize();
 
 	time1 = clock (); fprintf (stderr, "timing: %.8f secs\n", (double)(time1-time0)/(double)CLOCKS_PER_SEC);
@@ -258,12 +264,32 @@ new_genetree (topology g_tree, topology s_tree)
   if (!gt->tree->rec) gt->tree->rec = new_reconciliation (g_tree->nleaves, s_tree->nleaves); // if gene has rec, it better be from same sptree size!
   index_sptaxa_to_reconciliation (s_tree->taxlabel, g_tree->taxlabel, gt->tree->rec);
   for (i = 0; i < NDISTS; i++) {
-    gt->minmax[i] = 1.e35;
+    gt->minmax[i] = -1.e35;  // this is NOT minmax, but only MAX (currently we dont use min, only max)
     gt->minmax[i+NDISTS] = -1.e35;
     gt->dist[i] = -1.;
   }
   del_char_vector (g_tree->taxlabel); // should just decrease ref_counter and then delete later, with topology_space
   return gt;
+}
+
+double
+calculate_genetree_distance (genetree gt, topology s_tree, bool update_minmax)
+{
+  int k;
+  double g_score = 0.;
+  gene_tree_reconcile (gt->tree, s_tree);
+  dSPR_gene_species (gt->tree, s_tree, gt->split);
+  gt->dist[0] = (double) gt->tree->rec->ndups;
+  gt->dist[1] = (double) gt->tree->rec->nloss;
+  gt->dist[2] = (double) gt->tree->rec->ndcos;
+  gt->dist[3] = (double) gt->split->rf;
+  gt->dist[4] = (double) gt->split->hdist;
+  gt->dist[5] = (double) gt->split->spr + gt->split->spr_extra;  // order same as guenomu, NOT same as genefam_dist or treesignal.py
+  if (update_minmax) for (k=0; k < NDISTS; k++) { // we update ONLY MAX currently
+    if (gt->minmax[k] <  gt->dist[k]) gt->minmax[k] = gt->dist[k];
+  }
+  for (k=0; k < NDISTS; k++) g_score += (double)(gt->dist[k])/(double)(gt->minmax[k]); 
+  return g_score;
 }
 
 void
@@ -279,14 +305,14 @@ del_genetree (genetree gt)
 gene_sptrees
 new_gene_sptrees (int n_genes, int n_ratchet, int n_proposal, topology_space sptree)
 {
-  int i, n_trees_to_copy = sptree->ndistinct;
+  int i;
   gene_sptrees gs;
   gs = (gene_sptrees) biomcmc_malloc (sizeof (struct gene_sptrees_struct));
   gs->n_genes = n_genes;
   gs->n_ratchet = n_ratchet;
   gs->n_proposal = n_proposal;
-  gs->next_proposal = 0; // idx of topol to fill proposal (and therefore to be modified)
-  gs->next_free = 0; // idx of currently worse tree (which is just after best tree in a ratchet)
+  gs->next_proposal = 0; // idx of topol to fill proposal (and therefore to be modified); 
+  gs->next_avail = 0; // idx of currently worse tree (which is just after best tree in a ratchet)
   gs->best_score = 1.e35;
 
   if (gs->n_ratchet < 10) gs->n_ratchet = 10;
@@ -296,24 +322,59 @@ new_gene_sptrees (int n_genes, int n_ratchet, int n_proposal, topology_space spt
   gs->ratchet  = (topology*) biomcmc_malloc (gs->n_ratchet * sizeof (topology)); 
   gs->proposal = (topology*) biomcmc_malloc (gs->n_proposal * sizeof (topology));
 
-  for (i=0; i < gs->n_ratchet; i++) init_topol_for_new_gene_sptrees (gs->ratchet[i], sptree->distinct[0]);
-  for (i=0; i < gs->n_proposal; i++) init_topol_for_new_gene_sptrees (gs->proposal[i], sptree->distinct[0]);
-  // gs->gene must be created later, when we receive the gene topol_spaces 
+  for (i=0; i < gs->n_ratchet; i++) {
+    gs->ratchet[i] = init_topol_for_new_gene_sptrees (sptree->distinct[0]);
+    randomize_topology (gs->ratchet[i]); // should be filled outside this function (to recycle optimal sptrees from previous iteration)
+  }
+  for (i=0; i < gs->n_proposal; i++) gs->proposal[i] = init_topol_for_new_gene_sptrees (sptree->distinct[0]);
+  for (i=0; i < gs->n_genes; i++) gs->gene[i] = NULL; // must be created later, when we receive the gene topol_spaces 
 
-  if (n_trees_to_copy > gs->n_ratchet) n_trees_to_copy = gs->n_ratchet;
-  for (i=0; i < n_trees_to_copy; i++) copy_topology_from_topology (gs->ratchet[i], sptree->distinct[i]); 
-  for (i=n_trees_to_copy; i < gs->n_ratchet; i++) randomize_topology (gs->ratchet[i]);
-
+  initialise_ratchet_from_topol_space (gs, sptree);
   return gs;
 }
 
-void
-init_topol_for_new_gene_sptrees (topology tree, topology original)
+topology
+init_topol_for_new_gene_sptrees (topology original)
 {
-  tree = new_topology(original->nleaves);
+  topology tree = new_topology(original->nleaves);
   tree->taxlabel = original->taxlabel;
   tree->taxlabel->ref_counter++;
   new_mrca_for_topology (tree);
+  return tree;
+}
+
+void
+initialise_ratchet_from_topol_space (gene_sptrees gs, topology_space sptree)
+{
+  int i, n_trees_to_copy = sptree->ndistinct;
+  if (n_trees_to_copy > gs->n_ratchet) n_trees_to_copy = gs->n_ratchet;
+  for (i=0; i < n_trees_to_copy; i++) copy_topology_from_topology (gs->ratchet[i], sptree->distinct[i]); 
+  // the remaining trees (from n_trees_to_copy to n_ratchet) are random (if it's first time this function is called) 
+  // or are best from previous iteration
+  return;
+}
+
+void
+initialise_gene_sptrees_with_genetree_filenames (gene_sptrees gs, char_vector gene_files)
+{ // sample gene families, and calculate max values 
+  int i, j, *idx;
+  topology_space genetre;
+
+  idx = (int*) biomcmc_malloc (gs->n_genes * sizeof (int)); 
+  for (i=0; i < gs->n_genes; i++) idx[i] = i;
+
+  for (i=0; i < gs->n_genes; i++) {
+    j = biomcmc_rng_unif_int (gs->n_genes - i); 
+    genetre = read_topology_space_from_file (gene_files->string[ idx[j] ], NULL);/* read i-th gene family */
+    idx[j] = idx[gs->n_genes - i -1]; // avoids replacement
+    gs->gene[i] = new_genetree (genetre->distinct[0], gs->proposal[0]);
+    del_topology_space (genetre);
+    for (j = 0; j < 8; j++) {
+      randomize_topology (gs->proposal[0]);
+      calculate_genetree_distance (gs->gene[i], gs->proposal[0], true);
+    }
+  }
+  if (idx) free (idx);
   return;
 }
 
@@ -340,7 +401,7 @@ del_gene_sptrees (gene_sptrees gs)
 
 void
 initial_sorting_of_gene_sptree_ratchet (gene_sptrees gs)
-{
+{ // first step before start optimisation: sort ratchet 
   topology *pivot; // temporary vector with original location of topologies
   empfreq_double ef;
   double *score_vector;
@@ -349,12 +410,14 @@ initial_sorting_of_gene_sptree_ratchet (gene_sptrees gs)
   /* Find the score of each tree and sort their scores from highest (worst) to lowest (best) */ 
   score_vector = (double*) biomcmc_malloc (gs->n_ratchet * sizeof (double)); 
   for (i=0; i < gs->n_ratchet; i++) score_vector[i] = calculate_species_tree_score (gs, gs->ratchet[i]);
+  for (i=0; i < gs->n_ratchet; i++) printf ("DEBUG::score:: %lf\n", score_vector[i]);
+ 
   ef = new_empfreq_double_sort_decreasing (score_vector, gs->n_ratchet);
   if (score_vector) free (score_vector);
   /* reorder ratchet, by creating temporary pointers with previous location */
   pivot = (topology*) biomcmc_malloc (gs->n_ratchet * sizeof (topology)); 
   for (i=0; i < gs->n_ratchet; i++) pivot[i] = gs->ratchet[i];
-  for (i=0; i < gs->n_ratchet; i++) gs->ratchet[ ef->d[i].idx ] = pivot[i]; // i[i].idx has the order if indexes
+  for (i=0; i < gs->n_ratchet; i++) gs->ratchet[i] = pivot[ ef->d[i].idx ]; // i[i].idx has the order if indexes
   if (pivot) free (pivot);
 
   gs->best_score = ef->d[gs->n_ratchet-1].freq; // lowest (best) score is last element (must be recalc every time new proposals are created, using new minima)
@@ -363,6 +426,10 @@ initial_sorting_of_gene_sptree_ratchet (gene_sptrees gs)
 }
 
 double
-calculate_species_tree_score()
+calculate_species_tree_score(gene_sptrees gs, topology s_tree)
 {
+  int i;
+  double score = 0.;
+  for (i = 0; i < gs->n_genes; i++) score += calculate_genetree_distance (gs->gene[i], s_tree, false);
+  return score;
 } 

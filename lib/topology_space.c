@@ -392,6 +392,8 @@ merge_topology_spaces (topology_space ts1, topology_space ts2, double weight_ts1
   if (idx) free (idx);
 }
 
+//TODO:  void sort_topology_space_by_frequency() { }
+
 void
 save_topology_space_to_trprobs_file (topology_space tsp, char *filename, double credible)
 { // works even if tsp->freq is unscaled (i.e. total counts and not frequencies summing to one)
