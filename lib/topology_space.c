@@ -392,7 +392,18 @@ merge_topology_spaces (topology_space ts1, topology_space ts2, double weight_ts1
   if (idx) free (idx);
 }
 
-//TODO:  void sort_topology_space_by_frequency() { }
+/*
+void 
+sort_topology_space_by_frequency(topology_space tsp, double *external_freqs) 
+{ 
+  double part_sum = 0., freq, *local_freqs = tsp->freq, *pivot_d;
+  topology pivot_t;
+  char *stree;
+  empfreq_double efd;
+  if (external_freqs) local_freqs = external_freqs; 
+  efd = new_empfreq_double_sort_decreasing (local_freqs, tsp->ndistinct);
+  // FIXME: stopped here: must change tlen[3 x ndistinct] and freq[] if external is NULL. tree[i] is ponter to distinct, wont change
+} */
 
 void
 save_topology_space_to_trprobs_file (topology_space tsp, char *filename, double credible)

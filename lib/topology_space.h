@@ -48,6 +48,7 @@ topology_space read_topology_space_from_file (char *seqfilename, hashtable exter
 topology_space read_topology_space_from_file_with_burnin_thin (char *seqfilename, hashtable external_taxhash, int burnin, int thin);
 /*!  \brief merge trees from two topology_space objects, assuming names hashtable is the same */ 
 void merge_topology_spaces (topology_space ts1, topology_space ts2, double weight_ts1);
+void  sort_topology_space_by_frequency(topology_space tsp, double *external_freqs) ; // INCOMPLETE
 
 /*! \brief Save topology_space to a file, in format nexus w/ trprobs, up to "credible" cummul frequency */
 void save_topology_space_to_trprobs_file (topology_space tsp, char *filename, double credible);
