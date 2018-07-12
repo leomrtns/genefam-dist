@@ -23,7 +23,8 @@ int compare_splitset_bipartition_decreasing (const void *a1, const void *a2);
 void prepare_split_from_topologies (topology t1, topology t2, splitset split, int recycle_t1);
 void prepare_genetree_sptree_split (topology gene, topology species, splitset split);
 void split_add_gene_subtree (splitset split, int taxa);
-int dSPR_topology_lowlevel (splitset split, int rf_or_hdist);
+int rf_hdist_topology_lowlevel (splitset split, bool exit_at_rf);
+int dSPR_topology_lowlevel (splitset split);
 /*! \brief vector with pointers to bipartitions that are identical on both trees */
 void split_create_agreement_list (splitset split);
 void split_remove_agree_edges (splitset split, bipartition *b, int *nb);
@@ -52,7 +53,7 @@ new_splitset (int nleaves)
   split->prune = NULL; 
   split->h = NULL; /* hungarian method for bipartite matching; unused unless for tree distance */
   split->match = false;
-  split->spr = split->spr_extra = split->rf = split->hdist = 0;
+  split->spr = split->spr_extra = split->rf = split->hdist = split->hdist_reduced = 0;
 
   split->g_split = (bipartition*) biomcmc_malloc (split->size * sizeof (bipartition));
   split->s_split = (bipartition*) biomcmc_malloc (split->size * sizeof (bipartition));
@@ -298,61 +299,75 @@ split_add_gene_subtree (splitset split, int taxa)
 int
 dSPR_topology (topology t1, topology t2, splitset split)
 {
-  split->hdist = split->spr = split->spr_extra = split->rf = 0;
   if (topology_is_equal_unrooted (t1, t2, split, false)) return 0;
-  split->match = true;  return dSPR_topology_lowlevel (split, 0);
+  rf_hdist_topology_lowlevel (split, false); // calculate Hdist on full trees (without pruning common subtrees)
+  prepare_split_from_topologies (t1, t2, split, false); // prepare bipartitions again
+  return dSPR_topology_lowlevel (split);
 }
 
 int
 dSPR_topology_rf (topology t1, topology t2, splitset split)
-{
-  split->hdist = split->spr = split->spr_extra = split->rf = 0;
+{  // will calculate only RF, not Hdist or Hdist_reduced
   if (topology_is_equal_unrooted (t1, t2, split, false)) return 0;
-  split->match = true;  return dSPR_topology_lowlevel (split, 1);
+  return rf_hdist_topology_lowlevel (split, true); // true -> exit as soon as RF is calculated
 }
 
 int
 dSPR_topology_hdist (topology t1, topology t2, splitset split)
 {
-  split->hdist = split->spr = split->spr_extra = split->rf = 0;
   if (topology_is_equal_unrooted (t1, t2, split, false)) return 0;
-  split->match = true;  return dSPR_topology_lowlevel (split, 2);
+  return rf_hdist_topology_lowlevel (split, false);
 }
 
 int
 dSPR_gene_species (topology gene, topology species, splitset split)
 {
-  split->hdist = split->spr = split->spr_extra = split->rf = 0;
+  // first calculate Hdist on original (not reduced) trees, then prepare again (to use reduced trees)
   prepare_genetree_sptree_split (gene, species, split);
-  split->match = true;  return dSPR_topology_lowlevel (split, 0);
+  rf_hdist_topology_lowlevel (split, false); // hdist, rf
+  prepare_genetree_sptree_split (gene, species, split);
+  return dSPR_topology_lowlevel (split); // hdist_reduced, spr, spr_extra
 }
 
 int
 dSPR_gene_species_rf (topology gene, topology species, splitset split)
 {
-  split->hdist = split->spr = split->spr_extra = split->rf = 0;
   prepare_genetree_sptree_split (gene, species, split);
-  split->match = true;  return dSPR_topology_lowlevel (split, 1);
+  return rf_hdist_topology_lowlevel (split, true); // true -> exit as soon as RF is calculated
 }
 
 int
 dSPR_gene_species_hdist (topology gene, topology species, splitset split)
 {
-  split->hdist = split->spr = split->spr_extra = split->rf = 0;
   prepare_genetree_sptree_split (gene, species, split);
-  split->match = true;  return dSPR_topology_lowlevel (split, 2);
+  return rf_hdist_topology_lowlevel (split, false);
 }
 
-// FIXME: Hdist must use _all_ leaves, not SPR-reduced (but SPR can keep using Hungarian on reduced tree...)
-// 1. which means I need to create vector of "weights" of each leaf in reduced tree (with original sizes...), then
-// recalculate optimal cost).   2. also implies that another Hdist is possible, without reducing the tree.
+int
+rf_hdist_topology_lowlevel (splitset split, bool exit_at_rf)
+{
+  split->hdist_reduced = split->hdist = split->rf = 0;
+  split->n_agree = split->n_disagree = 0;
+  bipsize_resize (split->disagree[0]->n, split->g_split[0]->n->bits); 
+  bipsize_resize (split->agree[0]->n,    split->g_split[0]->n->bits); 
+  split_create_agreement_list (split);  // vector of identical bipartitions
+  // Importantly, here we do NOT call split_compress_agreement()
+  split->rf = split->n_g + split->n_s;
+  if (exit_at_rf) return split->rf;
+  if (!split->rf) return 0; // all edges were in agreement
+  split->match = true; // only calculate hdist_reduced if match == True (first time) 
+  split_create_disagreement_list (split); // vector of smallest disagreements
+  split_disagreement_assign_match (split); /* assignment matching between edges using hungarian method (split->hdist_reduced after first time) */
+  split->hdist = split->hdist_reduced;
+  return split->hdist; /* do not calculate SPR, exit now */
+}
 
 int
-dSPR_topology_lowlevel (splitset split, int rf_or_hdist)
+dSPR_topology_lowlevel (splitset split)
 {
   int i = 0, mismatch = -1;
-
-  split->hdist = split->spr = split->spr_extra = split->rf = 0;
+  split->match = true; 
+  split->hdist_reduced = split->spr = split->spr_extra = 0;
   split->n_agree = split->n_disagree = 0;
   bipsize_resize (split->disagree[0]->n, split->g_split[0]->n->bits); 
   bipsize_resize (split->agree[0]->n,    split->g_split[0]->n->bits); 
@@ -368,14 +383,11 @@ dSPR_topology_lowlevel (splitset split, int rf_or_hdist)
     //for (i = 0; i < split->n_s; i++)     { bipartition_print_to_stdout (split->s_split[i]); } printf ("S\n");
     //for (i = 0; i < split->n_agree; i++) { bipartition_print_to_stdout (split->agree[i]);   } printf ("A\n");
 
-    if (mismatch == -1) split->rf = split->n_g + split->n_s;
-    if (rf_or_hdist == 1) return split->rf; /* do not calculate SPR, exit now  (1=RF, 2=hdist) */
     mismatch = (split->n_g > 0) && (split->n_s > 0); // all edges were in agreement
     if (!mismatch) return split->spr;
     
     split_create_disagreement_list (split); // vector of smallest disagreements
     split_disagreement_assign_match (split); /* assignment matching between edges using hungarian method (split->hdist after first time) */
-    if (rf_or_hdist == 2) return split->hdist; /* do not calculate SPR, exit now */
     
     split_remove_duplicates (split->disagree, &(split->n_disagree)); // some elements are equal; this function also qsorts 
     split_find_small_disagreement (split);  // could also be one leaf only 
@@ -470,7 +482,7 @@ split_create_disagreement_list (splitset split)
 
 void
 split_disagreement_assign_match (splitset split)
-{ /* also calculates split->hdist */ 
+{ /* also calculates split->hdist_reduced */ 
   int g, s, max_n, sum = 0;
   
   if (split->n_g > split->n_s) max_n = split->n_g;
@@ -489,8 +501,7 @@ split_disagreement_assign_match (splitset split)
     bipartition_flip_to_smaller_set (split->disagree[split->n_disagree++]);
     sum += split->disagree[split->n_disagree-1]->n_ones;
   }
-//  if (split->match) { split->hdist = (100 * split->h->final_cost)/split->h->initial_cost; split->match = false; }
-  if (split->match) { split->hdist = split->h->final_cost+split->h->initial_cost; split->match = false; }
+  if (split->match) { split->hdist_reduced = split->h->final_cost+split->h->initial_cost; split->match = false; }
 }
 
 void

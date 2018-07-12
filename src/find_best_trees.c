@@ -1,7 +1,7 @@
 #include <genefam_dist.h> 
 /* based on guenomu/maxtree but also implementing elements from guenomu in ML mode */
 
-#define NDISTS 4 
+#define NDISTS 6 
 
 typedef struct pooled_matrix_struct* pooled_matrix;
 typedef struct genetree_struct* genetree;
@@ -62,6 +62,7 @@ int
 main (int argc, char **argv)
 {
   clock_t time0, time1;
+  int i,j;
   char_vector species, genefiles;
   topology_space tsp;
   gene_sptrees gs;
@@ -78,10 +79,12 @@ main (int argc, char **argv)
   tsp = maxtrees_from_subsamples (species, argv + 2, argc - 2, genefiles); 
   save_topology_space_to_trprobs_file (tsp, "patristic.tre", 1.);
 
-  gs = new_gene_sptrees (20000, 25, 20, tsp); // n_genes, n_ratchet, n_proposal
+  i = (int)(genefiles->nstrings/100); 
+  if (i < 10) i = 10;
+  gs = new_gene_sptrees (i, 50, 50, tsp); // i = n_genes, n_ratchet, n_proposal
   initialise_gene_sptrees_with_genetree_filenames (gs, genefiles);
   initial_sorting_of_gene_sptrees_ratchet (gs, tsp);
-  int i, j; for (i=0; i < 20; i++) {
+  for (i=0; i < 100; i++) {
     improve_gene_sptrees_ratchet (gs, i);
     j = gs->next_avail+1; if (j == gs->n_ratchet) j = 0;
     s = topology_to_string_by_name (gs->ratchet[j], NULL); /* second parameter is vector with branch lengths */
@@ -117,7 +120,7 @@ maxtrees_from_subsamples (char_vector sptaxa, char **arg_filename, int arg_nfile
   /* order species names from longer names to shorter (so that EColi is searched only after EColiII, e.g.) */
   empfreq ef = new_empfreq_sort_decreasing (sptaxa->nchars, sptaxa->nstrings, 1); /* 1=size_t (0=char, 2=int)*/
 
-  pool = new_pooled_matrix ((int)(arg_nfiles/100), sptaxa->nstrings);
+  pool = new_pooled_matrix ((int)(arg_nfiles/20), sptaxa->nstrings);
 
   for (i = 0; i < arg_nfiles; i++) { /* scan through gene files */
     genetre  = read_topology_space_from_file (arg_filename[i], NULL);/* read i-th gene family */
@@ -163,7 +166,7 @@ new_pooled_matrix (int n_sets, int n_species)
 
   pool->n_sptrees = n_sets;
   pool->n_species = n_species;
-  pool->n_sets_per_gene = n_sets/4;
+  pool->n_sets_per_gene = n_sets/10;
   pool->next = 0; // vector is shuffled whenever next arrives at last element
 
   if (pool->n_sptrees < 1) pool->n_sptrees = 1; 
@@ -287,17 +290,17 @@ calculate_genetree_distance (genetree gt, topology s_tree, bool update_minmax)
   int k;
   double g_score = 0.;
   gene_tree_reconcile (gt->tree, s_tree);
-  dSPR_gene_species_rf (gt->tree, s_tree, gt->split); // does not compute hdist and dSPR, only RF
+//  dSPR_gene_species_rf (gt->tree, s_tree, gt->split); // does not compute hdist and dSPR, only RF
+  dSPR_gene_species (gt->tree, s_tree, gt->split); 
   gt->dist[0] = (double) gt->tree->rec->ndups;
   gt->dist[1] = (double) gt->tree->rec->nloss;
   gt->dist[2] = (double) gt->tree->rec->ndcos;
   gt->dist[3] = (double) gt->split->rf;
-//  gt->dist[4] = (double) gt->split->hdist;
-//  gt->dist[5] = (double) gt->split->spr + gt->split->spr_extra;  // order same as guenomu, NOT same as genefam_dist or treesignal.py
+  gt->dist[4] = (double) gt->split->hdist;
+  gt->dist[5] = (double) gt->split->spr + gt->split->spr_extra;  // order same as guenomu, NOT same as genefam_dist or treesignal.py
   if (update_minmax) for (k=0; k < NDISTS; k++) { // we update ONLY MAX currently
     if (gt->minmax[k] <  gt->dist[k]) gt->minmax[k] = gt->dist[k];
   }
-//  for (k=0; k < NDISTS; k++) g_score += (double)(gt->dist[k]); 
   for (k=0; k < NDISTS; k++) g_score += biomcmc_log1p( (double)(gt->dist[k])/(double)(gt->minmax[k])); 
 //  for (k=0; k < NDISTS; k++) g_score += biomcmc_log1p( (double)(gt->dist[k])); 
   return g_score;
@@ -374,7 +377,7 @@ initialise_gene_sptrees_with_genetree_filenames (gene_sptrees gs, char_vector ge
   for (i=0; i < gs->n_genes; i++) idx[i] = i;
 
   for (i=0; i < gs->n_genes; i++) {
-    j = biomcmc_rng_unif_int (gs->n_genes - i); 
+    j = biomcmc_rng_unif_int (gs->n_genes - i);
     genetre = read_topology_space_from_file (gene_files->string[ idx[j] ], NULL);/* read i-th gene family */
     idx[j] = idx[gs->n_genes - i -1]; // avoids replacement
     gs->gene[i] = new_genetree (genetre->distinct[0], gs->proposal[0]);

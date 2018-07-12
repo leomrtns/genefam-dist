@@ -29,7 +29,7 @@ typedef struct splitset_struct* splitset;
 
 struct splitset_struct
 {
-  int size, spsize, spr, spr_extra, rf, hdist; /*! \brief spr, extra prunes for spr, rf distances and hdist=assignment cost */
+  int size, spsize, spr, spr_extra, rf, hdist, hdist_reduced; /*! \brief spr, extra prunes for spr, rf distances and hdist=assignment cost */
   int n_g, n_s, n_agree, n_disagree;
   bipartition *g_split, *s_split, *agree, *disagree, *sp0; /* sp0 points to vec[0], s_split points to vec[x] */
   bipartition prune;
