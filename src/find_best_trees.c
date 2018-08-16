@@ -66,6 +66,7 @@ main (int argc, char **argv)
   char_vector species, genefiles;
   topology_space tsp;
   gene_sptrees gs;
+  FILE *stream;
   char *s;
 
   time0 = clock ();
@@ -81,15 +82,25 @@ main (int argc, char **argv)
 
   i = (int)(genefiles->nstrings/100); 
   if (i < 10) i = 10;
-  gs = new_gene_sptrees (i, 50, 50, tsp); // i = n_genes, n_ratchet, n_proposal
+  gs = new_gene_sptrees (i, 20, 40, tsp); // i = n_genes, n_ratchet, n_proposal
   initialise_gene_sptrees_with_genetree_filenames (gs, genefiles);
   initial_sorting_of_gene_sptrees_ratchet (gs, tsp);
-  for (i=0; i < 100; i++) {
+  for (i=0; i < 10; i++) {
     improve_gene_sptrees_ratchet (gs, i);
     j = gs->next_avail+1; if (j == gs->n_ratchet) j = 0;
     s = topology_to_string_by_name (gs->ratchet[j], NULL); /* second parameter is vector with branch lengths */
     printf ("[score %lf] %s;\n",gs->ratchet_score[j],s); fflush(stdout); free (s);
   }
+
+  stream = biomcmc_fopen ("best_trees.tre", "w");
+  fprintf (stream, "#NEXUS\nBegin trees;\n");
+  for (i = 0; i < gs->n_ratchet; i++) {
+    s = topology_to_string_by_name (gs->ratchet[i], NULL); 
+    fprintf (stream, "tree PAUP_%d = %s;\n", i, s); free (s);
+  }
+  fprintf (stream, "End;\n");
+  fclose (stream);
+
   del_char_vector (species);
   del_char_vector (genefiles);
   del_topology_space (tsp);
@@ -124,7 +135,6 @@ maxtrees_from_subsamples (char_vector sptaxa, char **arg_filename, int arg_nfile
 
   for (i = 0; i < arg_nfiles; i++) { /* scan through gene files */
     genetre  = read_topology_space_from_file (arg_filename[i], NULL);/* read i-th gene family */
-    
     idx_gene_to_sp = (int *) biomcmc_realloc ((int*) idx_gene_to_sp, genetre->distinct[0]->nleaves * sizeof (int));/* for each gene leaf, index of species */
     index_sptaxa_to_genetaxa (sptaxa, genetre->taxlabel, idx_gene_to_sp, ef);/* map species names to gene names and store into idx[] */
     valid_species_size = prepare_spdistmatrix_from_gene_species_map (pool->this_gene_spdist, idx_gene_to_sp, genetre->distinct[0]->nleaves);

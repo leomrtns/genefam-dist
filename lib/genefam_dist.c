@@ -139,9 +139,9 @@ generate_output_distances (topology_space gtree, topology_space stree, double **
     (*distances)[NDISTS * i + 0] = (double) gtree->distinct[0]->rec->ndups; 
     (*distances)[NDISTS * i + 1] = (double) gtree->distinct[0]->rec->nloss; 
     (*distances)[NDISTS * i + 2] = (double) gtree->distinct[0]->rec->ndcos;
-    (*distances)[NDISTS * i + 3] = (double) split->spr + split->spr_extra;
-    (*distances)[NDISTS * i + 4] = (double) split->rf;
-    (*distances)[NDISTS * i + 5] = (double) split->hdist;
+    (*distances)[NDISTS * i + 3] = (double) split->rf;
+    (*distances)[NDISTS * i + 4] = (double) split->hdist;
+    (*distances)[NDISTS * i + 5] = (double) split->spr + split->spr_extra;   // order changed in 2018.08.15 (used to be spr, rf, hdist)
     if (rescale) for (j = 0; j < NDISTS; j++) (*distances)[NDISTS * i + j] /= maxdistance[j]; 
   }
   //printf ("sptrees::DEBUG \n"); 
@@ -168,9 +168,9 @@ update_randomized_distances (topology gtree, topology stree, int n_obs, double *
     tmp_dist[0] = (double) gtree->rec->ndups; 
     tmp_dist[1] = (double) gtree->rec->nloss; 
     tmp_dist[2] = (double) gtree->rec->ndcos;
-    tmp_dist[3] = (double) split->spr + split->spr_extra;
-    tmp_dist[4] = (double) split->rf;
-    tmp_dist[5] = (double) split->hdist;
+    tmp_dist[3] = (double) split->rf;
+    tmp_dist[4] = (double) split->hdist;
+    tmp_dist[5] = (double) split->spr + split->spr_extra;
     /* pvalues[] is freq of distances as low as observed */
     for (j=0; j < n_obs; j++) for (k=0; k < NDISTS; k++) if (obs_dist[NDISTS*j + k] >= tmp_dist[k]) pvalues[NDISTS*j + k]++;
     for (k=0; k < NDISTS; k++) {
@@ -193,12 +193,12 @@ calculate_max_distances (topology gt, double *maxd, splitset split)
   maxd[1] = (double) ((gt->nleaves - 2) * gt->rec->sp_size);
   // max deepcoal: dcos=loss-2 dups + 2 |diff in gt and st|; this bound is based on simulations as well
   maxd[2] = (double) ((gt->nleaves - 2) * (gt->rec->sp_size - 1) + (2 * gt->rec->size_diff));
-  // max uSPR: n-3
-  maxd[3] = (double) (((split->n_g) < (split->n_s)) ? (split->n_g) : (split->n_s));
   // max mulRF: total number of bipartitions
-  maxd[4] = (double) (split->n_g + split->n_s);
+  maxd[3] = (double) (split->n_g + split->n_s);
   // max hdist = when disagreement large (n/2) for all edge pairs, w/ n=gene tree leaves
-  maxd[5] = (double) (split->n_g * split->n_g);
+  maxd[4] = (double) (split->n_g * split->n_g);
+  // max uSPR: n-3
+  maxd[5] = (double) (((split->n_g) < (split->n_s)) ? (split->n_g) : (split->n_s));
   return true;
 }
 
