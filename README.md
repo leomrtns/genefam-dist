@@ -1,7 +1,8 @@
 # genefam_dist
 
 The main goal of *genefam_dist* is to describe the "tree signal" of a gene family, which is a vector of 'scores' describing how well
-supported this gene family is by a set of reference species trees.
+supported this gene family is by a set of reference species trees. You can download [here (PDF)](docs/Evolution2018_LeoMartinsPoster.pdf) 
+a low-resolution version of the poster presented at [Evolution 2018](https://www.evolutionmontpellier2018.org/).
 
 The software is composed of a (low-level) library to handle mul-trees, and both a python module and standalone programs using this library.
 The python module is called `treesignal` and is the standard way of creating the tree signatures. It uses
