@@ -82,7 +82,7 @@ main (int argc, char **argv)
 
   i = (int)(genefiles->nstrings/100); 
   if (i < 10) i = 10;
-  gs = new_gene_sptrees (i, 20, 40, tsp); // i = n_genes, n_ratchet, n_proposal
+  gs = new_gene_sptrees (i, 100, 50, tsp); // i = n_genes, n_ratchet, n_proposal
   initialise_gene_sptrees_with_genetree_filenames (gs, genefiles);
   initial_sorting_of_gene_sptrees_ratchet (gs, tsp);
   for (i=0; i < 10; i++) {
@@ -131,7 +131,7 @@ maxtrees_from_subsamples (char_vector sptaxa, char **arg_filename, int arg_nfile
   /* order species names from longer names to shorter (so that EColi is searched only after EColiII, e.g.) */
   empfreq ef = new_empfreq_sort_decreasing (sptaxa->nchars, sptaxa->nstrings, 1); /* 1=size_t (0=char, 2=int)*/
 
-  pool = new_pooled_matrix ((int)(arg_nfiles/20), sptaxa->nstrings);
+  pool = new_pooled_matrix ((int)(arg_nfiles/10), sptaxa->nstrings);
 
   for (i = 0; i < arg_nfiles; i++) { /* scan through gene files */
     genetre  = read_topology_space_from_file (arg_filename[i], NULL);/* read i-th gene family */
@@ -176,7 +176,7 @@ new_pooled_matrix (int n_sets, int n_species)
 
   pool->n_sptrees = n_sets;
   pool->n_species = n_species;
-  pool->n_sets_per_gene = n_sets/10;
+  pool->n_sets_per_gene = n_sets/20;
   pool->next = 0; // vector is shuffled whenever next arrives at last element
 
   if (pool->n_sptrees < 1) pool->n_sptrees = 1; 
