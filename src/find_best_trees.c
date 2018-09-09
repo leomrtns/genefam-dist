@@ -139,7 +139,7 @@ maxtrees_from_subsamples (char_vector sptaxa, char **arg_filename, int arg_nfile
     index_sptaxa_to_genetaxa (sptaxa, genetre->taxlabel, idx_gene_to_sp, ef);/* map species names to gene names and store into idx[] */
     valid_species_size = prepare_spdistmatrix_from_gene_species_map (pool->this_gene_spdist, idx_gene_to_sp, genetre->distinct[0]->nleaves);
     if (valid_species_size > 4) {
-      char_vector_add_string (gfilename, arg_filename[1]);
+      char_vector_add_string (gfilename, arg_filename[i]);
       update_pooled_matrix_from_gene_tree (pool, genetre->distinct[0], idx_gene_to_sp);
     }
     del_topology_space (genetre); 
