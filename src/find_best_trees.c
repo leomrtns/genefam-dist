@@ -62,7 +62,7 @@ int
 main (int argc, char **argv)
 {
   clock_t time0, time1;
-  int i,j;
+  int i,j,k;
   char_vector species, genefiles;
   topology_space tsp;
   gene_sptrees gs;
@@ -80,24 +80,31 @@ main (int argc, char **argv)
   tsp = maxtrees_from_subsamples (species, argv + 2, argc - 2, genefiles); 
   save_topology_space_to_trprobs_file (tsp, "patristic.tre", 1.);
 
-  i = (int)(genefiles->nstrings/100); 
-  if (i < 10) i = 10;
-  gs = new_gene_sptrees (i, 100, 50, tsp); // i = n_genes, n_ratchet, n_proposal
-  initialise_gene_sptrees_with_genetree_filenames (gs, genefiles);
-  initial_sorting_of_gene_sptrees_ratchet (gs, tsp);
-  for (i=0; i < 10; i++) {
-    improve_gene_sptrees_ratchet (gs, i);
-    j = gs->next_avail+1; if (j == gs->n_ratchet) j = 0;
-    s = topology_to_string_by_name (gs->ratchet[j], NULL); /* second parameter is vector with branch lengths */
-    printf ("[score %lf] %s;\n",gs->ratchet_score[j],s); fflush(stdout); free (s);
-  }
-
+  /* create genefam_sptree structure with ratchet and which fraction of total genefams (i=1%), but without chosing which genefams */
+  i = (int)(genefiles->nstrings/200);   if (i < 10) i = 10;
+  gs = new_gene_sptrees (i, 64, 6, tsp); // i = n_genes, n_ratchet, n_proposal (for each n_ratchet)
   stream = biomcmc_fopen ("best_trees.tre", "w");
   fprintf (stream, "#NEXUS\nBegin trees;\n");
-  for (i = 0; i < gs->n_ratchet; i++) {
-    s = topology_to_string_by_name (gs->ratchet[i], NULL); 
-    fprintf (stream, "tree PAUP_%d = %s;\n", i, s); free (s);
-  }
+
+  /* k samplings of i-percent above of genefams and search for optimal trees, using previous sptrees if exist */
+  for (k = 0; k < 32; k++) {
+    /* chose a new set of genefams, and recycle previous set of ratchet trees if exist or use from maxtrees o.w. */
+    initialise_gene_sptrees_with_genetree_filenames (gs, genefiles);
+    if (!k) initial_sorting_of_gene_sptrees_ratchet (gs, tsp);
+    else    initial_sorting_of_gene_sptrees_ratchet (gs, NULL);
+    /* optimisation of ratchet trees */
+    for (i=0; i < 16; i++) improve_gene_sptrees_ratchet (gs, i);// multiples of 4 since there are 4 randomisers
+    /* save top best trees to file */
+    for (i = 0; i < 16; i++) { // i must be smaller than gs->n_ratchet
+      j = (i + gs->next_avail+1) % gs->n_ratchet; // circular index 
+      s = topology_to_string_by_name (gs->ratchet[j], NULL); 
+      fprintf (stream, "tree PAUP_%d = %s;\n", k * 16 + i, s); fflush(stream); free (s); // each k sampling will have i x k trees
+    }
+    /* print best tree to screen */
+    j = (gs->next_avail+1) % gs->n_ratchet; // circular index 
+    s = topology_to_string_by_name (gs->ratchet[j], NULL); /* second parameter is vector with branch lengths */
+    printf ("[sampling %d score %lf] %s;\n",k, gs->ratchet_score[j],s); fflush(stdout); free (s);
+  } // for (k<number of subsamples)
   fprintf (stream, "End;\n");
   fclose (stream);
 
@@ -336,8 +343,8 @@ new_gene_sptrees (int n_genes, int n_ratchet, int n_proposal, topology_space spt
   gs->n_ratchet = n_ratchet;
   gs->n_proposal = n_proposal;
   gs->best_score = 1.e35;
-  if (gs->n_ratchet < 10) gs->n_ratchet = 10; // ratchet[0] has best score
-  if (gs->n_proposal < 10) gs->n_proposal = 10;
+  if (gs->n_ratchet < 10) gs->n_ratchet = 10; // ratchet[0] has best score at first (due to initial_sorting() )
+  if (gs->n_proposal < 2) gs->n_proposal = 2;
   gs->next_avail = gs->n_ratchet - 1; // idx of currently worse tree (which is just before best tree in a ratchet)
 
   gs->gene = (genetree*) biomcmc_malloc (gs->n_genes * sizeof (genetree)); 
@@ -452,7 +459,8 @@ initial_sorting_of_gene_sptrees_ratchet (gene_sptrees gs, topology_space tsp)
 
   for (i=0; i < gs->n_ratchet; i++) gs->ratchet_score[i] = ef->d[i].freq; // doesnt need pivot since ef->freqs came from ratchet_score[]
   gs->best_score = ef->d[0].freq; // lowest (best) score is first element (may need to be recalc every time new proposals are created, using new minima)
-  for (i=0; i < gs->n_ratchet; i++) printf ("DEBUG::score:: %lf\n", gs->ratchet_score[i]);
+  // for (i=0; i < gs->n_ratchet; i++) printf ("DEBUG::score:: %lf\n", gs->ratchet_score[i]);
+  gs->next_avail = gs->n_ratchet - 1; // idx of currently worse tree (which is just before best tree in a ratchet)
 
   del_empfreq_double (ef);
   return;
