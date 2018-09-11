@@ -73,8 +73,7 @@ void del_nexus_tree (nexus_tree T);
  * despite the taxlabel[] vector with leaf names is shared.
  * This is necessary since despite nexus_tree_struct has freedom about the order of nodes (including leaves), in 
  * topology_struct the order is defined. */
-void add_tree_to_topology_space (topology_space tsp, const char *string, bool translate, 
-                                 hashtable external_hash, int **order);
+void add_tree_to_topology_space (topology_space tsp, const char *string, bool translate, hashtable external_hash, int **order, bool use_root_location);
 
 /*! \brief Reads translation table (one line) of the form "number = taxa name" in tree file. */
 void translate_taxa_topology_space (topology_space tsp, char *string, hashtable external_hash);
@@ -214,13 +213,13 @@ add_topology_to_topology_space_if_distinct (topology topol, topology_space tsp, 
 }
 
 topology_space
-read_topology_space_from_file (char *seqfilename, hashtable external_taxhash)
+read_topology_space_from_file (char *seqfilename, hashtable external_taxhash, bool use_root_location)
 {
-  return read_topology_space_from_file_with_burnin_thin (seqfilename, external_taxhash, 0, 1);
+  return read_topology_space_from_file_with_burnin_thin (seqfilename, external_taxhash, 0, 1, use_root_location);
 }
 
 topology_space
-read_topology_space_from_file_with_burnin_thin (char *seqfilename, hashtable external_taxhash, int burnin, int thin)
+read_topology_space_from_file_with_burnin_thin (char *seqfilename, hashtable external_taxhash, int burnin, int thin, bool use_root_location)
 {
   topology_space treespace=NULL;
   FILE *seqfile;
@@ -281,7 +280,7 @@ read_topology_space_from_file_with_burnin_thin (char *seqfilename, hashtable ext
           needle_tip++; /* remove "=" from string */
           iteration++;
           if (option_include_tree)
-            add_tree_to_topology_space (treespace, needle_tip, option_translate_perm, external_taxhash, &order_external);
+            add_tree_to_topology_space (treespace, needle_tip, option_translate_perm, external_taxhash, &order_external, use_root_location);
         }
       }
     
@@ -343,7 +342,7 @@ read_topology_space_from_file_with_burnin_thin (char *seqfilename, hashtable ext
 }
 
 void
-merge_topology_spaces (topology_space ts1, topology_space ts2, double weight_ts1)
+merge_topology_spaces (topology_space ts1, topology_space ts2, double weight_ts1, bool use_root_location)
 { /* ts1->tree is not correct anymore, should not be used after calling this function */
   int i, j, *idx, n_idx = ts1->ndistinct; 
   double total_freq = 0.;
@@ -362,7 +361,7 @@ merge_topology_spaces (topology_space ts1, topology_space ts2, double weight_ts1
     int found_id = -1;
     /* comparison includes root location (faster than unrooted since uses hash) */ 
     for (i=0; (i < n_idx) && (found_id < 0); i++) if (topology_is_equal (ts2->distinct[j], ts1->distinct[idx[i]] )) found_id = i;
-    if (found_id < 0) { /* if they look distinct (different root), then do slower unrooted calculation */ 
+    if ((!use_root_location) && (found_id < 0)) { /* if they look distinct (different root), then do slower unrooted calculation */ 
       splitset split = new_splitset (ts2->distinct[j]->nleaves);
       for (i=0; (i < n_idx) && (found_id < 0); i++) if (topology_is_equal_unrooted (ts2->distinct[j], ts1->distinct[idx[i]], split, i)) found_id = i;
       del_splitset (split);
@@ -550,7 +549,7 @@ del_nexus_tree (nexus_tree T)
 }
 
 void
-add_tree_to_topology_space (topology_space tsp, const char *string, bool translate, hashtable external_hash, int **order)
+add_tree_to_topology_space (topology_space tsp, const char *string, bool translate, hashtable external_hash, int **order, bool use_root_location)
 {
   int i, index, *original_order;
   char *local_string;
@@ -689,7 +688,7 @@ add_tree_to_topology_space (topology_space tsp, const char *string, bool transla
   split = new_splitset (topol->nleaves);
   /* distinct trees might have same unrooted info, but rooted calculation is faster */
   for (i=0; (i < tsp->ndistinct) && (found_id < 0); i++) if (topology_is_equal (topol, tsp->distinct[i])) found_id = i;
-  if (found_id < 0) /* if they look distinct (different root), then do slower unrooted calculation */ 
+  if ((!use_root_location) && (found_id < 0)) /* if they look distinct (different root), then do slower unrooted calculation */ 
     for (i=0; (i < tsp->ndistinct) && (found_id < 0); i++) if (topology_is_equal_unrooted (topol, tsp->distinct[i], split, i)) found_id = i;
   del_splitset (split);
   // FIXME: better solution is to have vector of splits for each tree, since slowest part is to copy/order bipartitions 

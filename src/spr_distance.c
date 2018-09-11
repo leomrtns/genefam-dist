@@ -17,7 +17,7 @@ main (int argc, char **argv)
   }
 
   // read and order nexus_tree 
-  gt = read_topology_space_from_file (argv[1], NULL);
+  gt = read_topology_space_from_file (argv[1], NULL, false); // false -> neglects root location
   split = new_splitset_dSPR (gt->tree[0]->nleaves);
 
   time1 = clock (); fprintf (stderr, "read timing: %.8f secs\n", (double)(time1-time0)/(double)CLOCKS_PER_SEC);

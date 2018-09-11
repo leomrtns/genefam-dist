@@ -18,8 +18,8 @@ main (int argc, char **argv)
   }
 
   // read and order nexus_tree 
-  gt = read_topology_space_from_file (argv[1], NULL);
-  st = read_topology_space_from_file (argv[2], NULL);
+  gt = read_topology_space_from_file (argv[1], NULL, false); // false --> neglects root location
+  st = read_topology_space_from_file (argv[2], NULL, true);
 
   time1 = clock (); fprintf (stderr, "read timing: %.8f secs\n", (double)(time1-time0)/(double)CLOCKS_PER_SEC);
   time0 = time1;

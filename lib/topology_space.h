@@ -43,11 +43,11 @@ void add_string_with_size_to_topology_space (topology_space *tsp_address, char *
 void add_topology_to_topology_space_if_distinct (topology topol, topology_space tsp, bool use_root_location);
 
 /*! \brief Read tree file and store info in topology_space_struct with possible external hashtable to impose the leaf ordering. */
-topology_space read_topology_space_from_file (char *seqfilename, hashtable external_taxhash);
+topology_space read_topology_space_from_file (char *seqfilename, hashtable external_taxhash, bool use_root_location);
 /*! \brief lower level function where we can specify burnin and thinning factor, in iterations */ 
-topology_space read_topology_space_from_file_with_burnin_thin (char *seqfilename, hashtable external_taxhash, int burnin, int thin);
+topology_space read_topology_space_from_file_with_burnin_thin (char *seqfilename, hashtable external_taxhash, int burnin, int thin, bool use_root_location);
 /*!  \brief merge trees from two topology_space objects, assuming names hashtable is the same */ 
-void merge_topology_spaces (topology_space ts1, topology_space ts2, double weight_ts1);
+void merge_topology_spaces (topology_space ts1, topology_space ts2, double weight_ts1, bool use_root_location);
 void  sort_topology_space_by_frequency(topology_space tsp, double *external_freqs) ; // INCOMPLETE
 
 /*! \brief Save topology_space to a file, in format nexus w/ trprobs, up to "credible" cummul frequency */
