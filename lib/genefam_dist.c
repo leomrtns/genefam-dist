@@ -12,10 +12,146 @@
  */
 
 #include "genefam_dist.h"
-#define NDISTS 6
 
+genetree internal_new_genetree_from_gene_and_sp_topologies (topology g_tree, topology s_tree);
+void internal_del_genetree (genetree gt);
+double internal_calculate_genetree_distance (genetree gt, topology s_tree);
+sptree_ratchet internal_new_sptree_ratchet (int n_genes, int n_ratchet, int n_proposal, topology_space sptree);
+void internal_del_sptree_ratchet (sptree_ratchet sr);
 /*! \brief create a new topology_space from string with list of trees in newick format */
-topology_space topology_space_from_newick_string (const char *treelist_string, bool use_root_location);
+topology_space internal_topology_space_from_newick_string (const char *treelist_string, bool use_root_location);
+
+
+genetree 
+internal_new_genetree_from_gene_and_sp_topologies (topology g_tree, topology s_tree)
+{
+  int i;
+  genetree gt;
+  gt = (genetree) biomcmc_malloc (sizeof (struct genetree_struct));
+  gt->tree = g_tree; gt->tree->ref_counter++; // point to element of topology_space (usually)
+  gt->split = create_splitset_dSPR_genespecies (gt->tree, s_tree);
+  // init_tree_recon_from_species_topology() would order sptree names everytime (and already calculates distances...)
+  if (!gt->tree->rec) gt->tree->rec = new_reconciliation (g_tree->nleaves, s_tree->nleaves); // if gene has rec, it better be from same sptree size!
+  index_sptaxa_to_reconciliation (s_tree->taxlabel, g_tree->taxlabel, gt->tree->rec);
+  for (i = 0; i < NDISTS; i++) {
+    gt->minmax[i] = 1.e35;  // higher bound for min
+    gt->minmax[i+NDISTS] = -1.e35; // lower bound for max
+    gt->dist[i] = -1.;
+  }
+  del_char_vector (g_tree->taxlabel); // should just decrease ref_counter and then delete later, with topology_space
+  return gt;
+}
+
+void
+internal_del_genetree (genetree gt)
+{
+  if (!gt) return;
+  del_splitset (gt->split);
+  del_topology (gt->tree);
+  free (gt);
+  return;
+}
+
+double
+internal_calculate_genetree_distance (genetree gt, topology s_tree) 
+{ /* local_optima -> return zero if a new local optimum is found (new minimum for _some_ distance)  */
+  int k;
+  double g_score = 0.;
+  gene_tree_reconcile (gt->tree, s_tree);
+  dSPR_gene_species (gt->tree, s_tree, gt->split); 
+  gt->dist[0] = (double) gt->tree->rec->ndups;
+  gt->dist[1] = (double) gt->tree->rec->nloss;
+  gt->dist[2] = (double) gt->tree->rec->ndcos;
+  gt->dist[3] = (double) gt->split->rf;
+  gt->dist[4] = (double) gt->split->hdist;
+  gt->dist[5] = (double) gt->split->spr + gt->split->spr_extra;  // order same as guenomu, NOT same as genefam_dist or treesignal.py
+  /* minimum values are always updated */
+  for (k=0; k < NDISTS; k++) {
+    if (gt->minmax[k] > gt->dist[k]) { gt->minmax[k] = gt->dist[k]; g_score = -1; } // min
+    if (gt->minmax[k+NDISTS] < gt->dist[k])  gt->minmax[k+NDISTS] = gt->dist[k]; // max
+  }
+  if (g_score < 0) return 0.; // if new minimum is found; however if sptree has been seen before then regular score is calculated
+  g_score = 0.;
+  for (k=0; k < NDISTS; k++) g_score += biomcmc_log1p( (double)(gt->dist[k])/(double)(gt->minmax[k+NDISTS])); 
+  return g_score;
+}
+
+sptree_ratchet
+internal_new_sptree_ratchet (int n_genes, int n_ratchet, int n_proposal, topology_space sptree)
+{
+  int i;
+  sptree_ratchet sr; 
+  sr = (sptree_ratchet) biomcmc_malloc (sizeof (struct sptree_ratchet_struct));
+  sr->n_genesamples = n_genes;
+  sr->n_ratchet = n_ratchet;
+  sr->n_proposal = n_proposal;
+  sr->best_score = 1.e35;
+  if (sr->n_ratchet < 8) sr->n_ratchet = 8; // ratchet[0] has best score at first (due to initial_sorting() )
+  if (sr->n_proposal < 2) sr->n_proposal = 2;
+  sr->next_avail = sr->n_ratchet - 1; // idx of currently worse tree (which is just before best tree in a ratchet)
+
+  sr->genesample = (genetree*) biomcmc_malloc (sr->n_genesamples * sizeof (genetree)); 
+  sr->ratchet  = (topology*) biomcmc_malloc (sr->n_ratchet * sizeof (topology)); 
+  sr->proposal = (topology*) biomcmc_malloc (sr->n_proposal * sizeof (topology));
+  sr->ratchet_score  = (double*) biomcmc_malloc (sr->n_ratchet * sizeof (double)); 
+
+  for (i=0; i < sr->n_ratchet; i++) {
+    sr->ratchet[i] = init_topol_for_new_gene_sptrees (sptree->distinct[0]);
+    randomize_topology (sr->ratchet[i]); // should be filled outside this function (to recycle optimal sptrees from previous iteration)
+  }
+  for (i=0; i < sr->n_proposal; i++) sr->proposal[i] = init_topol_for_new_gene_sptrees (sptree->distinct[0]);
+  for (i=0; i < sr->n_genes; i++) sr->genesample[i] = NULL; // must be created later, when we receive the gene topol_spaces 
+
+  initialise_ratchet_from_topol_space (sr, sptree);
+  return sr;
+}
+
+void
+internal_del_sptree_ratchet (sptree_ratchet sr)
+{
+  int i;
+  if (!sr) return;
+  if (sr->genesample) {
+    for (i = sr->n_genesamples - 1; i >= 0 ; i--) internal_del_genetree (sr->genesample[i]);
+    free (sr->genesample);
+  }
+  if (sr->ratchet) {
+    for (i = sr->n_ratchet - 1; i >= 0 ; i--) del_topology (sr->ratchet[i]);
+    free (sr->ratchet);
+  }
+  if (sr->proposal) {
+    for (i = sr->n_proposal - 1; i >= 0 ; i--) del_topology (sr->proposal[i]);
+    free (sr->proposal);
+  }
+  if (sr->ratchet_score) free (sr->ratchet_score);
+  free (sr);
+  return;
+}
+
+topology_space
+internal_topology_space_from_newick_string (const char *treelist_string, bool use_root_location)
+{
+  size_t str_size;
+  char *str_start, *str_end;
+  topology_space ts = NULL;
+
+  str_start = strchr (treelist_string, '(');
+  if (!str_start) biomcmc_error ("Couldn't read first tree (single or from list) in newick format");
+  while (str_start) {
+    str_end = strchr (str_start, ';');
+    if (str_end == NULL) str_size = strlen (str_start); /* function strchrnul() does this, but may not be portable? */
+    else str_size = str_end - str_start; 
+    add_string_with_size_to_topology_space (&ts, str_start, str_size, use_root_location);
+    if (str_end) str_start = strchr (str_end, '('); 
+    else str_start = NULL;
+  }
+  return ts;
+}
+
+/*** First implementation of treesignal relied on external species trees, and didn't have access to C structs 
+ *   Legacy code below 
+ ***/
+
 /*! \brief calculate distances between gene tree and collection of sptrees, and storing into newly allocated distances[] */ 
 bool generate_output_distances (topology_space gtree, topology_space stree, double **distances, int *n, bool rescale);
 /*! \brief calculate distances between gene tree and random sptrees, accumulating into previously allocated pvalues[] */ 
@@ -29,8 +165,8 @@ genefam_module_treesignal_fromtrees (const char *gtree_str, const char *splist_s
   int n_output = 0;
   topology_space genetree = NULL, sptree = NULL;
 
-  genetree = topology_space_from_newick_string (gtree_str, false); /* bool -> use_root_location */
-  sptree = topology_space_from_newick_string (splist_str, true);
+  genetree = internal_topology_space_from_newick_string (gtree_str, false); /* bool -> use_root_location */
+  sptree = internal_topology_space_from_newick_string (splist_str, true);
   // TODO: reduce sptrees to genetree species here (and notice that afterwards some sptrees may be same)
   /* 
   int i;
@@ -52,8 +188,8 @@ genefam_module_treesignal_fromtrees_rescale (const char *gtree_str, const char *
   topology_space genetree = NULL, sptree = NULL;
 
 
-  sptree = topology_space_from_newick_string (splist_str, true);
-  genetree = topology_space_from_newick_string (gtree_str, false);
+  sptree = internal_topology_space_from_newick_string (splist_str, true);
+  genetree = internal_topology_space_from_newick_string (gtree_str, false);
 
   generate_output_distances (genetree, sptree, output_distances, &n_output, true);
   del_topology_space (genetree);
@@ -70,8 +206,8 @@ genefam_module_treesignal_fromtrees_pvalue (const char *gtree_str, const char *s
   bool valid_trees = true;
   topology_space genetree = NULL, sptree = NULL;
 
-  genetree = topology_space_from_newick_string (gtree_str, false);
-  sptree = topology_space_from_newick_string (splist_str, true);
+  genetree = internal_topology_space_from_newick_string (gtree_str, false);
+  sptree = internal_topology_space_from_newick_string (splist_str, true);
 
   valid_trees = generate_output_distances (genetree, sptree, &obs_distances, &n_output, false);
   *output_distances = (double*) biomcmc_malloc (sizeof (double) * 2 * n_output); /* pointer used (and freed) by calling function */
@@ -212,7 +348,7 @@ genefam_module_randomise_trees_with_spr (const char *splist_str, int n_copies, i
   char *s, *output_tree_string, *tmp_string;
 
   biomcmc_random_number_init(0ULL);
-  strees = topology_space_from_newick_string (splist_str, true);
+  strees = internal_topology_space_from_newick_string (splist_str, true);
   n_strees = strees->ndistinct;
 
   for (i=0; i < n_strees; i++) for (j = 0; j < n_copies; j++) {
@@ -296,22 +432,3 @@ genefam_module_generate_spr_trees (int n_leaves, int n_iter, int n_spr)
   return output_tree_string;
 }
 
-topology_space
-topology_space_from_newick_string (const char *treelist_string, bool use_root_location)
-{
-  size_t str_size;
-  char *str_start, *str_end;
-  topology_space ts = NULL;
-
-  str_start = strchr (treelist_string, '(');
-  if (!str_start) biomcmc_error ("Couldn't read first tree (single or from list) in newick format");
-  while (str_start) {
-    str_end = strchr (str_start, ';');
-    if (str_end == NULL) str_size = strlen (str_start); /* function strchrnul() does this, but may not be portable? */
-    else str_size = str_end - str_start; 
-    add_string_with_size_to_topology_space (&ts, str_start, str_size, use_root_location);
-    if (str_end) str_start = strchr (str_end, '('); 
-    else str_start = NULL;
-  }
-  return ts;
-}

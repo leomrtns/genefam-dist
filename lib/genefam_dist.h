@@ -14,8 +14,9 @@
 /*! \file genefam_dist.h 
  *  \brief biomcmc library interface to external programs, specific to genefam_dist repo.
  *
- *  The idea is for genefam_dist is to be general for several sofware, including treesignal but also parallel projects by
- *  leomrtns. This library started as a branching from the biomcmc library (from the guenomu software)
+ *  The idea is for genefam_dist is to be a general library for the analysis of multi-labelled gene family trees, 
+ *  including treesignal but also for species tree inference and distance calculation.
+ *  This library started as a branching from the biomcmc library (from the guenomu software)
  */
 
 #ifndef _genefam_dist_h_
@@ -37,6 +38,40 @@
 #include "random_number.h"   // called by topology_build.h
 #include "empirical_frequency.h" // called by topology_mrca.h, nexus_common.h  and alignment.h 
 #endif // of THESE_ARE_COMMENTS
+
+#define NDISTS 6 
+
+typedef struct genetree_struct* genetree;
+typedef struct sptree_ratchet_struct* sptree_ratchet; // gene_sptrees in find_best_tree.c 
+typedef struct genefam_sptree_struct* genefam_sptree; // accessible to other libraries
+
+struct genetree_struct
+{
+  topology tree;
+  double minmax[2 * NDISTS], dist[NDISTS]; // values are integers; might have a variable "scale" to allow for quick or no scaling 
+  splitset split;
+};
+
+struct sptree_ratchet_struct  
+{  // later this will have weights[NDISTS] to allow for 'random' score weighting assignment
+  int n_genesamples, n_ratchet, n_proposal;
+  int next_avail; // idx to ratchet elements 
+  genetree *genesample;
+  topology *ratchet, *proposal; 
+  double *ratchet_score, best_score; 
+};
+
+struct genefam_sptree_struct
+{
+  int n_genefams, n_sptrees, next_sptree;
+  genetree *genefam;
+  topology *sptree;
+  sptree_ratchet best_trees; // later this will be a vector since can be multi-threaded
+};
+
+/*** First implementation of treesignal relied on external species trees, and didn't have access to C structs 
+ *   Legacy code below 
+ ***/
 
 /*! \brief given a gene tree and a group of species trees, both in newick format, return the spectrum of unnormalized distances */
 int genefam_module_treesignal_fromtrees (const char *gtree_str, const char *splist_str, double **output_distances);
