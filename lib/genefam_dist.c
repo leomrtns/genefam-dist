@@ -17,6 +17,8 @@
 
 genefam_sptree new_genefam_sptree_from_species_char_vector (const char_vector species_names, const int n_sptrees, const int n_ratchet);
 void del_genefam_sptree (genefam_sptree gf);
+int add_genefam_from_string (genefam_sptree gf, const char *gtree_str);
+
 genetree internal_new_genetree_from_gene_and_sp_topologies (topology g_tree, topology s_tree);
 void internal_del_genetree (genetree gt);
 double internal_calculate_genetree_distance (genetree gt, topology s_tree);
@@ -70,18 +72,22 @@ del_genefam_sptree (genefam_sptree gf)
 }
 
 int
-add_genefam_from_string()
-{ // FIXME (just copied from find_best_tree.c)
-  // must check if possible to store idx into reconciliation 
-  biomcmc_realloc ((int*) idx_gene_to_sp, genetre->distinct[0]->nleaves * sizeof (int));
-  index_sptaxa_to_genetaxa (sptaxa, genetre->taxlabel, idx_gene_to_sp, ef);/* map species names to gene names and store into idx[] */
-  valid_species_size = prepare_spdistmatrix_from_gene_species_map (pool->this_gene_spdist, idx_gene_to_sp, genetre->distinct[0]->nleaves);
-  if (valid_species_size > 4) {
-    char_vector_add_string (gfilename, arg_filename[i]);
-    update_pooled_matrix_from_gene_tree (pool, genetre->distinct[0], idx_gene_to_sp);
+add_genefam_from_string (genefam_sptree gf, const char *gtree_str)
+{ 
+  topology_space gene;
+  int success = 0; // zero means failure (it's an integer since we can store the actual number of successful elements, in other functions)
+  gene = internal_topology_space_from_newick_string (gtree_str, false); /* bool -> use_root_location */
+  if (!gene->distinct[0]->rec) gene->distinct[0]->rec = new_reconciliation (gene->distinct[0]->nleaves, gf->sptree[0]->nleaves);
+  // init_tree_recon_from_species_topology() would order sptree names every time
+  index_sptaxa_to_reconciliation (gf->sptree[0]->taxlabel, gene->taxlabel, gene->distinct[0]->rec); 
+
+  if (gene->rec->sp_size > 4) { // number of distinct species represented in gene family
+    gf->genefam = biomcmc_realloc ((genetree*) gf->genefam, (gf->n_genefams + 1) * sizeof (genetree*));
+    gf->genefam[gf->n_genefams++] = internal_new_genetree_from_gene_and_sp_topologies (gene->distinct[0], gf->sptree[0]);
+    success = 1;
   }
-  del_topology_space (genetre);
-  return 1; // success
+  del_topology_space (gene);
+  return success;
 }
 
 int
@@ -97,9 +103,7 @@ internal_new_genetree_from_gene_and_sp_topologies (topology g_tree, topology s_t
   gt = (genetree) biomcmc_malloc (sizeof (struct genetree_struct));
   gt->tree = g_tree; gt->tree->ref_counter++; // point to element of topology_space (usually)
   gt->split = create_splitset_dSPR_genespecies (gt->tree, s_tree);
-  // init_tree_recon_from_species_topology() would order sptree names everytime (and already calculates distances...)
-  if (!gt->tree->rec) gt->tree->rec = new_reconciliation (g_tree->nleaves, s_tree->nleaves); // if gene has rec, it better be from same sptree size!
-  index_sptaxa_to_reconciliation (s_tree->taxlabel, g_tree->taxlabel, gt->tree->rec);
+  // we assume g_tree->rec exists (since was used to check if genefam tree is valid (>3species)
   for (i = 0; i < NDISTS; i++) {
     gt->minmax[i] = 1.e35;  // higher bound for min
     gt->minmax[i+NDISTS] = -1.e35; // lower bound for max
