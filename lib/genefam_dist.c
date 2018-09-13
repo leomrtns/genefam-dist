@@ -81,7 +81,7 @@ add_genefam_from_string (genefam_sptree gf, const char *gtree_str)
   // init_tree_recon_from_species_topology() would order sptree names every time
   index_sptaxa_to_reconciliation (gf->sptree[0]->taxlabel, gene->taxlabel, gene->distinct[0]->rec); 
 
-  if (gene->rec->sp_size > 4) { // number of distinct species represented in gene family
+  if (gene->rec->sp_size > 3) { // number of distinct species represented in gene family
     gf->genefam = biomcmc_realloc ((genetree*) gf->genefam, (gf->n_genefams + 1) * sizeof (genetree*));
     gf->genefam[gf->n_genefams++] = internal_new_genetree_from_gene_and_sp_topologies (gene->distinct[0], gf->sptree[0]);
     success = 1;
