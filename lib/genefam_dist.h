@@ -67,6 +67,10 @@ struct genefam_sptree_struct
   genetree *genefam;
   topology *sptree;
   sptree_ratchet best_trees; // later this will be a vector since can be multi-threaded
+  /* genetree *complete_genes;
+   * genetree *aux_genefam; // fake genefams composed of good sptrees
+   * int *rank_sptree; // could be sum of ranks or how many times was first ranked, per species tree
+   */
 };
 
 /*** First implementation of treesignal relied on external species trees, and didn't have access to C structs 

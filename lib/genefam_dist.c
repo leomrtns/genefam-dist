@@ -13,14 +13,81 @@
 
 #include "genefam_dist.h"
 
+/* later I can create/delete sptree_ratchet w/ distinct parameters (for python) using same genefam_sptree struct */
+
+genefam_sptree new_genefam_sptree_from_species_char_vector (const char_vector species_names, const int n_sptrees, const int n_ratchet);
+void del_genefam_sptree (genefam_sptree gf);
 genetree internal_new_genetree_from_gene_and_sp_topologies (topology g_tree, topology s_tree);
 void internal_del_genetree (genetree gt);
 double internal_calculate_genetree_distance (genetree gt, topology s_tree);
-sptree_ratchet internal_new_sptree_ratchet (int n_genes, int n_ratchet, int n_proposal, topology_space sptree);
+
+sptree_ratchet internal_new_sptree_ratchet (int n_genes, int n_ratchet, int n_proposal, topology_space sptree); 
 void internal_del_sptree_ratchet (sptree_ratchet sr);
+
 /*! \brief create a new topology_space from string with list of trees in newick format */
 topology_space internal_topology_space_from_newick_string (const char *treelist_string, bool use_root_location);
 
+genefam_sptree
+new_genefam_sptree_from_species_char_vector (const char_vector species_names, const int n_sptrees, const int n_ratchet)
+{
+  genefam_sptree gf;
+  int i;
+
+  gf = (genefam_sptree) biomcmc_malloc (sizeof (struct genefam_sptree_struct));
+  gf->n_sptrees = n_sptrees;
+  if (gf->n_sptrees < 4) gf->n_sptrees = 4;  
+  gf->n_genefams = 0;
+  gf->genefam = NULL;
+  gf->best_trees = NULL;
+  gf->next_sptree = 0;
+  gf->sptree = (topology*) biomcmc_malloc (gf->n_sptrees * sizeof (topology));
+
+  char_vector_remove_duplicate_strings (species_names); 
+  char_vector_longer_first_order (species_names); // order species names from longest to shortest (speed up gene/spnames comparison) 
+  for (i = 0; i < gf->n_sptrees; i++) {
+    gf->sptree[i] = new_topology (species_names->nstrings);
+    gf->sptree[i]->taxlabel = species_names; gf->sptree[i]->taxlabel->ref_counter++; 
+    randomize_topology (gf->sptree[i]);
+  } 
+  return gf;
+}
+
+void
+del_genefam_sptree (genefam_sptree gf)
+{
+  int i;
+  if (!gf) return;
+  if (gf->sptree) {
+    for (i = gf->n_sptrees - 1; i >= 0 ; i--) free_topology (gf->sptree[i]);
+    free (gf->sptree);
+  }
+  if (gf->genefam) {
+    for (i = gf->n_genefams - 1; i >= 0 ; i--) internal_del_genetree(gf->genefam[i]);
+    free (gf->genefam);
+  }
+  internal_del_sptree_ratchet (gf->best_trees);
+  free (gf);
+}
+
+int
+add_genefam_from_string()
+{ // FIXME (just copied from find_best_tree.c)
+  // must check if possible to store idx into reconciliation 
+  biomcmc_realloc ((int*) idx_gene_to_sp, genetre->distinct[0]->nleaves * sizeof (int));
+  index_sptaxa_to_genetaxa (sptaxa, genetre->taxlabel, idx_gene_to_sp, ef);/* map species names to gene names and store into idx[] */
+  valid_species_size = prepare_spdistmatrix_from_gene_species_map (pool->this_gene_spdist, idx_gene_to_sp, genetre->distinct[0]->nleaves);
+  if (valid_species_size > 4) {
+    char_vector_add_string (gfilename, arg_filename[i]);
+    update_pooled_matrix_from_gene_tree (pool, genetre->distinct[0], idx_gene_to_sp);
+  }
+  del_topology_space (genetre);
+  return 1; // success
+}
+
+int
+find_initial_best_trees_from_genefam ()
+{ // this function should use pool matrix, and create the sptree_ratchet best_trees
+}
 
 genetree 
 internal_new_genetree_from_gene_and_sp_topologies (topology g_tree, topology s_tree)
@@ -39,6 +106,10 @@ internal_new_genetree_from_gene_and_sp_topologies (topology g_tree, topology s_t
     gt->dist[i] = -1.;
   }
   del_char_vector (g_tree->taxlabel); // should just decrease ref_counter and then delete later, with topology_space
+  for (i = 0; i < 32; i++) {
+    randomize_topology (s_tree); 
+    internal_calculate_genetree_distance (gt, s_tree);
+  }
   return gt;
 }
 
@@ -72,13 +143,13 @@ internal_calculate_genetree_distance (genetree gt, topology s_tree)
   }
   if (g_score < 0) return 0.; // if new minimum is found; however if sptree has been seen before then regular score is calculated
   g_score = 0.;
-  for (k=0; k < NDISTS; k++) g_score += biomcmc_log1p( (double)(gt->dist[k])/(double)(gt->minmax[k+NDISTS])); 
+  for (k=0; k < NDISTS; k++) g_score += biomcmc_log1p( (double)(gt->dist[k] - gt->minmax[k])/(double)(gt->minmax[k+NDISTS] - gt->minmax[k]) ); 
   return g_score;
 }
 
 sptree_ratchet
 internal_new_sptree_ratchet (int n_genes, int n_ratchet, int n_proposal, topology_space sptree)
-{
+{ // n_minibatches will be given by optimiser function
   int i;
   sptree_ratchet sr; 
   sr = (sptree_ratchet) biomcmc_malloc (sizeof (struct sptree_ratchet_struct));
@@ -86,6 +157,7 @@ internal_new_sptree_ratchet (int n_genes, int n_ratchet, int n_proposal, topolog
   sr->n_ratchet = n_ratchet;
   sr->n_proposal = n_proposal;
   sr->best_score = 1.e35;
+  if (sr->n_genesamples < 2) sr->n_genesamples = 2;
   if (sr->n_ratchet < 8) sr->n_ratchet = 8; // ratchet[0] has best score at first (due to initial_sorting() )
   if (sr->n_proposal < 2) sr->n_proposal = 2;
   sr->next_avail = sr->n_ratchet - 1; // idx of currently worse tree (which is just before best tree in a ratchet)
