@@ -82,8 +82,8 @@ main (int argc, char **argv)
   save_topology_space_to_trprobs_file (tsp, "patristic.tre", 1.);
 
   /* create genefam_sptree structure with ratchet and which fraction of total genefams (i=1%), but without chosing which genefams */
-  i = (int)(genefiles->nstrings/200);   if (i < 10) i = 10;
-  gs = new_gene_sptrees (i, 128, 2, tsp); // i = n_genes, n_ratchet, n_proposal (for each n_ratchet)
+  i = (int)(genefiles->nstrings/256);   if (i < 10) i = 10;
+  gs = new_gene_sptrees (i, 64, 4, tsp); // i = n_genes, n_ratchet, n_proposal (for each n_ratchet)
   stream = biomcmc_fopen ("best_trees.tre", "w");
   fprintf (stream, "#NEXUS\nBegin trees;\n");
 
@@ -92,17 +92,17 @@ main (int argc, char **argv)
     /* chose a new set of genefams */ 
     initialise_gene_sptrees_with_genetree_filenames (gs, genefiles);
     /* few rounds of optimisation using global and local scores */
-    for (j = 0; j < 4; j++) {
+    for (j = 0; j < 8; j++) {
       sorting_of_gene_sptrees_ratchet (gs, tsp, (bool) j%2); // bool decides if local score or not
       if (tsp) { del_topology_space (tsp); tsp = NULL; } // discard after first use
       /* optimisation of ratchet trees */
       improve_gene_sptrees_ratchet (gs, 4);// multiples of 4 are better since there are 4 randomisers
     }
     /* save top best trees to file */
-    for (i = 0; i < 64; i++) { // i must be smaller than gs->n_ratchet
+    for (i = 0; i < 8; i++) { // i must be smaller than gs->n_ratchet
       j = (i + gs->next_avail+1) % gs->n_ratchet; // circular index 
       s = topology_to_string_by_name (gs->ratchet[j], NULL); 
-      fprintf (stream, "tree PAUP_%d = %s;\n", k * 64 + i, s); fflush(stream); free (s); // each k sampling will have i x k trees
+      fprintf (stream, "tree PAUP_%d = %s;\n", k * 8 + i, s); fflush(stream); free (s); // each k sampling will have i x k trees
     }
     /* print best tree to screen */
     j = (gs->next_avail+1) % gs->n_ratchet; // circular index 
