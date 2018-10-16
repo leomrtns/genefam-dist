@@ -83,7 +83,7 @@ main (int argc, char **argv)
 
   /* create genefam_sptree structure with ratchet and which fraction of total genefams (i=1%), but without chosing which genefams */
   i = (int)(genefiles->nstrings/500);   if (i < 10) i = 10;
-  gs = new_gene_sptrees (i, 64, 4, tsp); // i = n_genes, n_ratchet, n_proposal (for each n_ratchet)
+  gs = new_gene_sptrees (i, 128, 4, tsp); // i = n_genes, n_ratchet, n_proposal (for each n_ratchet)
   stream = biomcmc_fopen ("best_trees.tre", "w");
   fprintf (stream, "#NEXUS\nBegin trees;\n");
 
@@ -96,7 +96,7 @@ main (int argc, char **argv)
       sorting_of_gene_sptrees_ratchet (gs, tsp, (bool) j%2); // bool decides if local score or not
       if (tsp) { del_topology_space (tsp); tsp = NULL; } // discard after first use
       /* optimisation of ratchet trees */
-      improve_gene_sptrees_ratchet (gs, 8);// multiples of 4 are better since there are 4 randomisers
+      improve_gene_sptrees_ratchet (gs, 16);// multiples of 4 are better since there are 4 randomisers
     }
     /* save top best trees to file */
     for (i = 0; i < 4; i++) { // i must be smaller than gs->n_ratchet
@@ -186,7 +186,7 @@ new_pooled_matrix (int n_sets, int n_species)
 
   pool->n_sptrees = n_sets;
   pool->n_species = n_species;
-  pool->n_sets_per_gene = n_sets/2;
+  pool->n_sets_per_gene = n_sets/4;
   pool->next = 0; // vector is shuffled whenever next arrives at last element
 
   if (pool->n_sptrees < 1) pool->n_sptrees = 1; 
@@ -401,6 +401,7 @@ initialise_gene_sptrees_with_genetree_filenames (gene_sptrees gs, char_vector ge
 
   idx = (int*) biomcmc_malloc (gs->n_genes * sizeof (int)); 
   for (i=0; i < gs->n_genes; i++) idx[i] = i;
+  for (i= gs->n_genes - 1; i >=0; i--) { del_genetree (gs->gene[i]); gs->gene[i] = NULL; } // already allocated in previous iteration
 
   for (i=0; i < gs->n_genes; i++) {
     j = biomcmc_rng_unif_int (gs->n_genes - i);
