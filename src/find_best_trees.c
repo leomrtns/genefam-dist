@@ -7,8 +7,11 @@ typedef struct pooled_matrix_struct* pooled_matrix;
 typedef struct genetree_struct* genetree;
 typedef struct gene_sptrees_struct* gene_sptrees;
 
-/* idea: store bad  topologies and reject those close to them (RF between sptrees cheaper) <- too many?
+/* idea_1: store bad  topologies and reject those close to them (RF between sptrees cheaper) <- too many?
  * 'bad' in the sense that appeared in proposal (i.e. not random) but rejected (worse than any in ratchet?); we can even output these at end */
+/* idea_2: ratchet don't need to be updated only when new best score is found, it can be updated whenever new tree is better than worse. 
+ * However we may need to sort periodically (when?), and we may have repeated trees. Also we'll need to check whenever rescaling changes 
+ * (minimum is always minimum, but not the other values) */
 // unlike genefam_dist library, here we do not have ref_counter 
 
 struct pooled_matrix_struct
@@ -64,7 +67,7 @@ int
 main (int argc, char **argv)
 {
   clock_t time0, time1;
-  int i,j,k;
+  int i,j,k, n_samples = 32, n_cycles = 2, n_iter_per_cycle = 16, n_output_trees = 4, n_ratchet = 256, n_proposal = 4, fraction_gfs = 256;
   char_vector species, genefiles;
   topology_space tsp;
   gene_sptrees gs;
@@ -84,38 +87,49 @@ main (int argc, char **argv)
   save_topology_space_to_trprobs_file (tsp, "patristic.tre", 1.);
 
   /* create genefam_sptree structure with ratchet and which fraction of total genefams (i=1%), but without chosing which genefams */
-  i = (int)(genefiles->nstrings/512);   if (i < 10) i = 10;
-  gs = new_gene_sptrees (i, 128, 4, tsp); // i = n_genes, n_ratchet, n_proposal (for each n_ratchet) // 128, 4
+  i = (int)(genefiles->nstrings/fraction_gfs);   if (i < 10) i = 10;
+  gs = new_gene_sptrees (i, n_ratchet, n_proposal, tsp); // i = n_genes, n_ratchet, n_proposal (for each n_ratchet) // 128, 4
   stream = biomcmc_fopen ("best_trees.tre", "w");
   fprintf (stream, "#NEXUS\nBegin trees;\n");
+
+  time1 = clock (); fprintf (stderr, "timing: %.8f secs\n\n", (double)(time1-time0)/(double)CLOCKS_PER_SEC); time0 = time1;
 
   fprintf (stderr, "Step 2: Using trees from Step 1 as starting trees, sample subsets of valid gene families and try to\n");
   fprintf (stderr, "        (1) decrease overall sums of distances from all gene families ('global') --  or\n");
   fprintf (stderr, "        (2) maximise number of gene families with at least one optimal distance ('local').\n\n");
-  fprintf (stderr, " - Generate 32 samples of %d gene families each, saving the best 8 at the end of each sample\n", gs->n_genes);
-  fprintf (stderr, " - For each sample, store the best %d trees, randomizing each %d times over 8x64 = 512 iterations\n\n", gs->n_ratchet, gs->n_proposal);
+  fprintf (stderr, " - Generate %d samples of %d gene families each, saving the best %d at the end of each sample\n", 
+           n_samples, gs->n_genes, n_output_trees);
+  fprintf (stderr, " - For each sample, store the best %d trees, randomising each %d times over (%d x %d) iterations\n\n", 
+           gs->n_ratchet, gs->n_proposal, n_cycles, n_iter_per_cycle);
 
   /* k samplings of i-percent above of genefams and search for optimal trees, using previous sptrees if exist */
-  for (k = 0; k < 32; k++) {
+  for (k = 0; k < n_samples; k++) {
     /* chose a new set of genefams */ 
     initialise_gene_sptrees_with_genetree_filenames (gs, genefiles);
     /* few rounds of optimisation using global and local scores */
-    for (j = 0; j < 8; j++) { 
-      sorting_of_gene_sptrees_ratchet (gs, tsp, (bool) j < 3); // bool decides if local score or not, can be (bool)j%2
-      if (tsp) { del_topology_space (tsp); tsp = NULL; } // discard after first use
+    for (j = 0; j < n_cycles; j++) { 
       /* optimisation of ratchet trees */
-      improve_gene_sptrees_ratchet (gs, 64);// multiples of 4 are better since there are 4 randomisers
+      if (!j) {
+        sorting_of_gene_sptrees_ratchet (gs, tsp, true); // bool decides if local score or not, can be (bool)j%2
+        improve_gene_sptrees_ratchet (gs, 1); // spend just one iteration with local score trees
+      }
+      else {
+        sorting_of_gene_sptrees_ratchet (gs, tsp, false); // bool decides if local score or not, can be (bool)j%2
+        improve_gene_sptrees_ratchet (gs, n_iter_per_cycle);// multiples of 4 are better since there are 4 randomisers
+      }
+      if (tsp) { del_topology_space (tsp); tsp = NULL; } // discard after first use
     }
     /* save top best trees to file */
-    for (i = 0; i < 8; i++) { // i must be smaller than gs->n_ratchet
+    for (i = 0; i < n_output_trees; i++) { // i must be smaller than gs->n_ratchet
       j = (i + gs->next_avail+1) % gs->n_ratchet; // circular index 
       s = topology_to_string_by_name (gs->ratchet[j], NULL); 
-      fprintf (stream, "tree PAUP_%d = %s;\n", k * 8 + i, s); fflush(stream); free (s); // each k sampling will have i x k trees
+      fprintf (stream, "tree PAUP_%d = %s;\n", k * n_output_trees + i, s); fflush(stream); free (s); // each k sampling will have i x k trees
     }
     /* print best tree to screen */
     j = (gs->next_avail+1) % gs->n_ratchet; // circular index 
     s = topology_to_string_by_name (gs->ratchet[j], NULL); /* second parameter is vector with branch lengths */
     printf ("[sampling %d score %lf] %s;\n",k, gs->ratchet_score[j],s); fflush(stdout); free (s);
+    time1 = clock (); fprintf (stderr, "partial timing: %.8f secs\n", (double)(time1-time0)/(double)CLOCKS_PER_SEC); time0 = time1;
   } // for (k<number of subsamples)
   fprintf (stream, "End;\n");
   fclose (stream);
@@ -500,8 +514,9 @@ sorting_of_gene_sptrees_ratchet (gene_sptrees gs, topology_space tsp, bool local
 
   for (i=0; i < gs->n_ratchet; i++) gs->ratchet_score[i] = ef->d[i].freq; // doesnt need pivot since ef->freqs came from ratchet_score[]
   gs->best_score = ef->d[0].freq; // lowest (best) score is first element (may need to be recalc every time new proposals are created, using new minima)
-  printf ("DEBUG::current_best_scores:: ");
-  for (i = 0; i < 4; i++) printf ("%6.4lf ", gs->ratchet_score[i]);   printf ("\n");
+  fprintf (stderr, "Ordered list of best scores: ");
+  for (i = 0; i < 5; i++) printf ("%7.3lf ", gs->ratchet_score[i]);   printf (" ...... ");
+  for (i = gs->n_ratchet - 6; i < gs->n_ratchet; i++) printf ("%7.3lf ", gs->ratchet_score[i]);   printf ("\n");
   gs->next_avail = gs->n_ratchet - 1; // idx of currently worse tree (which is just before best tree in a ratchet)
 
   del_empfreq_double (ef);
@@ -522,7 +537,8 @@ improve_gene_sptrees_ratchet (gene_sptrees gs, int n_iterations)
 { 
   int i,j, iteration;
   double score = 0;
-  if (n_iterations < 4) n_iterations = 4;
+  if (n_iterations < 1) n_iterations = 1;
+  fprintf (stderr, "Best score at end of each iteration: ");
   for (iteration = 0; iteration < n_iterations; iteration++) {
     for (j = 0; j < gs->n_ratchet; j++) { 
       generate_new_gene_sptrees_proposal_trees (gs, j, iteration);
@@ -531,13 +547,43 @@ improve_gene_sptrees_ratchet (gene_sptrees gs, int n_iterations)
         if (score < gs->best_score) add_topol_to_gene_sptrees_ratchet (gs, i, score);
       }
     }
+    fprintf (stderr, "%7.3lf ", gs->ratchet_score[ (gs->next_avail+1) % gs->n_ratchet ]);
   } // for (iteration)
+  fprintf (stderr, "\n");
   return;
 }
 
 void
 generate_new_gene_sptrees_proposal_trees (gene_sptrees gs, int idx, int iteration)
 {
+  int coinflip = 0;
+  int i, j;
+  for (i = 0; i < gs->n_proposal; i++) copy_topology_from_topology (gs->proposal[i], gs->ratchet[idx]);
+  if (!(iteration%2)) {
+    for (i = 0; i < gs->n_proposal; i++) {
+      topology_apply_rerooting (gs->proposal[i], false);
+      for (j = 0; j < biomcmc_rng_unif_int (3); j++) topology_apply_shortspr (gs->proposal[i], false);
+      for (j = 0; j < biomcmc_rng_unif_int (2); j++) topology_apply_nni (gs->proposal[i], false);
+    }
+  }
+  if (!((iteration+1)%2)) {
+    for (i = 0; i < gs->n_proposal; i++) {
+      for (j = 0; j <= biomcmc_rng_unif_int (3); j++) topology_apply_nni (gs->proposal[i], false);
+      for (j = 0; j <  biomcmc_rng_unif_int (3); j++) topology_apply_spr_unrooted (gs->proposal[i], false);
+    }
+  }
+  // if rooted trees are the same, randomise one of them (assuming random tree won't be the same anymore...)
+  for (i = 0; i < gs->n_proposal; i++) {
+    for (j = 0; j < i; j++) if (topology_is_equal (gs->proposal[i], gs->proposal[j])) { randomize_topology (gs->proposal[i]); j = i; }
+    if (j < i) for (j = 0; j < gs->n_ratchet; j++) if (topology_is_equal (gs->proposal[i], gs->ratchet[j])) { randomize_topology (gs->proposal[i]); j = gs->n_ratchet; }
+  }
+  return;
+}
+
+void
+generate_new_gene_sptrees_proposal_trees_deterministic (gene_sptrees gs, int idx, int iteration)
+{
+  int coinflip = 0;
   int i, j, n_2 = gs->n_proposal/2;
   for (i = 0; i < gs->n_proposal; i++) copy_topology_from_topology (gs->proposal[i], gs->ratchet[idx]);
   if (!(iteration%4)) {
@@ -560,6 +606,11 @@ generate_new_gene_sptrees_proposal_trees (gene_sptrees gs, int idx, int iteratio
   }
   // if rooted trees are the same, randomise one of them (assuming random tree won't be the same anymore...)
   for (i = 0; i < gs->n_proposal; i++) for (j = 0; j < i; j++) if (topology_is_equal (gs->proposal[i], gs->proposal[j])) randomize_topology (gs->proposal[j]); 
+  for (i = 0; i < gs->n_proposal; i++) {
+    coinflip = biomcmc_rng_unif_int (10); 
+    if (coinflip < 2) topology_apply_spr_unrooted (gs->proposal[i], false); // 2/10 chance
+    if (coinflip > 8) randomize_topology (gs->proposal[i]); // 1/10 chance
+  }
   return;
 }
 
