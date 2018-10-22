@@ -9,9 +9,10 @@ typedef struct gene_sptrees_struct* gene_sptrees;
 
 /* idea_1: store bad  topologies and reject those close to them (RF between sptrees cheaper) <- too many?
  * 'bad' in the sense that appeared in proposal (i.e. not random) but rejected (worse than any in ratchet?); we can even output these at end */
-/* idea_2: ratchet don't need to be updated only when new best score is found, it can be updated whenever new tree is better than worse. 
+/* idea_2: ratchet don't need to be updated only when new best score is found, it can be updated whenever new tree is better than worse ( = best - 1). 
  * However we may need to sort periodically (when?), and we may have repeated trees. Also we'll need to check whenever rescaling changes 
- * (minimum is always minimum, but not the other values) */
+ * (minimum is always minimum, but not the other values). Better to use binary trees (e.g. binary heap arrays).
+ * Simpler solution is to have an intial stage where we try to improve from last to first trees (just after sorting) then sort again */
 // unlike genefam_dist library, here we do not have ref_counter 
 
 struct pooled_matrix_struct
@@ -59,6 +60,7 @@ void initialise_gene_sptrees_with_genetree_filenames (gene_sptrees gs, char_vect
 void del_gene_sptrees (gene_sptrees gs);
 void sorting_of_gene_sptrees_ratchet (gene_sptrees gs, topology_space tsp, bool local_optimum);
 double calculate_species_tree_score (gene_sptrees gs, topology s_tree, bool local_optimum);
+void improve_gene_sptrees_initial_state (gene_sptrees gs);
 void improve_gene_sptrees_ratchet (gene_sptrees gs, int n_iterations);
 void generate_new_gene_sptrees_proposal_trees (gene_sptrees gs, int idx, int iteration);
 void add_topol_to_gene_sptrees_ratchet (gene_sptrees gs, int idx_proposal, double score);
@@ -67,7 +69,7 @@ int
 main (int argc, char **argv)
 {
   clock_t time0, time1;
-  int i,j,k, n_samples = 32, n_cycles = 2, n_iter_per_cycle = 16, n_output_trees = 4, n_ratchet = 256, n_proposal = 4, fraction_gfs = 256;
+  int i,j,k, n_samples = 200, n_cycles = 2, n_iter_per_cycle = 16, n_output_trees = 2, n_ratchet = 128, n_proposal = 4, fraction_gfs = 512;
   char_vector species, genefiles;
   topology_space tsp;
   gene_sptrees gs;
@@ -487,6 +489,50 @@ sorting_of_gene_sptrees_ratchet (gene_sptrees gs, topology_space tsp, bool local
   empfreq_double ef;
   double *score_vec = NULL;
   gs->optimise_locally = local_optimum;
+  int i, min_size;
+
+  /* make sure ratchet has best scores (local scores initially, to update MinMax), but not necessarily in order */
+  if (tsp) {
+    min_size = (tsp->ndistinct < gs->n_ratchet)? tsp->ndistinct : gs->n_ratchet;
+    score_vec  = (double*) biomcmc_malloc (tsp->ndistinct * sizeof (double)); 
+    for (i=0; i < tsp->ndistinct; i++) score_vec[i] = calculate_species_tree_score (gs, tsp->distinct[i], true);
+    /* Find the score of each tree and sort their scores from lowest (best to highest (worst)  */ 
+    ef = new_empfreq_double_sort_increasing (score_vec, tsp->ndistinct);
+    for (i=0; i < min_size; i++) copy_topology_from_topology (gs->ratchet[i], tsp->distinct[ ef->d[i].idx ]);
+    for (i=0; i < min_size; i++) gs->ratchet_score[i] = ef->d[i].freq; // doesnt need pivot since ef->freqs came from ratchet_score[]
+    if (score_vec) free (score_vec);
+  }
+  else min_size = 0; 
+  /* first (or all) scores come from topol_space, remaining (or all) come from previous ratchet/sample (that are initialised to random trees) */
+  for (i = min_size; i < gs->n_ratchet; i++) gs->ratchet_score[i] = calculate_species_tree_score (gs, gs->ratchet[i], true);
+  /* working with local scores so far, recalculation may be needed */
+  if (!gs->optimise_locally) for (i=0; i < gs->n_ratchet; i++) gs->ratchet_score[i] = calculate_species_tree_score (gs, gs->ratchet[i], gs->optimise_locally);
+
+  improve_gene_sptrees_initial_state (gs); // try to replace very bad initial trees by better ones
+
+  ef = new_empfreq_double_sort_increasing (gs->ratchet_score, gs->n_ratchet);
+  pivot = (topology*) biomcmc_malloc (gs->n_ratchet * sizeof (topology)); 
+  for (i=0; i < gs->n_ratchet; i++) pivot[i] = gs->ratchet[i]; //vector version of tmp=a;a=b;b=tmp
+  for (i=0; i < gs->n_ratchet; i++) gs->ratchet[i] = pivot[ ef->d[i].idx ]; 
+  for (i=0; i < gs->n_ratchet; i++) gs->ratchet_score[i] = ef->d[i].freq; // doesnt need pivot since ef->freqs came from ratchet_score[]
+  gs->best_score = ef->d[0].freq; // lowest (best) score is first element (may need to be recalc every time new proposals are created, using new minima)
+  fprintf (stderr, "Ordered list of best scores: ");
+  for (i = 0; i < 5; i++) printf ("%7.3lf ", gs->ratchet_score[i]);   printf (" ...... ");
+  for (i = gs->n_ratchet - 6; i < gs->n_ratchet; i++) printf ("%7.3lf ", gs->ratchet_score[i]);   printf ("\n");
+  gs->next_avail = gs->n_ratchet - 1; // idx of currently worse tree (which is just before best tree in a ratchet)
+
+  del_empfreq_double (ef);
+  if (pivot) free (pivot);
+  return;
+}
+
+void // OLD
+sorting_of_gene_sptrees_ratchet_without_optimisation (gene_sptrees gs, topology_space tsp, bool local_optimum)
+{ // first step before start optimisation: sort ratchet 
+  topology *pivot; // temporary vector with original location of topologies
+  empfreq_double ef;
+  double *score_vec = NULL;
+  gs->optimise_locally = local_optimum;
   int i;
 
   if ((!tsp) || (tsp->ndistinct <= gs->n_ratchet)) {
@@ -533,6 +579,26 @@ calculate_species_tree_score (gene_sptrees gs, topology s_tree, bool local_optim
 } 
 
 void
+improve_gene_sptrees_initial_state (gene_sptrees gs)
+{ 
+  int i, j, iteration = 0; // iteration will determine the sets of possible branch swaps 
+  double score = 0;
+  for (j = 0; j < gs->n_ratchet; j++) { 
+    generate_new_gene_sptrees_proposal_trees (gs, j, iteration); // this function guarantees that proposal trees not the same as any in ratchet 
+    for (i = 0; i < gs->n_proposal; i++) {
+      score = calculate_species_tree_score (gs, gs->proposal[i], gs->optimise_locally);
+      if (score < gs->ratchet_score[j]) {
+        topology pivot = gs->proposal[i];
+        gs->proposal[i] = gs->ratchet[j];
+        gs->ratchet[j] = pivot;
+        gs->ratchet_score[j] = score;
+      }
+    }
+  }
+  return;
+}
+
+void 
 improve_gene_sptrees_ratchet (gene_sptrees gs, int n_iterations)
 { 
   int i,j, iteration;
@@ -544,7 +610,7 @@ improve_gene_sptrees_ratchet (gene_sptrees gs, int n_iterations)
       generate_new_gene_sptrees_proposal_trees (gs, j, iteration);
       for (i = 0; i < gs->n_proposal; i++) {
         score = calculate_species_tree_score (gs, gs->proposal[i], gs->optimise_locally);
-        if (score < gs->best_score) add_topol_to_gene_sptrees_ratchet (gs, i, score);
+        if (score <= gs->best_score) add_topol_to_gene_sptrees_ratchet (gs, i, score);
       }
     }
     fprintf (stderr, "%7.3lf ", gs->ratchet_score[ (gs->next_avail+1) % gs->n_ratchet ]);
@@ -580,7 +646,7 @@ generate_new_gene_sptrees_proposal_trees (gene_sptrees gs, int idx, int iteratio
   return;
 }
 
-void
+void // OLD
 generate_new_gene_sptrees_proposal_trees_deterministic (gene_sptrees gs, int idx, int iteration)
 {
   int coinflip = 0;
