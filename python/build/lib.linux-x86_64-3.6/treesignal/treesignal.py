@@ -19,8 +19,8 @@ class TreeSignal(object):
         """ if replicates is zero, then we use non-scaled distances; if replicate is one, then we use theoretical upper
         bounds to normalise distances; otherwise we use p-value normalisation
         """
-        if (replicates > 1) and (replicates < 20):
-            replicates = 20 # too few samples to estimate bounds
+        if (replicates > 1) and (replicates < 4):
+            replicates = 4 # too few samples to estimate bounds
         self.replicates = replicates 
         if self.replicates == 0:
             self.spectrum_fromtrees = _treesignalc.fromtrees # default is to use rescaled distances

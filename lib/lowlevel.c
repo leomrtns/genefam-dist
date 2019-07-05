@@ -78,16 +78,16 @@ compare_int_decreasing (const void *a, const void *b)
 int
 compare_double_increasing (const void *a, const void *b)
 {
-  if ((double *) a > (double *) b) return 1;
-  if ((double *) a < (double *) b) return -1;
+  if (*(double *) a > *(double *) b) return 1;
+  if (*(double *) a < *(double *) b) return -1;
   return 0;
 }
 
 int
 compare_double_decreasing (const void *a, const void *b)
 {
-  if ((double *) a < (double *) b) return 1;
-  if ((double *) a > (double *) b) return -1;
+  if (*(double *) a < *(double *) b) return 1;
+  if (*(double *) a > *(double *) b) return -1;
   return 0;
 }
 

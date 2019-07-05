@@ -202,6 +202,7 @@ add_topology_to_topology_space_if_distinct (topology topol, topology_space tsp, 
     tsp->distinct = (topology*) biomcmc_realloc ((topology*) tsp->distinct, sizeof (topology) * (tsp->ndistinct));
     tsp->freq[topol->id] = 1.;
     tsp->distinct[topol->id] = topol;
+    tsp->tree[tsp->ntrees] = tsp->distinct[topol->id];
     if (topol->id > 0) for (i=0; i < tsp->distinct[topol->id]->nleaves; i++) {
       /* the leaf bipartitions never change, so can be shared among all topologies */
       del_bipartition (tsp->distinct[topol->id]->nodelist[i]->split);
