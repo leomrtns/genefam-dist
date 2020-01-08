@@ -1,0 +1,83 @@
+\documentclass[pdftex,12pt,a4paper,openany,fleqn]{article}
+
+\usepackage[english]{babel}
+\usepackage[utf8x]{inputenc}
+\usepackage{appendix}
+\usepackage{amsmath}
+%\usepackage[textsize=footnotesize]{todonotes}
+\usepackage[top=0.5in, text={6.8in,10.3in}]{geometry}
+\usepackage{hyperref}
+% usepackages not included in writelatex
+\usepackage[dvips]{graphicx}
+\usepackage[usenames,dvipsnames]{color}% colored fonts ("usenames" defines 68 colors  http://en.wikibooks.org/wiki/LaTeX/Colors)
+\usepackage[sort&compress,numbers]{natbib} % bibliographic style (sorted numbers)
+\usepackage{nameref}  % standard references (to chapter, page)
+\usepackage{times}    % recommended fonts for pdflatex
+\usepackage{mathpazo} % recommended fonts for pdflatex
+\usepackage{courier}  % recommended fonts for pdflatex
+\usepackage{helvet}   % recommended fonts for pdflatex
+\usepackage{cmap}     % to produce searchable PDF
+\usepackage{amsmath}
+\usepackage{url} % quick-dirty replacement to "\tt"; use as "\path{}"; [obeyspaces] option to avoid unix-like no-space paths
+\usepackage{microtype} % fixes typography, minimizing overbox etc. (that is, solves the \tt problem without \path{})
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{multirow}  % fields that span multiple rows in tabular environment
+\usepackage{setspace} % use as \begin{spacing}{0.8} to reduce linespacing to 80% 
+\usepackage[margin=20pt,font=normal,labelfont=bf]{caption, subfig}  % caption and subfigure (composite figs) control 
+\usepackage{authblk} % authors and \affil
+
+\renewcommand\Authfont{\fontsize{12}{16}\selectfont}
+\renewcommand\Affilfont{\fontsize{10}{12}\itshape}
+
+\bibliographystyle{unsrt}
+\linespread{1.5}
+
+\renewcommand\floatpagefraction{.9} %page fraction with figures/tables 
+\renewcommand\topfraction{.9}       %page fraction with figures/tables 
+\renewcommand\bottomfraction{.9}    %page fraction with figures/tables 
+\renewcommand\textfraction{.1}      %page fraction with text 
+\setlength{\parskip}{2ex plus 0.5ex minus 0.2ex} % vertical space between paragraphs
+\setlength{\parindent}{0ex} % no indentation for first line of each paragraph
+\newcommand{\deriv}{\;\mathrm{d}}
+
+\definecolor{blucol}{rgb}{0,0.4,0.7}
+\newcommand{\blue}{\textcolor{blucol}}
+\newcommand{\green}{\textcolor{green}}
+\newcommand{\red}{\textcolor{red}}
+\newcommand{\magenta}{\textcolor{magenta}}
+\newcommand{\cyan}{\textcolor{cyan}}
+\definecolor{orangecol}{rgb}{1,0.5,0}
+\newcommand{\orange}{\textcolor{orangecol}}
+
+%\setlength{\marginparwidth}{4.3cm} %for todonotes
+\renewcommand\floatpagefraction{.8} %page fraction with figures/tables 
+\renewcommand\topfraction{.8}       %page fraction with figures/tables 
+\renewcommand\bottomfraction{.8}    %page fraction with figures/tables 
+\renewcommand\textfraction{.2}      %page fraction with text 
+\setcounter{totalnumber}{50}  % max figures per page
+\setcounter{topnumber}{50}    % max figures per page
+\setcounter{bottomnumber}{50} % max figures per page
+
+\renewcommand*{\familydefault}{\sfdefault}
+\title{Spectral signature of gene family trees}
+\author[1]{Leonardo de Oliveira Martins\thanks{{\tt Leonardo.de-Oliveira-Martins@quadram.ac.uk}}}
+\author[2,3]{Christophe Dessimoz\thanks{{\tt cdessimoz@unil.ch}}}
+\affil[1]{Quadram Institute Biosciences, Norwich, NR4 7UQ, UK}
+\affil[2]{UNIL}
+\affil[3]{UCL}
+\date{\vspace{-5ex}}
+\begin{document}
+\maketitle
+
+\begin{abstract}
+this is the abstract
+\end{abstract}
+
+\input{introduction}
+\input{methods}
+\input{results}
+
+\begin{spacing}{0.8} \bibliography{references} \end{spacing}
+\end{document}

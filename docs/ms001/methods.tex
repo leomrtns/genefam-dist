@@ -1,0 +1,106 @@
+\section{Methods}
+The gene family trees represent orthogroups or root HOGs <ref>, that is, a tree describing all sequences assumed to
+share a common ancestral sequence (including paralogs, or several individuals from the same population). These trees are
+the input to the algorithm and may have been estimated by any phylogenetic method --- the algorithm is agnostic to the
+source of disagreement (and therefore to the reason for the multiple leaves with same species label) or to the inference
+procedure. The reference trees represent possible species trees, and must be on the same set of all species (i.e. all
+species must be present in all reference trees). The set of reference trees should capture the variability between gene
+trees with respect to the set of distances used to describe them. Therefore a good choice would be a set of optimal
+species trees for the most dissimilar sets of gene families, although here we usually limit ourselves to a few species
+trees inferred from a single set of gene families, with further randomisation in a few cases. It is important to notice
+that the reference species trees are not restricted to the optimal ones (under some notion of optimality) and do not
+need to include all optimal species trees. However having good candidates for the species trees will help interpreting
+the gene trees in terms of them. The gene trees are assumed to be unrooted since the basic phylogenetic inference models
+can’t infer the root location, but our method can be easily adapted for rooted gene family trees. The reference species
+trees are rooted, although some distances disregard this information. The reference species trees are fixed beforehand,
+but once they are set they can be used to create the “tree signal” of any gene family online, as long as all species
+present in the gene family are represented in the reference species trees.
+
+\red{describe the vector}
+\begin{equation}
+v(t_j,T) = {d_i(t_j, T) forall T \in T, i={dups, loss, ils, RF, SPR} } \forall j=1\dots k
+\end{equation}
+
+
+i.e. the spectral signature of gene tree $t_j$ is the set of combinations of distances i and reference trees T in a
+specific order. In the simplest case, a single distance and a single tree could be used, as e.g. their RF distance to a
+point estimate of their species tree. This would lead to a one-dimensional spectral signature, which may not be able to
+discriminate well different gene trees. A natural extension is then to use more reference trees, in such a way that gene
+trees now can be closer to one reference or another, or to use more distances, that will describe distinct ways in which
+the gene trees relate to the reference.
+
+\subsection{Distances}
+We implemented several gene-species tree distances, in particular the reconciliation-based ones available in <guenomu>,
+the multi-labelled tree version of the Robinson-Foulds distance called mulRF <citation>, and  two new distances based on
+the the same ‘extended’ species tree from the mulRF distance, namely mulSPR and mulHdist. All distances utilise the
+topological information only, neglecting branch lengths. Although we refer to them as ‘distances’ they are in fact
+dissimilarity measures, and not true distance metrics since they do not satisfy the symmetry condition. The three
+reconciliation-based distances implemented are the minimum number of duplications, minimum number of losses, and minimum
+number of deep coalescences (also called ancestral polymorphisms or incomplete lineage sortings), and are based on the
+LCA mapping between gene tree and species tree nodes. Since they originally work on rooted gene trees, we try all
+possible gene rootings and store the minimal distance among all possibilities --- the species tree is rooted, however.
+
+The other three distances are based on the concept of an ‘extended’ species tree, which replaces each leaf from the
+species tree by a multifurcation with all leaves from the gene family tree mapping to this species (leaf) <citation>.
+The resulting extended species tree and the gene family tree will have thus a one-to-one mapping between leaves. The
+mulRF distance is then just the (unrooted) Robinson-Foulds distance between these trees. The mulSPR and the mulHdist,
+equivalently, are just the SPR and Hdist distances between the gene family tree and the extended species tree: the SPR
+distance is the approximation described in <citation>, and the Hdist is the total cost of matching each edge from the
+gene tree to its optimal counterpart on the species tree (it has its name since we use the Hungarian method for solving
+this assignment problem). This matching is also used by the SPR algorithm to find the smallest disagreement split
+<citation>. The Hdist represents therefore the minimum number of leaves in disagreement per edge, summed over all edges.
+If the gene tree is not multi-labelled (i.e. all leaves map to distinct leaves on the species tree) then the mulSPR and
+the mulHdist correspond to the SPR and Hdist distances implemented in <citation>. These distances neglect the species
+tree root location, treating it as unrooted.
+
+\subsection{Normalisation}
+Since we are comparing gene family trees with different numbers of leaves, species, and leaves per species, we must
+rescale the distances to a common range. For all implemented distances, lower and upper bounds can be found, but in
+practice they are too permissive and therefore we resort to randomisation to find tight bounds for the distances. This
+is achieved by, for each gene family t and set of reference species trees T, after calculating the distances $d_i(t, T)$
+for all distances i and species trees T, generate a new set of random species trees $\tau$ and calculate the distances to
+these trees. We implemented two independent normalisations, that are concatenated into the vector of tree signals: the
+p-value distance and the MinMax rescaled distance. The ‘p-value’ distance $p_i(t,T)$ counts the fraction of species trees
+in total (i.e. amongst both randomised $\tau$ and reference T) presented a distance as small as the observed:
+
+\begin{equation}
+p_i(t,T) = \sum_{\tau and T} I (d_i(t,k) <= d_i{t,T)) / |\tau and T|
+\end{equation}
+
+The MinMax distance $m_i(t,T)$ is the original distance rescaled to the zero-one interval:
+\begin{equation}
+m_i(t,T) = ( d_i(t,T) - Min ) / (Max - Min)
+\end{equation}
+where min and max are, respectively, the minimum and maximum distances observed among both $d_i(t,T)$ and $d_i(t,\tau)$.
+
+The vector is thus
+%\begin{equation}
+%v(t_j,T) = \{\{p_i(t_j, T), m_i(t_j,T)\}  \forall T\in T, i=\{dups, loss, ils, RF, SPR\} \} forall j=1\ddots k
+%\end{equation}
+
+\subsection{Choice of reference trees}
+Once the distances (dissimilarity measures in fact) and the reference trees are defined, we can calculate the signature
+of each gene tree independently. The more distances are used the more we may discriminate between the gene trees, and
+therefore we can implement and use as many measures as possible --- remembering that there are just a few that can be used
+in general for a gene tree/species tree pair. However the choice of the reference trees may affect our ability to
+distinguish between gene trees, since our rationale is that gene trees can be compared in terms of the species trees
+they support according to each biological phenomenon. Given N species, the number of possible rooted reference trees is
+r(N)=(2N-3)\!\!, which already exceeds $10^7$ even for N=10. However, in practice we don’t need that many reference trees
+since many of them will not be supported by any gene tree in the sample. Ideally our set of reference trees is then all
+species trees that can be supported by at least one gene tree in the sample. That is, if there is a distance measure i
+and gene tree t  s.t. $d_i(t,T’) < \epsilon(i,t)$ then T’ should be added to the list of reference trees (where
+$\epsilon(i,t)$ is a
+small, arbitrary value in the distribution of distances $d_i$ over all possible species trees given t). Since finding such
+trees T’ can challenging as well, a good strategy seems to be to find trees that summarise the information from subsets
+of genes from the sample. One example is to use methods that incorporate uncertainty and therefore output sets of
+species trees instead of finding a single point estimate (De Oliveira Martins, Mallo, and Posada 2016). Notice that even
+random trees might be at distinct distances from two given gene trees, but this distinction depends also on the
+discriminatory power of the distance measure. Also, we expect that by using collections of gene trees in the reference
+tree search instead of each gene tree we reduce the number of possible species trees, since small, incomplete gene trees
+are not informative in the sense that they favour equally a large number of species trees (not necessarily close to
+other gene trees).
+
+Notice that this relies on knowing the set of gene trees in advance, which somehow weakens our argument for continuous
+update, but in practice we hope that a broad choice of reference trees (by using not only the ‘optimal’ ones) can
+alleviate this problem. <needs rephrasing>
+
