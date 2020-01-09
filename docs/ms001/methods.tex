@@ -18,7 +18,7 @@ present in the gene family are represented in the reference species trees.
 
 \red{describe the vector}
 \begin{equation}
-v(t_j,T) = {d_i(t_j, T) forall T \in T, i={dups, loss, ils, RF, SPR} } \forall j=1\dots k
+v(t_j,T) = \{d_i(t_j, T) \forall T \in T, i=\left(dups, loss, ils, RF, SPR\right) \} \forall j=1\dots k
 \end{equation}
 
 
@@ -64,7 +64,7 @@ p-value distance and the MinMax rescaled distance. The ‘p-value’ distance $p
 in total (i.e. amongst both randomised $\tau$ and reference T) presented a distance as small as the observed:
 
 \begin{equation}
-p_i(t,T) = \sum_{\tau and T} I (d_i(t,k) <= d_i{t,T)) / |\tau and T|
+p_i(t,T) = \sum_{\tau and T} I (d_i(t,k) \leq d_i{t,T)) / |\tau and T|
 \end{equation}
 
 The MinMax distance $m_i(t,T)$ is the original distance rescaled to the zero-one interval:
@@ -74,9 +74,9 @@ m_i(t,T) = ( d_i(t,T) - Min ) / (Max - Min)
 where min and max are, respectively, the minimum and maximum distances observed among both $d_i(t,T)$ and $d_i(t,\tau)$.
 
 The vector is thus
-%\begin{equation}
-%v(t_j,T) = \{\{p_i(t_j, T), m_i(t_j,T)\}  \forall T\in T, i=\{dups, loss, ils, RF, SPR\} \} forall j=1\ddots k
-%\end{equation}
+\begin{equation}
+v(t_j,T) = \{\{p_i(t_j, T), m_i(t_j,T)\}  \forall T\in T, i=\left(dups, loss, ils, RF, SPR\right) \} forall j=1\dots k
+\end{equation}
 
 \subsection{Choice of reference trees}
 Once the distances (dissimilarity measures in fact) and the reference trees are defined, we can calculate the signature

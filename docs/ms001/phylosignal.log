@@ -1,8 +1,8 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017/Debian) (preloaded format=pdflatex 2019.7.16)  8 JAN 2020 17:50
+This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017/Debian) (preloaded format=pdflatex 2019.7.16)  9 JAN 2020 16:38
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
-**phylosignal
+**phylosignal.tex
 (./phylosignal.tex
 LaTeX2e <2017-04-15>
 Babel <3.18> and hyphenation patterns for 3 language(s) loaded.
@@ -682,7 +682,7 @@ l.68 \end{equation}
 LaTeX Warning: Command \textquoteright invalid in math mode on input line 91.
 
 [7]) (./results.tex [8]
-<figure002.png, id=83, 1096.095pt x 403.5075pt>
+<figure002.png, id=84, 1096.095pt x 403.5075pt>
 File: figure002.png Graphic file (type png)
 <use figure002.png>
 Package pdftex.def Info: figure002.png  used on input line 32.
@@ -693,12 +693,12 @@ Overfull \hbox (14.45378pt too wide) in paragraph at lines 32--38
  []
 
 [9 <./figure002.png>]
-<figure003a.png, id=90, 878.28125pt x 758.835pt>
+<figure003a.png, id=91, 878.28125pt x 758.835pt>
 File: figure003a.png Graphic file (type png)
 <use figure003a.png>
 Package pdftex.def Info: figure003a.png  used on input line 63.
 (pdftex.def)             Requested size: 433.62pt x 374.65765pt.
-<figure003b.png, id=91, 1055.945pt x 259.97125pt>
+<figure003b.png, id=92, 1055.945pt x 259.97125pt>
 File: figure003b.png Graphic file (type png)
 <use figure003b.png>
 Package pdftex.def Info: figure003b.png  used on input line 64.
@@ -708,7 +708,7 @@ Overfull \hbox (14.45378pt too wide) in paragraph at lines 62--68
 []$[]$ 
  []
 
-<figure004.png, id=92, 962.59625pt x 1042.89626pt>
+<figure004.png, id=93, 962.59625pt x 1042.89626pt>
 File: figure004.png Graphic file (type png)
 <use figure004.png>
 Package pdftex.def Info: figure004.png  used on input line 71.
@@ -735,13 +735,13 @@ Package rerunfilecheck Info: File `phylosignal.out' has not changed.
 Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 83.
  ) 
 Here is how much of TeX's memory you used:
- 12099 strings out of 494923
- 180847 string characters out of 6180742
+ 12100 strings out of 494923
+ 180859 string characters out of 6180742
  311132 words of memory out of 5000000
  14931 multiletter control sequences out of 15000+600000
  50917 words of font info for 206 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
- 36i,8n,39p,1189b,466s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 36i,8n,39p,1193b,466s stack positions out of 5000i,500n,10000p,200000b,80000s
 {/usr/share/texlive/texmf-dist/fonts/enc/dvips/base/8r.enc}</usr/share/texliv
 e/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/share/texlive/texm
 f-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/share/texlive/texmf-dist/
@@ -755,10 +755,10 @@ ive/texmf-dist/fonts/type1/urw/helvetic/uhvr8a.pfb></usr/share/texlive/texmf-di
 st/fonts/type1/urw/helvetic/uhvro8a.pfb></usr/share/texlive/texmf-dist/fonts/ty
 pe1/urw/palatino/uplr8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/pala
 tino/uplri8a.pfb>
-Output written on phylosignal.pdf (12 pages, 1713829 bytes).
+Output written on phylosignal.pdf (12 pages, 1714617 bytes).
 PDF statistics:
- 163 PDF objects out of 1000 (max. 8388607)
- 119 compressed objects within 2 object streams
- 26 named destinations out of 1000 (max. 500000)
+ 164 PDF objects out of 1000 (max. 8388607)
+ 120 compressed objects within 2 object streams
+ 27 named destinations out of 1000 (max. 500000)
  32854 words of extra memory for PDF output out of 35830 (max. 10000000)
 
