@@ -1,0 +1,37 @@
+% Christophe comment: - acknowledge weaknesses of the approach (e.g. interpretation of mulSPR, not that many distances
+% available (e.g. how to capture rooting errors?)
+% - alternative to what we do is mechanistic approach french-swedish school DLTI+Species tree. complementary to this.
+\section{Discussion}
+Euclid’s first theorem states that “things which are equal to the same thing are equal to each other”.  We make use of
+this principle to compare gene family trees, which cannot be compared to each other but that can be compared to the same
+thing – species trees. They will be equal, however, only in terms of the biologically-inspired dissimilarity measures
+that we can compute, and therefore we should use as many measures as possible.
+
+We propose a method that allows for the partition/visualisation of gene families integrated with the species tree estimation.
+
+As has been noted before (Gori et al. 2016), the SPR distance is a strong candidate for describing differences between
+trees in the context of gene partitioning, and here we show that indeed it can be successfully used to visualise and
+cluster gene families.
+
+Our proposed algorithm is a combination of concatenation of multiple views (Zhao et al. 2017; Xu, Tao, and Xu 2013)
+(where each gene-species tree pair dissimilarity is a view) and centroidQR or landmark-based representation (Chen and
+Cai 2011; Rafailidis, Constantinou, and Manolopoulos 2017; Vin De Silva 2003), where the landmarks are sensible species
+trees. As such, it can be improved through recent developments on both multi-view learning and landmark-based manifolds.
+In special we expect more improvement over the choice of reference trees, and its relation to species tree inference. In
+particular we are working on an iterative version of our algorithm where the gene tree space informs species tree
+inference algorithms, which in turn may allow for more detailed tree spaces.
+
+All results here employed unsupervised learning, but it is now straightforward to extend the analysis to supervised
+cases, where the samples may belong to e.g. posterior distributions of gene trees and each class is a gene family.
+Another idea is to split the gene family trees into well-supported and weakly-supported classes, to see if there is a
+reasonable separation between them. Since the features are associated to species trees, feature selection techniques can
+be interpreted in terms of the underlying species tree signals.
+
+
+% Christophe's comment: expand this discussion: - choice of species tree indeed influence result, but noteworthy that
+% the embedding and clustering was somewhat robust (fig. 2) ?
+It is important to notice that we are not interested in the (unconditional, theoretical problem of) comparison between
+trees, but in the specific problem of gene tree comparison conditional on possible scenarios of species trees. This
+means that choosing the set of relevant species trees will influence the resulting space, and that it should be like
+this. <feature, not a bug>
+

@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017/Debian) (preloaded format=pdflatex 2019.7.16)  9 JAN 2020 16:38
+This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017/Debian) (preloaded format=pdflatex 2019.7.16)  10 JAN 2020 10:30
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -441,21 +441,21 @@ LaTeX Warning: Unused global option(s):
 (./phylosignal.aux)
 \openout1 = `phylosignal.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 71.
-LaTeX Font Info:    ... okay on input line 71.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 71.
-LaTeX Font Info:    ... okay on input line 71.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 71.
-LaTeX Font Info:    ... okay on input line 71.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 71.
-LaTeX Font Info:    ... okay on input line 71.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 71.
-LaTeX Font Info:    ... okay on input line 71.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 71.
-LaTeX Font Info:    ... okay on input line 71.
-LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 71.
-LaTeX Font Info:    ... okay on input line 71.
-LaTeX Font Info:    Try loading font information for OT1+phv on input line 71.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 72.
+LaTeX Font Info:    ... okay on input line 72.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 72.
+LaTeX Font Info:    ... okay on input line 72.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 72.
+LaTeX Font Info:    ... okay on input line 72.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 72.
+LaTeX Font Info:    ... okay on input line 72.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 72.
+LaTeX Font Info:    ... okay on input line 72.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 72.
+LaTeX Font Info:    ... okay on input line 72.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 72.
+LaTeX Font Info:    ... okay on input line 72.
+LaTeX Font Info:    Try loading font information for OT1+phv on input line 72.
  (/usr/share/texlive/texmf-dist/tex/latex/psnfss/ot1phv.fd
 File: ot1phv.fd 2001/06/04 scalable font definitions for OT1/phv.
 )<<ot1.cmap>> (/usr/share/texlive/texmf-dist/tex/latex/ucs/ucsencs.def
@@ -495,10 +495,10 @@ File: ucsencs.def 2011/01/21 Fixes to fontencodings LGR, T3
 * (1in=72.27pt=25.4mm, 1cm=28.453pt)
 
 \AtBeginShipoutBox=\box28
-Package hyperref Info: Link coloring OFF on input line 71.
-LaTeX Info: Redefining \ref on input line 71.
-LaTeX Info: Redefining \pageref on input line 71.
-LaTeX Info: Redefining \nameref on input line 71.
+Package hyperref Info: Link coloring OFF on input line 72.
+LaTeX Info: Redefining \ref on input line 72.
+LaTeX Info: Redefining \pageref on input line 72.
+LaTeX Info: Redefining \nameref on input line 72.
 (./phylosignal.out) (./phylosignal.out)
 \@outlinefile=\write3
 \openout3 = `phylosignal.out'.
@@ -534,7 +534,7 @@ G,.JBIG2,.JB2,.eps]
 File: epstopdf-sys.cfg 2010/07/13 v1.3 Configuration of (r)epstopdf for TeX Liv
 e
 ))
-LaTeX Info: Redefining \microtypecontext on input line 71.
+LaTeX Info: Redefining \microtypecontext on input line 72.
 Package microtype Info: Generating PDF output.
 Package microtype Info: Character protrusion enabled (level 2).
 Package microtype Info: Using default protrusion set `alltext'.
@@ -551,7 +551,7 @@ Package microtype Info: Loading generic protrusion settings for font family
 Package caption Info: Begin \AtBeginDocument code.
 Package caption Info: subfig package v1.3 is loaded.
 Package caption Info: End \AtBeginDocument code.
-LaTeX Font Info:    Try loading font information for OT1+ppl on input line 72.
+LaTeX Font Info:    Try loading font information for OT1+ppl on input line 73.
 
 (/usr/share/texlive/texmf-dist/tex/latex/psnfss/ot1ppl.fd
 File: ot1ppl.fd 2001/06/04 font definitions for OT1/ppl.
@@ -559,25 +559,25 @@ File: ot1ppl.fd 2001/06/04 font definitions for OT1/ppl.
 (/usr/share/texlive/texmf-dist/tex/latex/microtype/mt-ppl.cfg
 File: mt-ppl.cfg 2005/11/16 v1.6 microtype config. file: Palatino (RS)
 )
-LaTeX Font Info:    Try loading font information for OML+zplm on input line 72.
+LaTeX Font Info:    Try loading font information for OML+zplm on input line 73.
 
 
 (/usr/share/texlive/texmf-dist/tex/latex/psnfss/omlzplm.fd
 File: omlzplm.fd 2002/09/08 Fontinst v1.914 font definitions for OML/zplm.
 )<<oml.cmap>>
-LaTeX Font Info:    Try loading font information for OMS+zplm on input line 72.
+LaTeX Font Info:    Try loading font information for OMS+zplm on input line 73.
 
 
 (/usr/share/texlive/texmf-dist/tex/latex/psnfss/omszplm.fd
 File: omszplm.fd 2002/09/08 Fontinst v1.914 font definitions for OMS/zplm.
 )<<oms.cmap>>
-LaTeX Font Info:    Try loading font information for OMX+zplm on input line 72.
+LaTeX Font Info:    Try loading font information for OMX+zplm on input line 73.
 
 
 (/usr/share/texlive/texmf-dist/tex/latex/psnfss/omxzplm.fd
 File: omxzplm.fd 2002/09/08 Fontinst v1.914 font definitions for OMX/zplm.
 )<<omx.cmap>>
-LaTeX Font Info:    Try loading font information for OT1+zplm on input line 72.
+LaTeX Font Info:    Try loading font information for OT1+zplm on input line 73.
 
 
 (/usr/share/texlive/texmf-dist/tex/latex/psnfss/ot1zplm.fd
@@ -588,51 +588,51 @@ Package microtype Info: Loading generic protrusion settings for font family
 (microtype)             For optimal results, create family-specific settings.
 (microtype)             See the microtype manual for details.
 LaTeX Font Info:    Font shape `U/msa/m/n' will be
-(Font)              scaled to size 12.50409pt on input line 72.
+(Font)              scaled to size 12.50409pt on input line 73.
 
 (/usr/share/texlive/texmf-dist/tex/latex/microtype/mt-msa.cfg
 File: mt-msa.cfg 2006/02/04 v1.1 microtype config. file: AMS symbols (a) (RS)
 )
 LaTeX Font Info:    Font shape `U/msa/m/n' will be
-(Font)              scaled to size 9.37807pt on input line 72.
+(Font)              scaled to size 9.37807pt on input line 73.
 LaTeX Font Info:    Font shape `U/msa/m/n' will be
-(Font)              scaled to size 7.29405pt on input line 72.
+(Font)              scaled to size 7.29405pt on input line 73.
 LaTeX Font Info:    Font shape `U/msb/m/n' will be
-(Font)              scaled to size 12.50409pt on input line 72.
+(Font)              scaled to size 12.50409pt on input line 73.
 
 (/usr/share/texlive/texmf-dist/tex/latex/microtype/mt-msb.cfg
 File: mt-msb.cfg 2005/06/01 v1.0 microtype config. file: AMS symbols (b) (RS)
 )
 LaTeX Font Info:    Font shape `U/msb/m/n' will be
-(Font)              scaled to size 9.37807pt on input line 72.
+(Font)              scaled to size 9.37807pt on input line 73.
 LaTeX Font Info:    Font shape `U/msb/m/n' will be
-(Font)              scaled to size 7.29405pt on input line 72.
-LaTeX Font Info:    Try loading font information for OMS+phv on input line 72.
+(Font)              scaled to size 7.29405pt on input line 73.
+LaTeX Font Info:    Try loading font information for OMS+phv on input line 73.
 
 (/usr/share/texlive/texmf-dist/tex/latex/psnfss/omsphv.fd
 File: omsphv.fd 
 )
 LaTeX Font Info:    Font shape `OMS/phv/m/n' in size <9> not available
-(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 72.
+(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 73.
 LaTeX Font Info:    Font shape `OT1/phv/m/it' in size <10> not available
-(Font)              Font shape `OT1/phv/m/sl' tried instead on input line 72.
+(Font)              Font shape `OT1/phv/m/sl' tried instead on input line 73.
 LaTeX Font Info:    Font shape `U/msa/m/n' will be
-(Font)              scaled to size 10.42007pt on input line 72.
+(Font)              scaled to size 10.42007pt on input line 73.
 LaTeX Font Info:    Font shape `U/msa/m/n' will be
-(Font)              scaled to size 7.91925pt on input line 72.
+(Font)              scaled to size 7.91925pt on input line 73.
 LaTeX Font Info:    Font shape `U/msa/m/n' will be
-(Font)              scaled to size 6.25204pt on input line 72.
+(Font)              scaled to size 6.25204pt on input line 73.
 LaTeX Font Info:    Font shape `U/msb/m/n' will be
-(Font)              scaled to size 10.42007pt on input line 72.
+(Font)              scaled to size 10.42007pt on input line 73.
 LaTeX Font Info:    Font shape `U/msb/m/n' will be
-(Font)              scaled to size 7.91925pt on input line 72.
+(Font)              scaled to size 7.91925pt on input line 73.
 LaTeX Font Info:    Font shape `U/msb/m/n' will be
-(Font)              scaled to size 6.25204pt on input line 72.
+(Font)              scaled to size 6.25204pt on input line 73.
 LaTeX Font Info:    Font shape `OT1/phv/m/it' in size <7.6> not available
-(Font)              Font shape `OT1/phv/m/sl' tried instead on input line 72.
+(Font)              Font shape `OT1/phv/m/sl' tried instead on input line 73.
 LaTeX Font Info:    Font shape `OMS/phv/m/n' in size <7.6> not available
-(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 72.
-LaTeX Font Info:    Try loading font information for OT1+pcr on input line 72.
+(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 73.
+LaTeX Font Info:    Try loading font information for OT1+pcr on input line 73.
 
 (/usr/share/texlive/texmf-dist/tex/latex/psnfss/ot1pcr.fd
 File: ot1pcr.fd 2001/06/04 font definitions for OT1/pcr.
@@ -642,7 +642,7 @@ Package microtype Info: Loading generic protrusion settings for font family
 (microtype)             For optimal results, create family-specific settings.
 (microtype)             See the microtype manual for details.
 LaTeX Font Info:    Font shape `OT1/phv/bx/n' in size <10.95> not available
-(Font)              Font shape `OT1/phv/b/n' tried instead on input line 74.
+(Font)              Font shape `OT1/phv/b/n' tried instead on input line 75.
 
 (./introduction.tex [1
 
@@ -653,36 +653,26 @@ File: uni-32.def 2013/05/13 UCS: Unicode data U+2000..U+20FF
 (/usr/share/texlive/texmf-dist/tex/latex/ucs/data/uni-34.def
 File: uni-34.def 2013/05/13 UCS: Unicode data U+2200..U+22FF
 )
-<figure001.png, id=44, 2321.67375pt x 2754.6915pt>
+<figure001.png, id=91, 2321.67375pt x 2754.6915pt>
 File: figure001.png Graphic file (type png)
 <use figure001.png>
-Package pdftex.def Info: figure001.png  used on input line 76.
-(pdftex.def)             Requested size: 469.75499pt x 557.35962pt.
-
-Overfull \hbox (14.45378pt too wide) in paragraph at lines 76--87
-[]$[]$ 
- []
-
+Package pdftex.def Info: figure001.png  used on input line 85.
+(pdftex.def)             Requested size: 433.62pt x 514.48581pt.
 LaTeX Font Info:    Font shape `OT1/phv/bx/n' in size <12> not available
-(Font)              Font shape `OT1/phv/b/n' tried instead on input line 87.
+(Font)              Font shape `OT1/phv/b/n' tried instead on input line 96.
 ) (./methods.tex
 LaTeX Font Info:    Font shape `OT1/phv/bx/n' in size <17.28> not available
 (Font)              Font shape `OT1/phv/b/n' tried instead on input line 1.
- [3] [4 <./figure001.png>]
+
+[3] [4 <./figure001.png>]
 LaTeX Font Info:    Font shape `OT1/phv/bx/n' in size <14.4> not available
 (Font)              Font shape `OT1/phv/b/n' tried instead on input line 32.
  [5] [6]
-! Missing } inserted.
-<inserted text> 
-                }
-l.68 \end{equation}
-                   
-? 
 
-LaTeX Warning: Command \textquoteright invalid in math mode on input line 91.
+LaTeX Warning: Command \textquoteright invalid in math mode on input line 93.
 
 [7]) (./results.tex [8]
-<figure002.png, id=84, 1096.095pt x 403.5075pt>
+<figure002.png, id=131, 1096.095pt x 403.5075pt>
 File: figure002.png Graphic file (type png)
 <use figure002.png>
 Package pdftex.def Info: figure002.png  used on input line 32.
@@ -692,13 +682,13 @@ Overfull \hbox (14.45378pt too wide) in paragraph at lines 32--38
 []$[]$ 
  []
 
-[9 <./figure002.png>]
-<figure003a.png, id=91, 878.28125pt x 758.835pt>
+[9]
+<figure003a.png, id=136, 878.28125pt x 758.835pt>
 File: figure003a.png Graphic file (type png)
 <use figure003a.png>
 Package pdftex.def Info: figure003a.png  used on input line 63.
 (pdftex.def)             Requested size: 433.62pt x 374.65765pt.
-<figure003b.png, id=92, 1055.945pt x 259.97125pt>
+<figure003b.png, id=137, 1055.945pt x 259.97125pt>
 File: figure003b.png Graphic file (type png)
 <use figure003b.png>
 Package pdftex.def Info: figure003b.png  used on input line 64.
@@ -708,7 +698,7 @@ Overfull \hbox (14.45378pt too wide) in paragraph at lines 62--68
 []$[]$ 
  []
 
-<figure004.png, id=93, 962.59625pt x 1042.89626pt>
+<figure004.png, id=138, 962.59625pt x 1042.89626pt>
 File: figure004.png Graphic file (type png)
 <use figure004.png>
 Package pdftex.def Info: figure004.png  used on input line 71.
@@ -718,30 +708,29 @@ Overfull \hbox (14.45378pt too wide) in paragraph at lines 71--74
 []$[]$ 
  []
 
-) (./phylosignal.bbl
-
-Package natbib Warning: Empty `thebibliography' environment on input line 3.
-
-)
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 83.
- [10] [11 <./figure003a.png> <./figure003b.png>] [12 <./figure004.png>]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 83.
-
-(./phylosignal.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 83.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 83.
+) (./discussion.tex [10 <./figure002.png>] [11 <./figure003a.png> <./figure003b
+.png>] [12 <./figure004.png>]) (./phylosignal.bbl
+LaTeX Font Info:    Font shape `OT1/phv/m/it' in size <12> not available
+(Font)              Font shape `OT1/phv/m/sl' tried instead on input line 11.
+ [13])
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 85.
+ [14]
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 85.
+ (./phylosignal.aux)
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 85.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 85.
 Package rerunfilecheck Info: File `phylosignal.out' has not changed.
-(rerunfilecheck)             Checksum: E328F05DB2DD80F5B530C58A8D10F707;278.
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 83.
+(rerunfilecheck)             Checksum: BA0BE70391B7CD628F2A23DBCE47AC60;323.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 85.
  ) 
 Here is how much of TeX's memory you used:
- 12100 strings out of 494923
- 180859 string characters out of 6180742
- 311132 words of memory out of 5000000
- 14931 multiletter control sequences out of 15000+600000
- 50917 words of font info for 206 fonts, out of 8000000 for 9000
+ 12218 strings out of 494923
+ 182465 string characters out of 6180742
+ 314998 words of memory out of 5000000
+ 14984 multiletter control sequences out of 15000+600000
+ 56378 words of font info for 237 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
- 36i,8n,39p,1193b,466s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 36i,8n,39p,1193b,512s stack positions out of 5000i,500n,10000p,200000b,80000s
 {/usr/share/texlive/texmf-dist/fonts/enc/dvips/base/8r.enc}</usr/share/texliv
 e/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/share/texlive/texm
 f-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/share/texlive/texmf-dist/
@@ -755,10 +744,10 @@ ive/texmf-dist/fonts/type1/urw/helvetic/uhvr8a.pfb></usr/share/texlive/texmf-di
 st/fonts/type1/urw/helvetic/uhvro8a.pfb></usr/share/texlive/texmf-dist/fonts/ty
 pe1/urw/palatino/uplr8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/pala
 tino/uplri8a.pfb>
-Output written on phylosignal.pdf (12 pages, 1714617 bytes).
+Output written on phylosignal.pdf (14 pages, 1735153 bytes).
 PDF statistics:
- 164 PDF objects out of 1000 (max. 8388607)
- 120 compressed objects within 2 object streams
- 27 named destinations out of 1000 (max. 500000)
- 32854 words of extra memory for PDF output out of 35830 (max. 10000000)
+ 243 PDF objects out of 1000 (max. 8388607)
+ 197 compressed objects within 2 object streams
+ 44 named destinations out of 1000 (max. 500000)
+ 37470 words of extra memory for PDF output out of 42996 (max. 10000000)
 

@@ -1,3 +1,141 @@
-\begin{thebibliography}{}
+\begin{thebibliography}{14}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi: #1}\else
+  \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[Colijn and Plazzotta(2018)]{Colijn2018}
+C~Colijn and G~Plazzotta.
+\newblock {A Metric on Phylogenetic Tree Shapes}.
+\newblock \emph{Systematic biology}, 67\penalty0 (1):\penalty0 113--126,
+  1~January 2018.
+\newblock ISSN 1063-5157, 1076-836X.
+\newblock \doi{10.1093/sysbio/syx046}.
+\newblock URL \url{http://dx.doi.org/10.1093/sysbio/syx046}.
+
+\bibitem[Gori et~al.(2016)Gori, Suchan, Alvarez, Goldman, and
+  Dessimoz]{Gori2016}
+Kevin Gori, Tomasz Suchan, Nadir Alvarez, Nick Goldman, and Christophe
+  Dessimoz.
+\newblock {Clustering Genes of Common Evolutionary History}.
+\newblock \emph{Molecular biology and evolution}, 33\penalty0 (6):\penalty0
+  msw038--msw038, February 2016.
+\newblock ISSN 0737-4038, 1537-1719.
+\newblock \doi{10.1093/molbev/msw038}.
+\newblock URL \url{http://dx.doi.org/10.1093/molbev/msw038}.
+
+\bibitem[Huang et~al.(2016)Huang, Zhou, Marchand, Ash, Morris, Van~Dooren,
+  Brown, Gallivan, and Wilgenbusch]{Huang2016}
+Wen Huang, Guifang Zhou, Melissa Marchand, Jeremy~R Ash, David Morris, Paul
+  Van~Dooren, Jeremy~M Brown, Kyle~A Gallivan, and Jim~C Wilgenbusch.
+\newblock {TreeScaper: Visualizing and Extracting Phylogenetic Signal from Sets
+  of Trees}.
+\newblock \emph{Molecular biology and evolution}, 33\penalty0 (12):\penalty0
+  msw196--msw196, September 2016.
+\newblock ISSN 0737-4038, 1537-1719.
+\newblock \doi{10.1093/molbev/msw196}.
+\newblock URL \url{http://dx.doi.org/10.1093/molbev/msw196}.
+
+\bibitem[Jombart et~al.(2017)Jombart, Kendall, Almagro-Garcia, and
+  Colijn]{Jombart2017}
+Thibaut Jombart, Michelle Kendall, Jacob Almagro-Garcia, and Caroline Colijn.
+\newblock {treespace: statistical exploration of landscapes of phylogenetic
+  trees}.
+\newblock \emph{Molecular ecology resources}, 17\penalty0 (6):\penalty0
+  1385--1392, November 2017.
+\newblock ISSN 1755-098X, 1755-0998.
+\newblock \doi{10.1111/1755-0998.12676}.
+\newblock URL \url{dx.doi.org/10.1111/1755-0998.12676}.
+
+\bibitem[Kendall and Colijn(2016)]{Kendall2016}
+Michelle Kendall and Caroline Colijn.
+\newblock {Mapping Phylogenetic Trees to Reveal Distinct Patterns of
+  Evolution}.
+\newblock \emph{Molecular biology and evolution}, 33\penalty0 (10):\penalty0
+  msw124--msw124, 1~October 2016.
+\newblock ISSN 0737-4038, 1537-1719.
+\newblock \doi{10.1093/molbev/msw124}.
+\newblock URL \url{https://academic.oup.com/mbe/article/33/10/2735/2925548}.
+
+\bibitem[Kendall et~al.(2018)Kendall, Eldholm, and Colijn]{Kendall2018}
+Michelle Kendall, Vegard Eldholm, and Caroline Colijn.
+\newblock {Comparing phylogenetic trees according to tip label categories}.
+\newblock 22~January 2018.
+\newblock URL \url{https://www.biorxiv.org/content/early/2018/01/22/251710}.
+
+\bibitem[Leigh et~al.(2008)Leigh, Susko, Baumgartner, and Roger]{Leigh2008}
+Jessica~W Leigh, Edward Susko, Manuela Baumgartner, and Andrew~J Roger.
+\newblock {Testing Congruence in Phylogenomic Analysis}.
+\newblock \emph{Systematic biology}, 57\penalty0 (1):\penalty0
+  104--115--104--115, February 2008.
+\newblock ISSN 1063-5157, 1076-836X.
+\newblock \doi{10.1080/10635150801910436}.
+\newblock URL \url{http://dx.doi.org/10.1080/10635150801910436}.
+
+\bibitem[Leigh et~al.(2011)Leigh, Schliep, Lopez, and Bapteste]{Leigh2011}
+Jessica~W Leigh, Klaus Schliep, Philippe Lopez, and Eric Bapteste.
+\newblock {{Let Them Fall Where They May: Congruence Analysis in Massive,
+  Phylogenetically Messy Datasets.}}
+\newblock \emph{Molecular biology and evolution}, 28\penalty0 (10):\penalty0
+  2773--2785, April 2011.
+\newblock ISSN 0737-4038, 1537-1719.
+\newblock \doi{10.1093/molbev/msr110}.
+\newblock URL \url{http://dx.doi.org/10.1093/molbev/msr110}.
+
+\bibitem[Lewitus and Morlon(2015)]{Lewitus2015}
+Eric Lewitus and Helene Morlon.
+\newblock {Characterizing and Comparing Phylogenies from their Laplacian
+  Spectrum}.
+\newblock \emph{Systematic biology}, 65\penalty0 (3):\penalty0
+  495--507--495--507, December 2015.
+\newblock ISSN 1063-5157, 1076-836X.
+\newblock \doi{10.1093/sysbio/syv116}.
+\newblock URL \url{http://dx.doi.org/10.1093/sysbio/syv116}.
+
+\bibitem[Narechania et~al.(2016)Narechania, Baker, DeSalle, Mathema,
+  Kolokotronis, Kreiswirth, and Planet]{Narechania2016}
+Apurva Narechania, Richard Baker, Rob DeSalle, Barun Mathema, Sergios-Orestis
+  Kolokotronis, Barry Kreiswirth, and Paul~J Planet.
+\newblock {Clusterflock: a flocking algorithm for isolating congruent
+  phylogenomic datasets}.
+\newblock \emph{GigaScience}, 5\penalty0 (1):\penalty0 44, 24~October 2016.
+\newblock ISSN 2047-217X.
+\newblock \doi{10.1186/s13742-016-0152-3}.
+\newblock URL \url{http://dx.doi.org/10.1186/s13742-016-0152-3}.
+
+\bibitem[Nye(2011)]{Nye2011}
+Tom M~W Nye.
+\newblock {{Principal components analysis in the space of phylogenetic trees}}.
+\newblock \emph{Annals of statistics}, 39\penalty0 (5):\penalty0 2716--2739,
+  October 2011.
+\newblock ISSN 0090-5364.
+\newblock \doi{10.1214/11-AOS915}.
+\newblock URL \url{http://dx.doi.org/10.1214/11-AOS915}.
+
+\bibitem[Smith et~al.(2018)Smith, Brown, and Walker]{Smith2018}
+Stephen~A Smith, Joseph~W Brown, and Joseph~F Walker.
+\newblock {So many genes, so little time: A practical approach to
+  divergence-time estimation in the genomic era}.
+\newblock \emph{PloS one}, 13\penalty0 (5):\penalty0 e0197433, 17~May 2018.
+\newblock ISSN 1932-6203.
+\newblock \doi{10.1371/journal.pone.0197433}.
+\newblock URL \url{http://dx.doi.org/10.1371/journal.pone.0197433}.
+
+\bibitem[Susko et~al.(2006)Susko, Leigh, Doolittle, and Bapteste]{Susko2006}
+E~Susko, J~Leigh, W~F Doolittle, and E~Bapteste.
+\newblock {{Visualizing and assessing phylogenetic congruence of core gene
+  sets: a case study of the gamma-proteobacteria.}}
+\newblock \emph{Molecular biology and evolution}, 23\penalty0 (5):\penalty0
+  1019--1030, May 2006.
+\newblock ISSN 0737-4038.
+\newblock \doi{10.1093/molbev/msj113}.
+\newblock URL \url{http://dx.doi.org/10.1093/molbev/msj113}.
+
+\bibitem[Yoshida et~al.(2015)Yoshida, Fukumizu, and Vogiatzis]{Yoshida2015}
+Ruriko Yoshida, Kenji Fukumizu, and Chrysafis Vogiatzis.
+\newblock {Multi Loci Phylogenetic Analysis with Gene Tree Clustering}.
+\newblock 26~June 2015.
+\newblock URL \url{http://arxiv.org/abs/1506.07976}.
 
 \end{thebibliography}

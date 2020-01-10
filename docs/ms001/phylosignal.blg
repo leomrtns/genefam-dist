@@ -1,48 +1,49 @@
 This is BibTeX, Version 0.99d (TeX Live 2017/Debian)
 Capacity: max_strings=100000, hash_size=100000, hash_prime=85009
 The top-level auxiliary file: phylosignal.aux
-The style file: unsrt.bst
-I found no \citation commands---while reading file phylosignal.aux
+The style file: plainnat.bst
 Database file #1: references.bib
-You've used 0 entries,
-            1791 wiz_defined-function locations,
-            445 strings with 3530 characters,
-and the built_in function-call counts, 18 in all, are:
-= -- 0
-> -- 0
-< -- 0
-+ -- 0
-- -- 0
-* -- 2
-:= -- 7
-add.period$ -- 0
-call.type$ -- 0
-change.case$ -- 0
-chr.to.int$ -- 0
-cite$ -- 0
-duplicate$ -- 0
-empty$ -- 1
-format.name$ -- 0
-if$ -- 1
-int.to.chr$ -- 0
-int.to.str$ -- 0
-missing$ -- 0
-newline$ -- 3
-num.names$ -- 0
-pop$ -- 0
+Warning--empty note in Kendall2018
+Warning--empty journal in Yoshida2015
+You've used 14 entries,
+            2773 wiz_defined-function locations,
+            732 strings with 8551 characters,
+and the built_in function-call counts, 8338 in all, are:
+= -- 811
+> -- 517
+< -- 4
++ -- 173
+- -- 159
+* -- 822
+:= -- 1317
+add.period$ -- 80
+call.type$ -- 14
+change.case$ -- 95
+chr.to.int$ -- 14
+cite$ -- 30
+duplicate$ -- 282
+empty$ -- 578
+format.name$ -- 179
+if$ -- 1694
+int.to.chr$ -- 1
+int.to.str$ -- 1
+missing$ -- 13
+newline$ -- 116
+num.names$ -- 56
+pop$ -- 127
 preamble$ -- 1
-purify$ -- 0
+purify$ -- 81
 quote$ -- 0
-skip$ -- 1
+skip$ -- 212
 stack$ -- 0
-substring$ -- 0
-swap$ -- 0
+substring$ -- 450
+swap$ -- 26
 text.length$ -- 0
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 0
-warning$ -- 0
-while$ -- 0
+type$ -- 154
+warning$ -- 2
+while$ -- 68
 width$ -- 0
-write$ -- 2
-(There was 1 error message)
+write$ -- 261
+(There were 2 warnings)

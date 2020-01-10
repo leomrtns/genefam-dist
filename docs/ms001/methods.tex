@@ -64,14 +64,16 @@ p-value distance and the MinMax rescaled distance. The ‘p-value’ distance $p
 in total (i.e. amongst both randomised $\tau$ and reference T) presented a distance as small as the observed:
 
 \begin{equation}
-p_i(t,T) = \sum_{\tau and T} I (d_i(t,k) \leq d_i{t,T)) / |\tau and T|
+p_i(t,T)=\frac{ \sum_{k=\{\tau,T\} } I(d_i(t,k)\leq d_i(t,T))}{|\tau| + |T|}
 \end{equation}
 
+where $I(x)$ is the indicator function of event $x$.
 The MinMax distance $m_i(t,T)$ is the original distance rescaled to the zero-one interval:
 \begin{equation}
-m_i(t,T) = ( d_i(t,T) - Min ) / (Max - Min)
+m_i(t,T) = \frac{d_i(t,T) - Min_i}{Max_i - Min_i}
 \end{equation}
-where min and max are, respectively, the minimum and maximum distances observed among both $d_i(t,T)$ and $d_i(t,\tau)$.
+where $Min_i$ and $Max_i$ are, respectively, the minimum and maximum distances observed among both $d_i(t,T)$ and
+$d_i(t,\tau)$ for distance $i$.
 
 The vector is thus
 \begin{equation}

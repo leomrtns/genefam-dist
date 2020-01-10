@@ -6,11 +6,12 @@
 \usepackage{amsmath}
 %\usepackage[textsize=footnotesize]{todonotes}
 \usepackage[top=0.5in, text={6.8in,10.3in}]{geometry}
-\usepackage{hyperref}
+\usepackage[hidelinks]{hyperref} % hidelinks to remove ugly green boxes
 % usepackages not included in writelatex
 \usepackage[dvips]{graphicx}
 \usepackage[usenames,dvipsnames]{color}% colored fonts ("usenames" defines 68 colors  http://en.wikibooks.org/wiki/LaTeX/Colors)
-\usepackage[sort&compress,numbers]{natbib} % bibliographic style (sorted numbers)
+\usepackage[round]{natbib}
+%\usepackage[sort&compress,numbers]{natbib} % bibliographic style (sorted numbers)
 \usepackage{nameref}  % standard references (to chapter, page)
 \usepackage{times}    % recommended fonts for pdflatex
 \usepackage{mathpazo} % recommended fonts for pdflatex
@@ -31,7 +32,7 @@
 \renewcommand\Authfont{\fontsize{12}{16}\selectfont}
 \renewcommand\Affilfont{\fontsize{10}{12}\itshape}
 
-\bibliographystyle{unsrt}
+\bibliographystyle{plainnat}
 \linespread{1.5}
 
 \renewcommand\floatpagefraction{.9} %page fraction with figures/tables 
@@ -78,6 +79,7 @@ this is the abstract
 \input{introduction}
 \input{methods}
 \input{results}
+\input{discussion}
 
 \begin{spacing}{0.8} \bibliography{references} \end{spacing}
 \end{document}
