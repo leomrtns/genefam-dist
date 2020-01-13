@@ -6,15 +6,25 @@
 %* On empirical data, cluster (either using an automated method, or quadrants, or by hand), and try to reconstruct a consensus tree for each cluster vs. overall consensus tree.
 %* Potential discussion point: discrete clusters or continuum? ILS and “isolated” HGT events, missing data, inference errors -> probably better modeled as a continuum -> interesting to see the extremes?
 
+A fundamental unit in phylogenomic analysis is the gene (or genomic locus), and the most detailed evolutionary
+history of a gene includes the duplication and loss events by which an ancestral locus gave rise to all
+observed diversity of loci and genes --- the so-called gene family, of which a single copy gene is a particular case.
+Each gene family will then be described by all the loci within a species connected through an common ancestor 
+(i.e. inferred to be homologous to each other).
+And their histories are expected to differ from one another due to the coalescent, duplications, losses, and
+other biological events.
+Therefore, even for the simplest case of single copy genes, we might still observe distinct patterns of their presence and
+absence amongst species, and conflicting inferred phylogenies due to the coalescent, lateral transfers, and the very
+inference process. 
 The accumulation of large-scale phylogenomic data sets leads to new challenges of comparison and visualisation of
 distinct gene families, as well as of detecting the influence of each genomic region into the overall phylogenomic
-signals. 
-State-of-the-art phylogenetic methods take gene trees as input, and model the incongruence among them in
-various ways, based on various assumptions. 
+signals.
+Many state-of-the-art phylogenetic methods take gene trees as input, and model the incongruence among them in
+various ways, based on parametric and non-parametric assumptions \citep{astral, astrid}.
 Many of these methods require the input gene trees to have at most one
-representative from each species (e.g. by requiring the user to first run an orthology inference pipeline). This
-limitation is hard to circumvent since almost all tree distance measures (required to measure incongruence between two
-trees) assume that the same leaves are present on both trees.
+representative from each species (e.g. by requiring the user to first run an orthology inference pipeline). 
+This limitation is hard to circumvent since almost all tree distance measures (required to measure incongruence between
+two trees) assume that the same leaves are present on both trees.
 
 There has been several attempts at describing phylogenetic trees as vectors of features, suitable for statistical
 comparison, such as \cite{Leigh2008, Leigh2011, Susko2006, Narechania2016, Nye2011, Yoshida2015, Lewitus2015,
@@ -22,12 +32,16 @@ Kendall2016, Colijn2018}.
 There are also a few methods that rely on pairwise tree distance matrices, which could then be projected into a new
 coordinate system.
 
-Unsupervised learning algorithms accept one of two forms of input: a design (also called feature) matrix X of size nXp
-(n samples with p dimensions each), or a dissimilarity matrix D of size nXn describing the distances between each pair
-of samples. Given D, one can project the samples into a feature space for further analysis (using multidimensional
-scaling, for instance). However, this projection needs to be recalculated if new samples arise. Our method, on the other
+Unsupervised learning algorithms accept one of two forms of input: a design (also called feature) matrix $X$ of size
+$n\times p$ (n samples with $p$ dimensions each), or a dissimilarity matrix $D$ of size $n\times n$ 
+describing the distances between each pair of samples. 
+Given $D$, one can project the samples into a feature space for further analysis (using multidimensional
+scaling, for instance). 
+However, this projection needs to be recalculated if new samples arise. 
+Our method, on the other
 hand, allows for disentangling the acquisition of sample gene trees and their projection, since their feature space can
-be described without resorting to the whole set of existing sample trees. This can become particularly relevant when the
+be described without resorting to the whole set of existing sample trees. 
+This can become particularly relevant when the
 number of sample gene trees exceeds largely the number of reference species trees.
 
 Visualisation and comparison of gene trees has been increasingly recognised as a way to objectively partition
@@ -37,15 +51,19 @@ trees can be compared (with the potential exception of \cite{Kendall2018}).
 However in many cases we cannot or prefer not to decide beforehand the orthologous groups. 
 In these cases we must work with  the so-called
 multi-labelled trees (or mul-trees, for short), which are trees with potentially more than one leaf with same label
-(labelled by the same species, in our case). At the same time, dissimilarity matrices are not the only input for
+(labelled by the same species, in our case). 
+At the same time, dissimilarity matrices are not the only input for
 classification algorithms, and describing samples through a coordinate system can have advantages.
 
-There are many new algos thanks to big data, and our data sets are also increasing, therefore we can make use of their
-novelties if we write our problem as a big data one. <...> This analysis can also help in ‘gene shopping’, i.e. when
+There are many new algorithms thanks to big data, and our data sets are also increasing, therefore we can make use of their
+novelties if we write our problem as a big data one.
+\red{to fill in something}
+This analysis can also help in ‘gene shopping’, i.e. when
 only genomic regions with desired properties are selected \citep{Smith2018}.
 On the other hand, we might be concerned if a certain selection of genes can be responsible for a bias in the results.
 
-Each gene family tree is represented by a set of features, and may contain paralogs or missing species. Each gene family
+Each gene family tree is represented by a set of features, and may contain paralogs or missing species. 
+Each gene family
 can be represented by several trees, all sharing same pattern of missing/duplicate species, as in Bayesian posterior
 distributions. (However for testing purposes we might prune individual trees from a gene family.)
 
@@ -70,15 +88,16 @@ since they give equal weight to all distances (since we compare gene trees direc
 can "weight" these hypotheses by their representativity in the reference sptrees (minimal case is to use just two
 sptrees, as "only" dimensions in the eigenbasis).
 
-At the same time, choosing just "a few" sptrees allows our matrix to be lower dimensional than a full pairwise distance.
+At the same time, choosing just ``a few'' sptrees allows our matrix to be lower dimensional than a full pairwise distance.
 This becomes more evident when 1) gene families are much larger than sptrees (more leaves), and 2) many samples from
 many genefams are analysed (e.g. 1M trees per family).
 
 The idea is that although we may lose a lot of resolution when comparing two gene family trees directly (assuming such
 comparison can be accomplished), we may have higher resolution [signal] by comparing each gene family to a species tree.
-The difference lies in the number of species in common: when comparing two gene families G1 and G2 representing
-respectively n1 and n2 species (over possibly N species), they will have in the worst case only max(0,n1+n2-N) ≤
-min(n1,n2)  ---  where min(n1,n2) is the worst case comparison between G1 or G2 and the species tree.
+The difference lies in the number of species in common: when comparing two gene families $G_1$ and $G_2$ representing
+respectively $n_1$ and $n_2$ species (over possibly $N$ species), they will have in the worst case only
+$\max\left(0,n1+n2-N\right) \leq \min\left(n1,n2\right)$  --- where $\min\left(n1,n2\right)$ 
+is the worst case comparison between $G_1$ or $G_2$ and the species tree.
 
 
 \begin{figure}[!htbp]

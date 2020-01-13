@@ -5,45 +5,45 @@ The style file: plainnat.bst
 Database file #1: references.bib
 Warning--empty note in Kendall2018
 Warning--empty journal in Yoshida2015
-You've used 14 entries,
+You've used 16 entries,
             2773 wiz_defined-function locations,
-            732 strings with 8551 characters,
-and the built_in function-call counts, 8338 in all, are:
-= -- 811
-> -- 517
-< -- 4
-+ -- 173
-- -- 159
-* -- 822
-:= -- 1317
-add.period$ -- 80
-call.type$ -- 14
-change.case$ -- 95
-chr.to.int$ -- 14
-cite$ -- 30
-duplicate$ -- 282
-empty$ -- 578
-format.name$ -- 179
-if$ -- 1694
+            752 strings with 9046 characters,
+and the built_in function-call counts, 9371 in all, are:
+= -- 924
+> -- 559
+< -- 6
++ -- 187
+- -- 171
+* -- 911
+:= -- 1475
+add.period$ -- 92
+call.type$ -- 16
+change.case$ -- 105
+chr.to.int$ -- 16
+cite$ -- 34
+duplicate$ -- 322
+empty$ -- 660
+format.name$ -- 197
+if$ -- 1911
 int.to.chr$ -- 1
 int.to.str$ -- 1
-missing$ -- 13
-newline$ -- 116
-num.names$ -- 56
-pop$ -- 127
+missing$ -- 15
+newline$ -- 132
+num.names$ -- 64
+pop$ -- 137
 preamble$ -- 1
-purify$ -- 81
+purify$ -- 89
 quote$ -- 0
-skip$ -- 212
+skip$ -- 242
 stack$ -- 0
-substring$ -- 450
-swap$ -- 26
+substring$ -- 517
+swap$ -- 30
 text.length$ -- 0
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 154
+type$ -- 176
 warning$ -- 2
-while$ -- 68
+while$ -- 79
 width$ -- 0
-write$ -- 261
+write$ -- 299
 (There were 2 warnings)

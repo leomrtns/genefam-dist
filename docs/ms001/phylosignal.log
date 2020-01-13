@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017/Debian) (preloaded format=pdflatex 2019.7.16)  10 JAN 2020 10:30
+This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017/Debian) (preloaded format=pdflatex 2019.7.16)  13 JAN 2020 15:56
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -647,32 +647,29 @@ LaTeX Font Info:    Font shape `OT1/phv/bx/n' in size <10.95> not available
 (./introduction.tex [1
 
 {/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}]
-(/usr/share/texlive/texmf-dist/tex/latex/ucs/data/uni-32.def
+[2] (/usr/share/texlive/texmf-dist/tex/latex/ucs/data/uni-32.def
 File: uni-32.def 2013/05/13 UCS: Unicode data U+2000..U+20FF
-) [2]
-(/usr/share/texlive/texmf-dist/tex/latex/ucs/data/uni-34.def
-File: uni-34.def 2013/05/13 UCS: Unicode data U+2200..U+22FF
-)
-<figure001.png, id=91, 2321.67375pt x 2754.6915pt>
+) [3]
+<figure001.png, id=103, 2321.67375pt x 2754.6915pt>
 File: figure001.png Graphic file (type png)
 <use figure001.png>
-Package pdftex.def Info: figure001.png  used on input line 85.
+Package pdftex.def Info: figure001.png  used on input line 104.
 (pdftex.def)             Requested size: 433.62pt x 514.48581pt.
 LaTeX Font Info:    Font shape `OT1/phv/bx/n' in size <12> not available
-(Font)              Font shape `OT1/phv/b/n' tried instead on input line 96.
-) (./methods.tex
+(Font)              Font shape `OT1/phv/b/n' tried instead on input line 115.
+)
+(./methods.tex
 LaTeX Font Info:    Font shape `OT1/phv/bx/n' in size <17.28> not available
 (Font)              Font shape `OT1/phv/b/n' tried instead on input line 1.
-
-[3] [4 <./figure001.png>]
+ [4] [5 <./figure001.png>]
 LaTeX Font Info:    Font shape `OT1/phv/bx/n' in size <14.4> not available
-(Font)              Font shape `OT1/phv/b/n' tried instead on input line 32.
- [5] [6]
+(Font)              Font shape `OT1/phv/b/n' tried instead on input line 41.
+ [6] [7]
 
-LaTeX Warning: Command \textquoteright invalid in math mode on input line 93.
+LaTeX Warning: Command \textquoteright invalid in math mode on input line 102.
 
-[7]) (./results.tex [8]
-<figure002.png, id=131, 1096.095pt x 403.5075pt>
+[8]) (./results.tex [9]
+<figure002.png, id=141, 1096.095pt x 403.5075pt>
 File: figure002.png Graphic file (type png)
 <use figure002.png>
 Package pdftex.def Info: figure002.png  used on input line 32.
@@ -682,13 +679,13 @@ Overfull \hbox (14.45378pt too wide) in paragraph at lines 32--38
 []$[]$ 
  []
 
-[9]
-<figure003a.png, id=136, 878.28125pt x 758.835pt>
+[10 <./figure002.png>]
+<figure003a.png, id=148, 878.28125pt x 758.835pt>
 File: figure003a.png Graphic file (type png)
 <use figure003a.png>
 Package pdftex.def Info: figure003a.png  used on input line 63.
 (pdftex.def)             Requested size: 433.62pt x 374.65765pt.
-<figure003b.png, id=137, 1055.945pt x 259.97125pt>
+<figure003b.png, id=149, 1055.945pt x 259.97125pt>
 File: figure003b.png Graphic file (type png)
 <use figure003b.png>
 Package pdftex.def Info: figure003b.png  used on input line 64.
@@ -698,7 +695,7 @@ Overfull \hbox (14.45378pt too wide) in paragraph at lines 62--68
 []$[]$ 
  []
 
-<figure004.png, id=138, 962.59625pt x 1042.89626pt>
+<figure004.png, id=150, 962.59625pt x 1042.89626pt>
 File: figure004.png Graphic file (type png)
 <use figure004.png>
 Package pdftex.def Info: figure004.png  used on input line 71.
@@ -708,29 +705,29 @@ Overfull \hbox (14.45378pt too wide) in paragraph at lines 71--74
 []$[]$ 
  []
 
-) (./discussion.tex [10 <./figure002.png>] [11 <./figure003a.png> <./figure003b
-.png>] [12 <./figure004.png>]) (./phylosignal.bbl
+) (./discussion.tex [11 <./figure003a.png> <./figure003b.png>] [12 <./figure004
+.png>]) (./phylosignal.bbl
 LaTeX Font Info:    Font shape `OT1/phv/m/it' in size <12> not available
 (Font)              Font shape `OT1/phv/m/sl' tried instead on input line 11.
  [13])
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 85.
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 100.
  [14]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 85.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 100.
  (./phylosignal.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 85.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 85.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 100.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 100.
 Package rerunfilecheck Info: File `phylosignal.out' has not changed.
 (rerunfilecheck)             Checksum: BA0BE70391B7CD628F2A23DBCE47AC60;323.
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 85.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 100.
  ) 
 Here is how much of TeX's memory you used:
- 12218 strings out of 494923
- 182465 string characters out of 6180742
- 314998 words of memory out of 5000000
- 14984 multiletter control sequences out of 15000+600000
- 56378 words of font info for 237 fonts, out of 8000000 for 9000
+ 11685 strings out of 494923
+ 176489 string characters out of 6180742
+ 311422 words of memory out of 5000000
+ 14436 multiletter control sequences out of 15000+600000
+ 57006 words of font info for 248 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
- 36i,8n,39p,1193b,512s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 36i,8n,39p,1193b,498s stack positions out of 5000i,500n,10000p,200000b,80000s
 {/usr/share/texlive/texmf-dist/fonts/enc/dvips/base/8r.enc}</usr/share/texliv
 e/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/share/texlive/texm
 f-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/share/texlive/texmf-dist/
@@ -744,10 +741,10 @@ ive/texmf-dist/fonts/type1/urw/helvetic/uhvr8a.pfb></usr/share/texlive/texmf-di
 st/fonts/type1/urw/helvetic/uhvro8a.pfb></usr/share/texlive/texmf-dist/fonts/ty
 pe1/urw/palatino/uplr8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/pala
 tino/uplri8a.pfb>
-Output written on phylosignal.pdf (14 pages, 1735153 bytes).
+Output written on phylosignal.pdf (14 pages, 1740211 bytes).
 PDF statistics:
- 243 PDF objects out of 1000 (max. 8388607)
- 197 compressed objects within 2 object streams
- 44 named destinations out of 1000 (max. 500000)
+ 252 PDF objects out of 1000 (max. 8388607)
+ 205 compressed objects within 3 object streams
+ 46 named destinations out of 1000 (max. 500000)
  37470 words of extra memory for PDF output out of 42996 (max. 10000000)
 

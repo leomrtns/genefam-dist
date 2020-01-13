@@ -1,4 +1,4 @@
-\begin{thebibliography}{14}
+\begin{thebibliography}{16}
 \providecommand{\natexlab}[1]{#1}
 \providecommand{\url}[1]{\texttt{#1}}
 \expandafter\ifx\csname urlstyle\endcsname\relax
@@ -93,6 +93,16 @@ Eric Lewitus and Helene Morlon.
 \newblock \doi{10.1093/sysbio/syv116}.
 \newblock URL \url{http://dx.doi.org/10.1093/sysbio/syv116}.
 
+\bibitem[Mirarab and Warnow(2015)]{astral}
+Siavash Mirarab and Tandy Warnow.
+\newblock {ASTRAL-II: coalescent-based species tree estimation with many
+  hundreds of taxa and thousands of genes}.
+\newblock \emph{Bioinformatics}, 31\penalty0 (12):\penalty0 i44--i52--i44--i52,
+  15~June 2015.
+\newblock ISSN 1367-4803, 1460-2059.
+\newblock \doi{10.1093/bioinformatics/btv234}.
+\newblock URL \url{http://dx.doi.org/10.1093/bioinformatics/btv234}.
+
 \bibitem[Narechania et~al.(2016)Narechania, Baker, DeSalle, Mathema,
   Kolokotronis, Kreiswirth, and Planet]{Narechania2016}
 Apurva Narechania, Richard Baker, Rob DeSalle, Barun Mathema, Sergios-Orestis
@@ -131,6 +141,14 @@ E~Susko, J~Leigh, W~F Doolittle, and E~Bapteste.
 \newblock ISSN 0737-4038.
 \newblock \doi{10.1093/molbev/msj113}.
 \newblock URL \url{http://dx.doi.org/10.1093/molbev/msj113}.
+
+\bibitem[Vachaspati and Warnow(2015)]{astrid}
+Pranjal Vachaspati and Tandy Warnow.
+\newblock {ASTRID: Accurate Species TRees from Internode Distances}.
+\newblock \emph{BMC genomics}, 16 Suppl 10:\penalty0 S3, 2~October 2015.
+\newblock ISSN 1471-2164.
+\newblock \doi{10.1186/1471-2164-16-S10-S3}.
+\newblock URL \url{http://dx.doi.org/10.1186/1471-2164-16-S10-S3}.
 
 \bibitem[Yoshida et~al.(2015)Yoshida, Fukumizu, and Vogiatzis]{Yoshida2015}
 Ruriko Yoshida, Kenji Fukumizu, and Chrysafis Vogiatzis.

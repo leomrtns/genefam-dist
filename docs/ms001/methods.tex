@@ -1,19 +1,28 @@
 \section{Methods}
-The gene family trees represent orthogroups or root HOGs <ref>, that is, a tree describing all sequences assumed to
-share a common ancestral sequence (including paralogs, or several individuals from the same population). These trees are
+The gene family trees represent orthogroups or root HOGs [ref], that is, a tree describing all sequences assumed to
+share a common ancestral sequence (including paralogs, or several individuals from the same population). 
+These trees are
 the input to the algorithm and may have been estimated by any phylogenetic method --- the algorithm is agnostic to the
 source of disagreement (and therefore to the reason for the multiple leaves with same species label) or to the inference
-procedure. The reference trees represent possible species trees, and must be on the same set of all species (i.e. all
-species must be present in all reference trees). The set of reference trees should capture the variability between gene
-trees with respect to the set of distances used to describe them. Therefore a good choice would be a set of optimal
+procedure. 
+The reference trees represent possible species trees, and must be on the same set of all species (i.e. all
+species must be present in all reference trees). 
+The set of reference trees should capture the variability between gene
+trees with respect to the set of distances used to describe them. 
+Therefore a good choice would be a set of optimal
 species trees for the most dissimilar sets of gene families, although here we usually limit ourselves to a few species
-trees inferred from a single set of gene families, with further randomisation in a few cases. It is important to notice
+trees inferred from a single set of gene families, with further randomisation in a few cases. 
+It is important to notice
 that the reference species trees are not restricted to the optimal ones (under some notion of optimality) and do not
-need to include all optimal species trees. However having good candidates for the species trees will help interpreting
-the gene trees in terms of them. The gene trees are assumed to be unrooted since the basic phylogenetic inference models
-can’t infer the root location, but our method can be easily adapted for rooted gene family trees. The reference species
-trees are rooted, although some distances disregard this information. The reference species trees are fixed beforehand,
-but once they are set they can be used to create the “tree signal” of any gene family online, as long as all species
+need to include all optimal species trees. 
+However having good candidates for the species trees will help interpreting
+the gene trees in terms of them. 
+The gene trees are assumed to be unrooted since the basic phylogenetic inference models
+can’t infer the root location, but our method can be easily adapted for rooted gene family trees.
+The reference species
+trees are rooted, although some distances disregard this information.
+The reference species trees are fixed beforehand,
+but once they are set they can be used to create the ``tree signal'' of any gene family online, as long as all species
 present in the gene family are represented in the reference species trees.
 
 \red{describe the vector}

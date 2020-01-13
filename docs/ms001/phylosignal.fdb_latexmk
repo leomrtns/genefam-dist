@@ -1,13 +1,13 @@
 # Fdb version 3
-["bibtex phylosignal"] 1578652164 "phylosignal.aux" "phylosignal.bbl" "phylosignal" 1578652202
+["bibtex phylosignal"] 1578929492 "phylosignal.aux" "phylosignal.bbl" "phylosignal" 1578930968
   "/usr/share/texlive/texmf-dist/bibtex/bst/natbib/plainnat.bst" 1480098435 26816 ffe5423d2019860bad9f54bc402fac15 ""
-  "phylosignal.aux" 1578652202 6408 db2b657c1d63e7bbbc7b1f1952bfdb2d ""
+  "phylosignal.aux" 1578930968 6546 3c6d168148ee96935e58055a42da1d69 ""
   "phylosignal.bcf" 0 -1 0 ""
-  "references.bib" 1578652161 54298 2feca82417618655de143e638cfd25cd ""
+  "references.bib" 1578929467 61602 9c607567436af25241139a6b24a48c50 ""
   (generated)
-  "phylosignal.blg"
   "phylosignal.bbl"
-["pdflatex"] 1578652200 "phylosignal.tex" "phylosignal.pdf" "phylosignal" 1578652202
+  "phylosignal.blg"
+["pdflatex"] 1578930966 "phylosignal.tex" "phylosignal.pdf" "phylosignal" 1578930968
   "/etc/texmf/web2c/texmf.cnf" 1551175058 475 c0e671620eb5563b2130f56340a5fde8 ""
   "/usr/share/texlive/texmf-dist/fonts/enc/dvips/base/8r.enc" 1480098666 4850 80dc9bab7f31fb78a000ccfed0e27cab ""
   "/usr/share/texlive/texmf-dist/fonts/map/fontname/texfonts.map" 1511824771 3332 103109f5612ad95229751940c61aada0 ""
@@ -137,7 +137,6 @@
   "/usr/share/texlive/texmf-dist/tex/latex/setspace/setspace.sty" 1480098838 22913 a27d7908fc6f0385466454a966a316eb ""
   "/usr/share/texlive/texmf-dist/tex/latex/subfig/subfig.sty" 1480098839 21369 9ef165ca6df8815c92e693146a376c92 ""
   "/usr/share/texlive/texmf-dist/tex/latex/ucs/data/uni-32.def" 1480098842 8033 ee5a06eead35a732222f876800c8f10f ""
-  "/usr/share/texlive/texmf-dist/tex/latex/ucs/data/uni-34.def" 1480098842 10889 f4bb23aad9b12df75a5d13bd63a0cd45 ""
   "/usr/share/texlive/texmf-dist/tex/latex/ucs/data/uni-global.def" 1480098842 1375 8a855db83af5d6753ccbbd32e6a8a901 ""
   "/usr/share/texlive/texmf-dist/tex/latex/ucs/ucs.sty" 1480098842 27982 5723d81d568db410592a59b85fb3eaae ""
   "/usr/share/texlive/texmf-dist/tex/latex/ucs/ucsencs.def" 1480098842 22368 c53c9d0d16c65bef2b157515c9d9f658 ""
@@ -153,15 +152,15 @@
   "figure003a.png" 1578475672 167194 e14301efaf40a0ad0718dbf408e6e0ef ""
   "figure003b.png" 1578475672 12576 b1463a18d7b06c46f98be3ca5a2fea47 ""
   "figure004.png" 1578475672 560864 37bab416823258ed626bac93a6390902 ""
-  "introduction.tex" 1578652199 8259 e3b56093800f553d780fc44d89841f92 ""
-  "methods.tex" 1578648785 9258 57d39a54fbb712ae4a53f0d66ee3183d ""
-  "phylosignal.aux" 1578652202 6408 db2b657c1d63e7bbbc7b1f1952bfdb2d ""
-  "phylosignal.bbl" 1578652164 6407 3634371ae399d4b3edac97fd2dd65dd3 "bibtex phylosignal"
-  "phylosignal.out" 1578652202 323 ba0be70391b7cd628f2a23dbce47ac60 ""
-  "phylosignal.tex" 1578651727 3655 98d1e566622dc5745dcb4a51f7e45cbc ""
+  "introduction.tex" 1578930883 9314 a2f21d2990d8773c89f5b1072e335976 ""
+  "methods.tex" 1578930966 9263 1e3bf4383a126f2c97a148857120c007 ""
+  "phylosignal.aux" 1578930968 6546 3c6d168148ee96935e58055a42da1d69 ""
+  "phylosignal.bbl" 1578929492 7215 33c45c60ab736c1b2d34539b7ee79b4d "bibtex phylosignal"
+  "phylosignal.out" 1578930968 323 ba0be70391b7cd628f2a23dbce47ac60 ""
+  "phylosignal.tex" 1578927388 4923 30c3369c126d02bc83ce4361b796daae ""
   "results.tex" 1578505401 5371 948654eeda604ea86385cb753b5a070a ""
   (generated)
-  "phylosignal.aux"
   "phylosignal.log"
+  "phylosignal.aux"
   "phylosignal.out"
   "phylosignal.pdf"

@@ -62,7 +62,7 @@
 \setcounter{bottomnumber}{50} % max figures per page
 
 \renewcommand*{\familydefault}{\sfdefault}
-\title{Spectral signature of gene family trees}
+\title{Tree signature of gene families}
 \author[1]{Leonardo de Oliveira Martins\thanks{{\tt Leonardo.de-Oliveira-Martins@quadram.ac.uk}}}
 \author[2,3]{Christophe Dessimoz\thanks{{\tt cdessimoz@unil.ch}}}
 \affil[1]{Quadram Institute Biosciences, Norwich, NR4 7UQ, UK}
@@ -73,7 +73,22 @@
 \maketitle
 
 \begin{abstract}
-this is the abstract
+Genome-scale data sets routinely comprise thousands of genes from hundreds of species, which tell us complementary
+aspects of their evolution --- the evolution of the species is a mosaic of the evolutionary history of its composing
+genes.
+Several methods have been developed to visualise the similarity between histories told by each gene, under certain
+circumstances.
+This visualisation and comparison is essential to detect outliers, clusters of similar genes, and possibly description
+of the reason for disagreement between them.
+However the circumstances under which we can quantify this disagreement relies on being able to map 
+the leaves of one gene tree to another --- in practice this is equivalent to removing the effects of paralogy, and
+working only with single copy genes or inferred orthologous groups.
+Here we present a way of comparing whole gene families, even when they have vastly different sizes (due to duplications,
+losses) and few overlapping species. 
+The idea is to describe gene family trees within a coordinate system imposed by a set of possible species trees, what we
+call their tree signature.
+Gene families can not be compared directly, but we use the fact that those with a similar history (of duplications,
+losses, coalescences) should have resembling signatures.
 \end{abstract}
 
 \input{introduction}

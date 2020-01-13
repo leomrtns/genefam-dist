@@ -936,3 +936,127 @@
   pmid      = "27634869",
   doi       = "10.1093/molbev/msw196"
 }
+
+
+@UNPUBLISHED{astral-pro,
+  title    = "{ASTRAL-Pro: quartet-based species tree inference despite paralogy}",
+  author   = "Zhang, Chao and Scornavacca, Celine and Molloy, Erin and Mirarab,
+              Siavash",
+  abstract = "Species tree inference via summary methods that combine gene
+              trees has become an increasingly common analysis in recent
+              phylogenomic studies. This broad adoption has been partly due to
+              the greater availability of genome-wide data and ample
+              recognition that gene trees and species trees can differ due to
+              biological processes such as gene duplication and gene loss. This
+              increase has also been encouraged by the recent development of
+              accurate and scalable summary methods, such as ASTRAL. However,
+              most of these methods, including ASTRAL, can only handle
+              single-copy gene trees and do not attempt to model gene
+              duplication and gene loss. In this paper, we introduce a measure
+              of quartet similarity between single-copy and multi-copy trees
+              (accounting for orthology and paralogy relationships) that can be
+              optimized via a scalable dynamic programming similar to the one
+              used by ASTRAL. We then present a new quartet-based species tree
+              inference method: ASTRAL-Pro (ASTRAL for PaRalogs and Orthologs).
+              By studying its performance on an extensive collection of
+              simulated datasets and on a real plant dataset, we show that
+              ASTRAL-Pro is more accurate than alternative methods when gene
+              trees differ from the species tree due to the simultaneous
+              presence of gene duplication, gene loss, incomplete lineage
+              sorting, and estimation errors.",
+  journal  = "bioRxiv",
+  pages    = "2019.12.12.874727",
+  month    =  "13~" # dec,
+  year     =  2019,
+  url      = "https://www.biorxiv.org/content/10.1101/2019.12.12.874727v1",
+  file     = "All Papers/Z/Zhang et al. 2019 - ASTRAL-Pro - quartet-based species tree inference despite paralogy.pdf",
+  language = "en",
+  doi      = "10.1101/2019.12.12.874727"
+}
+
+@ARTICLE{astrid,
+  title    = "{ASTRID: Accurate Species TRees from Internode Distances}",
+  author   = "Vachaspati, Pranjal and Warnow, Tandy",
+  abstract = "BACKGROUND: Incomplete lineage sorting (ILS), modelled by the
+              multi-species coalescent (MSC), is known to create discordance
+              between gene trees and species trees, and lead to inaccurate
+              species tree estimations unless appropriate methods are used to
+              estimate the species tree. While many statistically consistent
+              methods have been developed to estimate the species tree in the
+              presence of ILS, only ASTRAL-2 and NJst have been shown to have
+              good accuracy on large datasets. Yet, NJst is generally slower
+              and less accurate than ASTRAL-2, and cannot run on some datasets.
+              RESULTS: We have redesigned NJst to enable it to run on all
+              datasets, and we have expanded its design space so that it can be
+              used with different distance-based tree estimation methods. The
+              resultant method, ASTRID, is statistically consistent under the
+              MSC model, and has accuracy that is competitive with ASTRAL-2.
+              Furthermore, ASTRID is much faster than ASTRAL-2, completing in
+              minutes on some datasets for which ASTRAL-2 used hours.
+              CONCLUSIONS: ASTRID is a new coalescent-based method for species
+              tree estimation that is competitive with the best current method
+              in terms of accuracy, while being much faster. ASTRID is
+              available in open source form on github.",
+  journal  = "BMC genomics",
+  volume   = "16 Suppl 10",
+  pages    = "S3",
+  month    =  "2~" # oct,
+  year     =  2015,
+  url      = "http://dx.doi.org/10.1186/1471-2164-16-S10-S3",
+  annote   = "<p>Added to JabRef: 20150803.1235</p><p>Owner: leo</p>",
+  file     = "All Papers/V/Vachaspati and Warnow 2015 - ASTRID - Accurate Species TRees from Internode Distances.pdf;All Papers/V/Vachaspati and Warnow 2015 - ASTRID - Accurate Species TRees from Internode Distances.pdf",
+  keywords = "00.phylogenomics, 00.reconciliation, 00.species.tree",
+  language = "en",
+  issn     = "1471-2164",
+  pmid     = "26449326",
+  doi      = "10.1186/1471-2164-16-S10-S3",
+  pmc      = "PMC4602181"
+}
+
+@ARTICLE{astral,
+  title     = "{ASTRAL-II: coalescent-based species tree estimation with many
+               hundreds of taxa and thousands of genes}",
+  author    = "Mirarab, Siavash and Warnow, Tandy",
+  abstract  = "MOTIVATION: The estimation of species phylogenies requires
+               multiple loci, since different loci can have different trees due
+               to incomplete lineage sorting, modeled by the multi-species
+               coalescent model. We recently developed a coalescent-based
+               method, ASTRAL, which is statistically consistent under the
+               multi-species coalescent model and which is more accurate than
+               other coalescent-based methods on the datasets we examined.
+               ASTRAL runs in polynomial time, by constraining the search space
+               using a set of allowed 'bipartitions'. Despite the limitation to
+               allowed bipartitions, ASTRAL is statistically consistent.
+               RESULTS: We present a new version of ASTRAL, which we call
+               ASTRAL-II. We show that ASTRAL-II has substantial advantages
+               over ASTRAL: it is faster, can analyze much larger datasets (up
+               to 1000 species and 1000 genes) and has substantially better
+               accuracy under some conditions. ASTRAL's running time is
+               [Formula: see text], and ASTRAL-II's running time is [Formula:
+               see text], where n is the number of species, k is the number of
+               loci and X is the set of allowed bipartitions for the search
+               space. AVAILABILITY AND IMPLEMENTATION: ASTRAL-II is available
+               in open source at https://github.com/smirarab/ASTRAL and
+               datasets used are available at
+               http://www.cs.utexas.edu/~phylo/datasets/astral2/. CONTACT:
+               smirarab@gmail.com SUPPLEMENTARY INFORMATION: Supplementary data
+               are available at Bioinformatics online.",
+  journal   = "Bioinformatics",
+  publisher = "Oxford University Press (OUP)",
+  volume    =  31,
+  number    =  12,
+  pages     = "i44--i52--i44--i52",
+  month     =  "15~" # jun,
+  year      =  2015,
+  url       = "http://dx.doi.org/10.1093/bioinformatics/btv234",
+  annote    = "<p>Added to JabRef: 20161125.1159</p><p>Owner: leo</p>",
+  file      = "All Papers/M/Mirarab and Warnow 2015 - ASTRAL-II - coalescent-based species tree estimation with many hundreds of taxa and thousands of genes.pdf",
+  keywords  = "00.distance, 00.phylogenomics, 00.coalescent, 00.reconciliation",
+  language  = "en",
+  issn      = "1367-4803, 1460-2059",
+  pmid      = "26072508",
+  doi       = "10.1093/bioinformatics/btv234",
+  pmc       = "PMC4765870"
+}
+
+
