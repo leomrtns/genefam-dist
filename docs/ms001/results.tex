@@ -68,7 +68,7 @@ Typical case (simphy simulation). Colors represent underlying species trees.
 \begin{figure}[!htbp]
 \begin{minipage}{7in}\centering\includegraphics[width = 6.5in]{figure004.png}\end{minipage}
 \caption{\label{figure004}
-Fungal data set
+  Fungal data set \red{(not same as below BTW)}
 }\end{figure}
 
 
@@ -82,24 +82,56 @@ trees and used guenomu again to estimate some 30 further good likelihood species
 This set of 70 reference trees (with a few random ones added to round up) was then expanded into 250 by
 branch-length-dependent ``noise addition'' as described in \cite{Martins2016}, and finally the {\tt treesignal} library
 was used to simulate another set of 250 ``random'' reference trees based on these 250 ``good'' trees.
-\textcolor{red}{perhaps explanation is easier as a separate section/preprint}.
-
 The final set included around 11k gene families, over 49 species. 
+We ditched the p-valued distances and work only with the min-max ones, since the former didn't perform well. 
+\textcolor{red}{perhaps explanation is easier as a separate section/preprint; why describe p-value if not using it?}.
+
 By decomposing the resulting feature matrices with sparse PCA, such that only a fraction of the features (combinations
 of reference species tree and distances to gene family tree) are retained, we see that results chagen if we use ``good''
-reference trees, that is, those based on maximum likelihood estimation by {\tt guenomu}, or if we use random trees.
+reference trees, that is, those based on maximum likelihood estimation by {\tt guenomu}, or if we use random trees
+(see Figures \ref{figure005} and \ref{figure006}).
 Good reference trees lead to first sparse PCA components strongly correlated with specifi distances, for instance the
 first component seems to keep the RF and ILS distances, while the second component points to the number of duplications
 (and to a lesser extent to the number of losses). On the other hand, when using random trees, the first sparse PCA
 components don't seem to be correlated with any particular distance.
 
 \begin{figure}[!htbp]
-  \begin{minipage}{7in}\centering
+  \begin{minipage}{6.9in}\centering
   \includegraphics[width = 3.4in]{good_indicator.png}
   \includegraphics[width = 3.4in]{random_indicator.png}
 \end{minipage}
   \caption{\label{figure005}
     Correlation between the first eight sparse PCA components and the distances to the reference trees, when using good
     reference trees (left) or random reference trees (right). 
-    Each bar represents the number of genes with a component different from zero.
+    Each bar represents, per distance, the number of genes with a load different from zero, for that sparse principal component.
   }\end{figure}
+\begin{figure}[!htbp]
+  \begin{minipage}{6.9in}\centering
+  \includegraphics[width = 3.4in]{good_weighted.png}
+  \includegraphics[width = 3.4in]{random_weighted.png}
+\end{minipage}
+  \caption{\label{figure006}
+    Correlation between the first eight sparse PCA components and the distances to the reference trees, when using good
+    reference trees (left) or random reference trees (right). 
+    Each bar represents, per distance, the sum of squares of the loads of all genes, for each sparse PCA component.
+    \textcolor{red}{(todo: plot only first 4 components?)} 
+  }\end{figure}
+
+This indicates that each distance is capturing a different aspect of the gene family trees, and that having good
+reference trees allows us to capture this difference better than random trees.
+The clustering, however, seems to profit from a combination of reference trees (Figure \ref{figure007}).
+\red{say something about the gene families going into different clusters? check score of different features subsets,
+e.g. only good ref trees or only a particular distance, as plot in notebook}
+
+\begin{figure}[!htbp]
+  \begin{minipage}{6.9in}\centering
+  \includegraphics[width = 6in]{fungal_all.png}
+  \includegraphics[width = 6in]{fungal_good.png}
+  \includegraphics[width = 6in]{fungal_random.png}
+\end{minipage}
+  \caption{\label{figure007}
+    Clustering of the gene families based on the rescaled min-max distances, when using all reference trees (top), only good reference trees (middle) or only random reference trees (bottom).
+    We show several dimension reduction methods (PCA, Isomap, and Spectral Embedding).
+    The colouring is based on k-means clustering with five clusters using all reference trees. 
+  }\end{figure}
+

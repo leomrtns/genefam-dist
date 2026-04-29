@@ -1,46 +1,12 @@
-This is LuaHBTeX, Version 1.22.0 (TeX Live 2025/Debian)  (format=lualatex 2026.3.11)  29 APR 2026 10:06
- restricted system commands enabled.
+This is pdfTeX, Version 3.141592653-2.6-1.40.28 (TeX Live 2025/Debian) (preloaded format=pdflatex 2026.3.11)  29 APR 2026 11:35
+entering extended mode
+ restricted \write18 enabled.
+ %&-line parsing enabled.
 **phylosignal.tex
 (./phylosignal.tex
 LaTeX2e <2025-11-01>
 L3 programming layer <2026-01-19>
-Lua module: luaotfload 2024-12-03 v3.29 Lua based OpenType font support
-Lua module: lualibs 2023-07-13 v2.76 ConTeXt Lua standard libraries.
-Lua module: lualibs-extended 2023-07-13 v2.76 ConTeXt Lua libraries -- extended 
-collection.
-luaotfload | conf : Root cache directory is "/home/leo/.texlive2025/texmf-var/lu
-atex-cache/generic/names".
-luaotfload | init : Loading fontloader "fontloader-2023-12-28.lua" from kpse-res
-olved path "/usr/share/texlive/texmf-dist/tex/luatex/luaotfload/fontloader-2023-
-12-28.lua".
-Lua-only attribute luaotfload@noligature = 1
-luaotfload | init : Context OpenType loader version 3.134
-Inserting `luaotfload.node_processor' in `pre_linebreak_filter'.
-Inserting `luaotfload.node_processor' in `hpack_filter'.
-Inserting `luaotfload.glyph_stream' in `glyph_stream_provider'.
-Inserting `luaotfload.define_font' in `define_font'.
-Lua-only attribute luaotfload_color_attribute = 2
-luaotfload | conf : Root cache directory is "/home/leo/.texlive2025/texmf-var/lu
-atex-cache/generic/names".
-Inserting `luaotfload.harf.strip_prefix' in `find_opentype_file'.
-Inserting `luaotfload.harf.strip_prefix' in `find_truetype_file'.
-Removing  `luaotfload.glyph_stream' from `glyph_stream_provider'.
-Inserting `luaotfload.harf.glyphstream' in `glyph_stream_provider'.
-Inserting `luaotfload.harf.finalize_vlist' in `post_linebreak_filter'.
-Inserting `luaotfload.harf.finalize_hlist' in `hpack_filter'.
-Inserting `luaotfload.cleanup_files' in `wrapup_run'.
-Inserting `luaotfload.harf.finalize_unicode' in `finish_pdffile'.
-Inserting `luaotfload.glyphinfo' in `glyph_info'.
-Lua-only attribute luaotfload.letterspace_done = 3
-Inserting `luaotfload.aux.set_sscale_dimens' in `luaotfload.patch_font'.
-Inserting `luaotfload.aux.set_font_index' in `luaotfload.patch_font'.
-Inserting `luaotfload.aux.patch_cambria_domh' in `luaotfload.patch_font'.
-Inserting `luaotfload.aux.fixup_fontdata' in `luaotfload.patch_font_unsafe'.
-Inserting `luaotfload.aux.set_capheight' in `luaotfload.patch_font'.
-Inserting `luaotfload.aux.set_xheight' in `luaotfload.patch_font'.
-Inserting `luaotfload.rewrite_fontname' in `luaotfload.patch_font'.
-Inserting `tracingstacklevels' in `input_level_string'. (/usr/share/texlive/tex
-mf-dist/tex/latex/base/article.cls
+(/usr/share/texlive/texmf-dist/tex/latex/base/article.cls
 Document Class: article 2025/01/22 v1.4n Standard LaTeX document class
 (/usr/share/texlive/texmf-dist/tex/latex/base/fleqn.clo
 File: fleqn.clo 2016/12/29 v1.2b Standard LaTeX option (flush left equations)
@@ -54,120 +20,23 @@ Already applied: [0000/00/00] Make \] robust on input line 83.
 )
 (/usr/share/texlive/texmf-dist/tex/latex/base/size12.clo
 File: size12.clo 2025/01/22 v1.4n Standard LaTeX file (size option)
-luaotfload | db : Font names database loaded from /home/leo/.texlive2025/texmf-v
-ar/luatex-cache/generic/names/luaotfload-names.luc.gz)
-\c@part=\count273
-\c@section=\count274
-\c@subsection=\count275
-\c@subsubsection=\count276
-\c@paragraph=\count277
-\c@subparagraph=\count278
-\c@figure=\count279
-\c@table=\count280
+)
+\c@part=\count275
+\c@section=\count276
+\c@subsection=\count277
+\c@subsubsection=\count278
+\c@paragraph=\count279
+\c@subparagraph=\count280
+\c@figure=\count281
+\c@table=\count282
 \abovecaptionskip=\skip50
 \belowcaptionskip=\skip51
-\bibindent=\dimen147
+\bibindent=\dimen148
 )
 (/usr/share/texlive/texmf-dist/tex/generic/babel/babel.sty
 Package: babel 2026/01/18 v26.1 The multilingual framework for LuaLaTeX, pdfLaT
 eX and XeLaTeX
-
-(/usr/share/texlive/texmf-dist/tex/generic/babel/luababel.def
-\bbl@readstream=\read2
-\l@dumylang=\language2
-Package babel Info: Non-standard hyphenation setup on input line 118.
-\l@nohyphenation=\language3
-\l@afrikaans=\language4
-\l@swedish=\language5
-\l@turkmen=\language6
-\l@irish=\language7
-\l@friulan=\language8
-\l@monogreek=\language9
-\l@turkish=\language10
-\l@belarusian=\language11
-\l@czech=\language12
-\l@icelandic=\language13
-\l@dutch=\language14
-\l@ngerman=\language15
-\l@thai=\language16
-\l@liturgicallatin=\language17
-\l@estonian=\language18
-\l@mongolianlmc=\language19
-\l@hebrew=\language20
-\l@panjabi=\language21
-\l@french=\language22
-\l@greek=\language23
-\l@macedonian=\language24
-\l@coptic=\language25
-\l@ibycus=\language26
-\l@georgian=\language27
-\l@latin=\language28
-\l@arabic=\language29
-\l@bulgarian=\language30
-\l@ukrainian=\language31
-\l@polish=\language32
-\l@pali=\language33
-\l@kannada=\language34
-\l@assamese=\language35
-\l@classiclatin=\language36
-\l@welsh=\language37
-\l@latvian=\language38
-\l@occitan=\language39
-\l@spanish=\language40
-\l@malayalam=\language41
-\l@usenglishmax=\language42
-\l@schoolfinnish=\language43
-\l@serbian=\language44
-\l@piedmontese=\language45
-\l@mongolian=\language46
-\l@portuguese=\language47
-\l@kurmanji=\language48
-\l@russian=\language49
-\l@swissgerman=\language50
-\l@indonesian=\language51
-\l@interlingua=\language52
-\l@ukenglish=\language53
-\l@romansh=\language54
-\l@finnish=\language55
-\l@oriya=\language56
-\l@danish=\language57
-\l@marathi=\language58
-\l@uppersorbian=\language59
-\l@telugu=\language60
-\l@german=\language61
-\l@gujarati=\language62
-\l@ancientgreek=\language63
-\l@galician=\language64
-\l@farsi=\language65
-\l@armenian=\language66
-\l@churchslavonic=\language67
-\l@basque=\language68
-\l@albanian=\language69
-\l@hungarian=\language70
-\l@italian=\language71
-\l@bengali=\language72
-\l@hindi=\language73
-\l@slovenian=\language74
-\l@lithuanian=\language75
-\l@ethiopic=\language76
-\l@sanskrit=\language77
-\l@serbianc=\language78
-\l@tamil=\language79
-\l@ngerman-x-2024-02-28=\language80
-\l@catalan=\language81
-\l@vietnamese=\language82
-\l@pinyin=\language83
-\l@romanian=\language84
-\l@croatian=\language85
-\l@german-x-2024-02-28=\language86
-\l@bokmal=\language87
-\l@slovak=\language88
-\l@nynorsk=\language89
-\l@esperanto=\language90
-\babelcatcodetablenum=\catcodetable14
-\bbl@pattcodes=\catcodetable15
-)
-\babel@savecnt=\count281
+\babel@savecnt=\count283
 LaTeX Encoding Info:    Redeclaring text command \ij (encoding OT1) on input li
 ne 2078.
 LaTeX Encoding Info:    Redeclaring text command \IJ (encoding OT1) on input li
@@ -182,12 +51,13 @@ LaTeX Encoding Info:    Ignoring declaration for text command \IJ (encoding ?)
 on input line 2086.
 LaTeX Encoding Info:    Ignoring declaration for text command \SS (encoding ?) 
 on input line 2111.
-\U@D=\dimen148
-\l@unhyphenated=\language91
+\U@D=\dimen149
+\l@unhyphenated=\language90
 
-(/usr/share/texlive/texmf-dist/tex/generic/babel/luababel.def
-\bbl@attr@locale=\attribute4
-)
+(/usr/share/texlive/texmf-dist/tex/generic/babel/txtbabel.def)
+\bbl@readstream=\read2
+\bbl@dirlevel=\count284
+
 (/usr/share/texlive/texmf-dist/tex/generic/babel/locale/en/babel-english.tex)
 Package babel Info: Importing font and identification data for english
 (babel)             from babel-en.ini. Reported on input line 4330.
@@ -197,23 +67,468 @@ Language: english 2017/06/06 v3.3r English support from the babel system
 Package babel Info: Hyphen rules for 'canadian' set to \l@english
 (babel)             (\language0). Reported on input line 102.
 Package babel Info: Hyphen rules for 'australian' set to \l@ukenglish
-(babel)             (\language53). Reported on input line 105.
+(babel)             (\language52). Reported on input line 105.
 Package babel Info: Hyphen rules for 'newzealand' set to \l@ukenglish
-(babel)             (\language53). Reported on input line 108.
+(babel)             (\language52). Reported on input line 108.
 ))
 (/usr/share/texlive/texmf-dist/tex/latex/base/inputenc.sty
 Package: inputenc 2024/02/08 v1.3d Input encoding file
 \inpenc@prehook=\toks17
 \inpenc@posthook=\toks18
 
+(/usr/share/texlive/texmf-dist/tex/latex/ucs/utf8x.def
+File: utf8x.def 2023/11/09 UCS: Input encoding UTF-8
 
-Package inputenc Warning: inputenc package ignored with utf8 based engines.
 
-) (/usr/share/texlive/texmf-dist/tex/latex/appendix/appendix.sty
+Package ucs Info: utf8x disabled, assuming standard utf8 processing
+(ucs)             load ucs package to force utf8x processing.
+
+(/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def
+File: utf8.def 2022/06/07 v1.3c UTF-8 support
+Now handling font encoding OML ...
+... no UTF-8 mapping file for font encoding OML
+Now handling font encoding OMS ...
+... processing UTF-8 mapping file for font encoding OMS
+
+(/usr/share/texlive/texmf-dist/tex/latex/base/omsenc.dfu
+File: omsenc.dfu 2022/06/07 v1.3c UTF-8 support
+   defining Unicode char U+00A7 (decimal 167)
+   defining Unicode char U+00B6 (decimal 182)
+   defining Unicode char U+00B7 (decimal 183)
+   defining Unicode char U+2020 (decimal 8224)
+   defining Unicode char U+2021 (decimal 8225)
+   defining Unicode char U+2022 (decimal 8226)
+)
+Now handling font encoding OT1 ...
+... processing UTF-8 mapping file for font encoding OT1
+
+(/usr/share/texlive/texmf-dist/tex/latex/base/ot1enc.dfu
+File: ot1enc.dfu 2022/06/07 v1.3c UTF-8 support
+   defining Unicode char U+00A0 (decimal 160)
+   defining Unicode char U+00A1 (decimal 161)
+   defining Unicode char U+00A3 (decimal 163)
+   defining Unicode char U+00AD (decimal 173)
+   defining Unicode char U+00B8 (decimal 184)
+   defining Unicode char U+00BF (decimal 191)
+   defining Unicode char U+00C5 (decimal 197)
+   defining Unicode char U+00C6 (decimal 198)
+   defining Unicode char U+00D8 (decimal 216)
+   defining Unicode char U+00DF (decimal 223)
+   defining Unicode char U+00E6 (decimal 230)
+   defining Unicode char U+00EC (decimal 236)
+   defining Unicode char U+00ED (decimal 237)
+   defining Unicode char U+00EE (decimal 238)
+   defining Unicode char U+00EF (decimal 239)
+   defining Unicode char U+00F8 (decimal 248)
+   defining Unicode char U+0131 (decimal 305)
+   defining Unicode char U+0141 (decimal 321)
+   defining Unicode char U+0142 (decimal 322)
+   defining Unicode char U+0152 (decimal 338)
+   defining Unicode char U+0153 (decimal 339)
+   defining Unicode char U+0174 (decimal 372)
+   defining Unicode char U+0175 (decimal 373)
+   defining Unicode char U+0176 (decimal 374)
+   defining Unicode char U+0177 (decimal 375)
+   defining Unicode char U+0218 (decimal 536)
+   defining Unicode char U+0219 (decimal 537)
+   defining Unicode char U+021A (decimal 538)
+   defining Unicode char U+021B (decimal 539)
+   defining Unicode char U+0237 (decimal 567)
+   defining Unicode char U+2013 (decimal 8211)
+   defining Unicode char U+2014 (decimal 8212)
+   defining Unicode char U+2018 (decimal 8216)
+   defining Unicode char U+2019 (decimal 8217)
+   defining Unicode char U+201C (decimal 8220)
+   defining Unicode char U+201D (decimal 8221)
+   defining Unicode char U+FB00 (decimal 64256)
+   defining Unicode char U+FB01 (decimal 64257)
+   defining Unicode char U+FB02 (decimal 64258)
+   defining Unicode char U+FB03 (decimal 64259)
+   defining Unicode char U+FB04 (decimal 64260)
+   defining Unicode char U+FB05 (decimal 64261)
+   defining Unicode char U+FB06 (decimal 64262)
+)
+Now handling font encoding T1 ...
+... processing UTF-8 mapping file for font encoding T1
+
+(/usr/share/texlive/texmf-dist/tex/latex/base/t1enc.dfu
+File: t1enc.dfu 2022/06/07 v1.3c UTF-8 support
+   defining Unicode char U+00A0 (decimal 160)
+   defining Unicode char U+00A1 (decimal 161)
+   defining Unicode char U+00A3 (decimal 163)
+   defining Unicode char U+00AB (decimal 171)
+   defining Unicode char U+00AD (decimal 173)
+   defining Unicode char U+00BB (decimal 187)
+   defining Unicode char U+00BF (decimal 191)
+   defining Unicode char U+00C0 (decimal 192)
+   defining Unicode char U+00C1 (decimal 193)
+   defining Unicode char U+00C2 (decimal 194)
+   defining Unicode char U+00C3 (decimal 195)
+   defining Unicode char U+00C4 (decimal 196)
+   defining Unicode char U+00C5 (decimal 197)
+   defining Unicode char U+00C6 (decimal 198)
+   defining Unicode char U+00C7 (decimal 199)
+   defining Unicode char U+00C8 (decimal 200)
+   defining Unicode char U+00C9 (decimal 201)
+   defining Unicode char U+00CA (decimal 202)
+   defining Unicode char U+00CB (decimal 203)
+   defining Unicode char U+00CC (decimal 204)
+   defining Unicode char U+00CD (decimal 205)
+   defining Unicode char U+00CE (decimal 206)
+   defining Unicode char U+00CF (decimal 207)
+   defining Unicode char U+00D0 (decimal 208)
+   defining Unicode char U+00D1 (decimal 209)
+   defining Unicode char U+00D2 (decimal 210)
+   defining Unicode char U+00D3 (decimal 211)
+   defining Unicode char U+00D4 (decimal 212)
+   defining Unicode char U+00D5 (decimal 213)
+   defining Unicode char U+00D6 (decimal 214)
+   defining Unicode char U+00D8 (decimal 216)
+   defining Unicode char U+00D9 (decimal 217)
+   defining Unicode char U+00DA (decimal 218)
+   defining Unicode char U+00DB (decimal 219)
+   defining Unicode char U+00DC (decimal 220)
+   defining Unicode char U+00DD (decimal 221)
+   defining Unicode char U+00DE (decimal 222)
+   defining Unicode char U+00DF (decimal 223)
+   defining Unicode char U+00E0 (decimal 224)
+   defining Unicode char U+00E1 (decimal 225)
+   defining Unicode char U+00E2 (decimal 226)
+   defining Unicode char U+00E3 (decimal 227)
+   defining Unicode char U+00E4 (decimal 228)
+   defining Unicode char U+00E5 (decimal 229)
+   defining Unicode char U+00E6 (decimal 230)
+   defining Unicode char U+00E7 (decimal 231)
+   defining Unicode char U+00E8 (decimal 232)
+   defining Unicode char U+00E9 (decimal 233)
+   defining Unicode char U+00EA (decimal 234)
+   defining Unicode char U+00EB (decimal 235)
+   defining Unicode char U+00EC (decimal 236)
+   defining Unicode char U+00ED (decimal 237)
+   defining Unicode char U+00EE (decimal 238)
+   defining Unicode char U+00EF (decimal 239)
+   defining Unicode char U+00F0 (decimal 240)
+   defining Unicode char U+00F1 (decimal 241)
+   defining Unicode char U+00F2 (decimal 242)
+   defining Unicode char U+00F3 (decimal 243)
+   defining Unicode char U+00F4 (decimal 244)
+   defining Unicode char U+00F5 (decimal 245)
+   defining Unicode char U+00F6 (decimal 246)
+   defining Unicode char U+00F8 (decimal 248)
+   defining Unicode char U+00F9 (decimal 249)
+   defining Unicode char U+00FA (decimal 250)
+   defining Unicode char U+00FB (decimal 251)
+   defining Unicode char U+00FC (decimal 252)
+   defining Unicode char U+00FD (decimal 253)
+   defining Unicode char U+00FE (decimal 254)
+   defining Unicode char U+00FF (decimal 255)
+   defining Unicode char U+0100 (decimal 256)
+   defining Unicode char U+0101 (decimal 257)
+   defining Unicode char U+0102 (decimal 258)
+   defining Unicode char U+0103 (decimal 259)
+   defining Unicode char U+0104 (decimal 260)
+   defining Unicode char U+0105 (decimal 261)
+   defining Unicode char U+0106 (decimal 262)
+   defining Unicode char U+0107 (decimal 263)
+   defining Unicode char U+0108 (decimal 264)
+   defining Unicode char U+0109 (decimal 265)
+   defining Unicode char U+010A (decimal 266)
+   defining Unicode char U+010B (decimal 267)
+   defining Unicode char U+010C (decimal 268)
+   defining Unicode char U+010D (decimal 269)
+   defining Unicode char U+010E (decimal 270)
+   defining Unicode char U+010F (decimal 271)
+   defining Unicode char U+0110 (decimal 272)
+   defining Unicode char U+0111 (decimal 273)
+   defining Unicode char U+0112 (decimal 274)
+   defining Unicode char U+0113 (decimal 275)
+   defining Unicode char U+0114 (decimal 276)
+   defining Unicode char U+0115 (decimal 277)
+   defining Unicode char U+0116 (decimal 278)
+   defining Unicode char U+0117 (decimal 279)
+   defining Unicode char U+0118 (decimal 280)
+   defining Unicode char U+0119 (decimal 281)
+   defining Unicode char U+011A (decimal 282)
+   defining Unicode char U+011B (decimal 283)
+   defining Unicode char U+011C (decimal 284)
+   defining Unicode char U+011D (decimal 285)
+   defining Unicode char U+011E (decimal 286)
+   defining Unicode char U+011F (decimal 287)
+   defining Unicode char U+0120 (decimal 288)
+   defining Unicode char U+0121 (decimal 289)
+   defining Unicode char U+0122 (decimal 290)
+   defining Unicode char U+0123 (decimal 291)
+   defining Unicode char U+0124 (decimal 292)
+   defining Unicode char U+0125 (decimal 293)
+   defining Unicode char U+0128 (decimal 296)
+   defining Unicode char U+0129 (decimal 297)
+   defining Unicode char U+012A (decimal 298)
+   defining Unicode char U+012B (decimal 299)
+   defining Unicode char U+012C (decimal 300)
+   defining Unicode char U+012D (decimal 301)
+   defining Unicode char U+012E (decimal 302)
+   defining Unicode char U+012F (decimal 303)
+   defining Unicode char U+0130 (decimal 304)
+   defining Unicode char U+0131 (decimal 305)
+   defining Unicode char U+0132 (decimal 306)
+   defining Unicode char U+0133 (decimal 307)
+   defining Unicode char U+0134 (decimal 308)
+   defining Unicode char U+0135 (decimal 309)
+   defining Unicode char U+0136 (decimal 310)
+   defining Unicode char U+0137 (decimal 311)
+   defining Unicode char U+0139 (decimal 313)
+   defining Unicode char U+013A (decimal 314)
+   defining Unicode char U+013B (decimal 315)
+   defining Unicode char U+013C (decimal 316)
+   defining Unicode char U+013D (decimal 317)
+   defining Unicode char U+013E (decimal 318)
+   defining Unicode char U+0141 (decimal 321)
+   defining Unicode char U+0142 (decimal 322)
+   defining Unicode char U+0143 (decimal 323)
+   defining Unicode char U+0144 (decimal 324)
+   defining Unicode char U+0145 (decimal 325)
+   defining Unicode char U+0146 (decimal 326)
+   defining Unicode char U+0147 (decimal 327)
+   defining Unicode char U+0148 (decimal 328)
+   defining Unicode char U+014A (decimal 330)
+   defining Unicode char U+014B (decimal 331)
+   defining Unicode char U+014C (decimal 332)
+   defining Unicode char U+014D (decimal 333)
+   defining Unicode char U+014E (decimal 334)
+   defining Unicode char U+014F (decimal 335)
+   defining Unicode char U+0150 (decimal 336)
+   defining Unicode char U+0151 (decimal 337)
+   defining Unicode char U+0152 (decimal 338)
+   defining Unicode char U+0153 (decimal 339)
+   defining Unicode char U+0154 (decimal 340)
+   defining Unicode char U+0155 (decimal 341)
+   defining Unicode char U+0156 (decimal 342)
+   defining Unicode char U+0157 (decimal 343)
+   defining Unicode char U+0158 (decimal 344)
+   defining Unicode char U+0159 (decimal 345)
+   defining Unicode char U+015A (decimal 346)
+   defining Unicode char U+015B (decimal 347)
+   defining Unicode char U+015C (decimal 348)
+   defining Unicode char U+015D (decimal 349)
+   defining Unicode char U+015E (decimal 350)
+   defining Unicode char U+015F (decimal 351)
+   defining Unicode char U+0160 (decimal 352)
+   defining Unicode char U+0161 (decimal 353)
+   defining Unicode char U+0162 (decimal 354)
+   defining Unicode char U+0163 (decimal 355)
+   defining Unicode char U+0164 (decimal 356)
+   defining Unicode char U+0165 (decimal 357)
+   defining Unicode char U+0168 (decimal 360)
+   defining Unicode char U+0169 (decimal 361)
+   defining Unicode char U+016A (decimal 362)
+   defining Unicode char U+016B (decimal 363)
+   defining Unicode char U+016C (decimal 364)
+   defining Unicode char U+016D (decimal 365)
+   defining Unicode char U+016E (decimal 366)
+   defining Unicode char U+016F (decimal 367)
+   defining Unicode char U+0170 (decimal 368)
+   defining Unicode char U+0171 (decimal 369)
+   defining Unicode char U+0172 (decimal 370)
+   defining Unicode char U+0173 (decimal 371)
+   defining Unicode char U+0174 (decimal 372)
+   defining Unicode char U+0175 (decimal 373)
+   defining Unicode char U+0176 (decimal 374)
+   defining Unicode char U+0177 (decimal 375)
+   defining Unicode char U+0178 (decimal 376)
+   defining Unicode char U+0179 (decimal 377)
+   defining Unicode char U+017A (decimal 378)
+   defining Unicode char U+017B (decimal 379)
+   defining Unicode char U+017C (decimal 380)
+   defining Unicode char U+017D (decimal 381)
+   defining Unicode char U+017E (decimal 382)
+   defining Unicode char U+01C4 (decimal 452)
+   defining Unicode char U+01C5 (decimal 453)
+   defining Unicode char U+01C6 (decimal 454)
+   defining Unicode char U+01C7 (decimal 455)
+   defining Unicode char U+01C8 (decimal 456)
+   defining Unicode char U+01C9 (decimal 457)
+   defining Unicode char U+01CA (decimal 458)
+   defining Unicode char U+01CB (decimal 459)
+   defining Unicode char U+01CC (decimal 460)
+   defining Unicode char U+01CD (decimal 461)
+   defining Unicode char U+01CE (decimal 462)
+   defining Unicode char U+01CF (decimal 463)
+   defining Unicode char U+01D0 (decimal 464)
+   defining Unicode char U+01D1 (decimal 465)
+   defining Unicode char U+01D2 (decimal 466)
+   defining Unicode char U+01D3 (decimal 467)
+   defining Unicode char U+01D4 (decimal 468)
+   defining Unicode char U+01E2 (decimal 482)
+   defining Unicode char U+01E3 (decimal 483)
+   defining Unicode char U+01E6 (decimal 486)
+   defining Unicode char U+01E7 (decimal 487)
+   defining Unicode char U+01E8 (decimal 488)
+   defining Unicode char U+01E9 (decimal 489)
+   defining Unicode char U+01EA (decimal 490)
+   defining Unicode char U+01EB (decimal 491)
+   defining Unicode char U+01F0 (decimal 496)
+   defining Unicode char U+01F4 (decimal 500)
+   defining Unicode char U+01F5 (decimal 501)
+   defining Unicode char U+0218 (decimal 536)
+   defining Unicode char U+0219 (decimal 537)
+   defining Unicode char U+021A (decimal 538)
+   defining Unicode char U+021B (decimal 539)
+   defining Unicode char U+0232 (decimal 562)
+   defining Unicode char U+0233 (decimal 563)
+   defining Unicode char U+0237 (decimal 567)
+   defining Unicode char U+02D9 (decimal 729)
+   defining Unicode char U+02DB (decimal 731)
+   defining Unicode char U+1E02 (decimal 7682)
+   defining Unicode char U+1E03 (decimal 7683)
+   defining Unicode char U+1E0D (decimal 7693)
+   defining Unicode char U+1E1E (decimal 7710)
+   defining Unicode char U+1E1F (decimal 7711)
+   defining Unicode char U+1E25 (decimal 7717)
+   defining Unicode char U+1E30 (decimal 7728)
+   defining Unicode char U+1E31 (decimal 7729)
+   defining Unicode char U+1E37 (decimal 7735)
+   defining Unicode char U+1E8E (decimal 7822)
+   defining Unicode char U+1E8F (decimal 7823)
+   defining Unicode char U+1E43 (decimal 7747)
+   defining Unicode char U+1E45 (decimal 7749)
+   defining Unicode char U+1E47 (decimal 7751)
+   defining Unicode char U+1E5B (decimal 7771)
+   defining Unicode char U+1E63 (decimal 7779)
+   defining Unicode char U+1E6D (decimal 7789)
+   defining Unicode char U+1E90 (decimal 7824)
+   defining Unicode char U+1E91 (decimal 7825)
+   defining Unicode char U+1E9E (decimal 7838)
+   defining Unicode char U+1EF2 (decimal 7922)
+   defining Unicode char U+1EF3 (decimal 7923)
+   defining Unicode char U+200C (decimal 8204)
+   defining Unicode char U+2010 (decimal 8208)
+   defining Unicode char U+2011 (decimal 8209)
+   defining Unicode char U+2012 (decimal 8210)
+   defining Unicode char U+2013 (decimal 8211)
+   defining Unicode char U+2014 (decimal 8212)
+   defining Unicode char U+2015 (decimal 8213)
+   defining Unicode char U+2018 (decimal 8216)
+   defining Unicode char U+2019 (decimal 8217)
+   defining Unicode char U+201A (decimal 8218)
+   defining Unicode char U+201C (decimal 8220)
+   defining Unicode char U+201D (decimal 8221)
+   defining Unicode char U+201E (decimal 8222)
+   defining Unicode char U+2030 (decimal 8240)
+   defining Unicode char U+2031 (decimal 8241)
+   defining Unicode char U+2039 (decimal 8249)
+   defining Unicode char U+203A (decimal 8250)
+   defining Unicode char U+2423 (decimal 9251)
+   defining Unicode char U+1E20 (decimal 7712)
+   defining Unicode char U+1E21 (decimal 7713)
+   defining Unicode char U+FB00 (decimal 64256)
+   defining Unicode char U+FB01 (decimal 64257)
+   defining Unicode char U+FB02 (decimal 64258)
+   defining Unicode char U+FB03 (decimal 64259)
+   defining Unicode char U+FB04 (decimal 64260)
+   defining Unicode char U+FB05 (decimal 64261)
+   defining Unicode char U+FB06 (decimal 64262)
+)
+Now handling font encoding TS1 ...
+... processing UTF-8 mapping file for font encoding TS1
+
+(/usr/share/texlive/texmf-dist/tex/latex/base/ts1enc.dfu
+File: ts1enc.dfu 2022/06/07 v1.3c UTF-8 support
+   defining Unicode char U+00A2 (decimal 162)
+   defining Unicode char U+00A3 (decimal 163)
+   defining Unicode char U+00A4 (decimal 164)
+   defining Unicode char U+00A5 (decimal 165)
+   defining Unicode char U+00A6 (decimal 166)
+   defining Unicode char U+00A7 (decimal 167)
+   defining Unicode char U+00A8 (decimal 168)
+   defining Unicode char U+00A9 (decimal 169)
+   defining Unicode char U+00AA (decimal 170)
+   defining Unicode char U+00AC (decimal 172)
+   defining Unicode char U+00AE (decimal 174)
+   defining Unicode char U+00AF (decimal 175)
+   defining Unicode char U+00B0 (decimal 176)
+   defining Unicode char U+00B1 (decimal 177)
+   defining Unicode char U+00B2 (decimal 178)
+   defining Unicode char U+00B3 (decimal 179)
+   defining Unicode char U+00B4 (decimal 180)
+   defining Unicode char U+00B5 (decimal 181)
+   defining Unicode char U+00B6 (decimal 182)
+   defining Unicode char U+00B7 (decimal 183)
+   defining Unicode char U+00B9 (decimal 185)
+   defining Unicode char U+00BA (decimal 186)
+   defining Unicode char U+00BC (decimal 188)
+   defining Unicode char U+00BD (decimal 189)
+   defining Unicode char U+00BE (decimal 190)
+   defining Unicode char U+00D7 (decimal 215)
+   defining Unicode char U+00F7 (decimal 247)
+   defining Unicode char U+0192 (decimal 402)
+   defining Unicode char U+02C7 (decimal 711)
+   defining Unicode char U+02D8 (decimal 728)
+   defining Unicode char U+02DD (decimal 733)
+   defining Unicode char U+0E3F (decimal 3647)
+   defining Unicode char U+2016 (decimal 8214)
+   defining Unicode char U+2020 (decimal 8224)
+   defining Unicode char U+2021 (decimal 8225)
+   defining Unicode char U+2022 (decimal 8226)
+   defining Unicode char U+2030 (decimal 8240)
+   defining Unicode char U+2031 (decimal 8241)
+   defining Unicode char U+203B (decimal 8251)
+   defining Unicode char U+203D (decimal 8253)
+   defining Unicode char U+2044 (decimal 8260)
+   defining Unicode char U+204E (decimal 8270)
+   defining Unicode char U+2052 (decimal 8274)
+   defining Unicode char U+20A1 (decimal 8353)
+   defining Unicode char U+20A4 (decimal 8356)
+   defining Unicode char U+20A6 (decimal 8358)
+   defining Unicode char U+20A9 (decimal 8361)
+   defining Unicode char U+20AB (decimal 8363)
+   defining Unicode char U+20AC (decimal 8364)
+   defining Unicode char U+20B1 (decimal 8369)
+   defining Unicode char U+2103 (decimal 8451)
+   defining Unicode char U+2116 (decimal 8470)
+   defining Unicode char U+2117 (decimal 8471)
+   defining Unicode char U+211E (decimal 8478)
+   defining Unicode char U+2120 (decimal 8480)
+   defining Unicode char U+2122 (decimal 8482)
+   defining Unicode char U+2126 (decimal 8486)
+   defining Unicode char U+2127 (decimal 8487)
+   defining Unicode char U+212E (decimal 8494)
+   defining Unicode char U+2190 (decimal 8592)
+   defining Unicode char U+2191 (decimal 8593)
+   defining Unicode char U+2192 (decimal 8594)
+   defining Unicode char U+2193 (decimal 8595)
+   defining Unicode char U+2329 (decimal 9001)
+   defining Unicode char U+3008 (decimal 12296)
+   defining Unicode char U+232A (decimal 9002)
+   defining Unicode char U+3009 (decimal 12297)
+   defining Unicode char U+2422 (decimal 9250)
+   defining Unicode char U+25E6 (decimal 9702)
+   defining Unicode char U+25EF (decimal 9711)
+   defining Unicode char U+266A (decimal 9834)
+   defining Unicode char U+27E8 (decimal 10216)
+   defining Unicode char U+27E9 (decimal 10217)
+   defining Unicode char U+FEFF (decimal 65279)
+)
+Now handling font encoding OMX ...
+... no UTF-8 mapping file for font encoding OMX
+Now handling font encoding U ...
+... no UTF-8 mapping file for font encoding U
+   defining Unicode char U+00A9 (decimal 169)
+   defining Unicode char U+00AA (decimal 170)
+   defining Unicode char U+00AE (decimal 174)
+   defining Unicode char U+00BA (decimal 186)
+   defining Unicode char U+02C6 (decimal 710)
+   defining Unicode char U+02DC (decimal 732)
+   defining Unicode char U+200C (decimal 8204)
+   defining Unicode char U+2026 (decimal 8230)
+   defining Unicode char U+2122 (decimal 8482)
+   defining Unicode char U+2423 (decimal 9251)
+   defining Unicode char U+FEFF (decimal 65279)
+)))
+(/usr/share/texlive/texmf-dist/tex/latex/appendix/appendix.sty
 Package: appendix 2020/02/08 v1.2c extra appendix facilities
-\c@@pps=\count282
-\c@@ppsavesec=\count283
-\c@@ppsaveapp=\count284
+\c@@pps=\count285
+\c@@ppsavesec=\count286
+\c@@ppsaveapp=\count287
 )
 (/usr/share/texlive/texmf-dist/tex/latex/amsmath/amsmath.sty
 Package: amsmath 2025/07/09 v2.17z AMS math features
@@ -226,23 +541,23 @@ Package: amstext 2024/11/17 v2.01 AMS text
 (/usr/share/texlive/texmf-dist/tex/latex/amsmath/amsgen.sty
 File: amsgen.sty 1999/11/30 v2.0 generic functions
 \@emptytoks=\toks19
-\ex@=\dimen149
+\ex@=\dimen150
 ))
 (/usr/share/texlive/texmf-dist/tex/latex/amsmath/amsbsy.sty
 Package: amsbsy 1999/11/29 v1.2d Bold Symbols
-\pmbraise@=\dimen150
+\pmbraise@=\dimen151
 )
 (/usr/share/texlive/texmf-dist/tex/latex/amsmath/amsopn.sty
 Package: amsopn 2022/04/08 v2.04 operator names
 )
-\inf@bad=\count285
-LaTeX Info: Redefining \frac on input line 235.
-\uproot@=\count286
-\leftroot@=\count287
+\inf@bad=\count288
+LaTeX Info: Redefining \frac on input line 233.
+\uproot@=\count289
+\leftroot@=\count290
 LaTeX Info: Redefining \overline on input line 398.
 LaTeX Info: Redefining \colon on input line 409.
-\classnum@=\count288
-\DOTSCASE@=\count289
+\classnum@=\count291
+\DOTSCASE@=\count292
 LaTeX Info: Redefining \ldots on input line 495.
 LaTeX Info: Redefining \dots on input line 498.
 LaTeX Info: Redefining \cdots on input line 619.
@@ -252,30 +567,30 @@ LaTeX Info: Redefining \big on input line 721.
 LaTeX Info: Redefining \Big on input line 722.
 LaTeX Info: Redefining \bigg on input line 723.
 LaTeX Info: Redefining \Bigg on input line 724.
-\big@size=\dimen151
+\big@size=\dimen152
 LaTeX Font Info:    Redeclaring font encoding OML on input line 742.
 LaTeX Font Info:    Redeclaring font encoding OMS on input line 743.
-\macc@depth=\count290
+\macc@depth=\count293
 LaTeX Info: Redefining \bmod on input line 904.
 LaTeX Info: Redefining \pmod on input line 909.
 LaTeX Info: Redefining \smash on input line 939.
 LaTeX Info: Redefining \relbar on input line 969.
 LaTeX Info: Redefining \Relbar on input line 970.
-\c@MaxMatrixCols=\count291
+\c@MaxMatrixCols=\count294
 \dotsspace@=\muskip17
-\c@parentequation=\count292
-\dspbrk@lvl=\count293
+\c@parentequation=\count295
+\dspbrk@lvl=\count296
 \tag@help=\toks20
-\row@=\count294
-\column@=\count295
-\maxfields@=\count296
+\row@=\count297
+\column@=\count298
+\maxfields@=\count299
 \andhelp@=\toks21
-\eqnshift@=\dimen152
-\alignsep@=\dimen153
-\tagshift@=\dimen154
-\tagwidth@=\dimen155
-\totwidth@=\dimen156
-\lineht@=\dimen157
+\eqnshift@=\dimen153
+\alignsep@=\dimen154
+\tagshift@=\dimen155
+\tagwidth@=\dimen156
+\totwidth@=\dimen157
+\lineht@=\dimen158
 \@envbody=\toks22
 \multlinegap=\skip53
 \multlinetaggap=\skip54
@@ -296,17 +611,17 @@ Package: ifvtex 2019/10/25 v1.7 ifvtex legacy package. Use iftex instead.
 (/usr/share/texlive/texmf-dist/tex/generic/iftex/iftex.sty
 Package: iftex 2024/12/12 v1.0g TeX engine tests
 ))
-\Gm@cnth=\count297
-\Gm@cntv=\count298
-\c@Gm@tempcnt=\count299
-\Gm@bindingoffset=\dimen158
-\Gm@wd@mp=\dimen159
-\Gm@odd@mp=\dimen160
-\Gm@even@mp=\dimen161
-\Gm@layoutwidth=\dimen162
-\Gm@layoutheight=\dimen163
-\Gm@layouthoffset=\dimen164
-\Gm@layoutvoffset=\dimen165
+\Gm@cnth=\count300
+\Gm@cntv=\count301
+\c@Gm@tempcnt=\count302
+\Gm@bindingoffset=\dimen159
+\Gm@wd@mp=\dimen160
+\Gm@odd@mp=\dimen161
+\Gm@even@mp=\dimen162
+\Gm@layoutwidth=\dimen163
+\Gm@layoutheight=\dimen164
+\Gm@layouthoffset=\dimen165
+\Gm@layoutvoffset=\dimen166
 \Gm@dimlist=\toks25
 )
 (/usr/share/texlive/texmf-dist/tex/latex/hyperref/hyperref.sty
@@ -334,7 +649,6 @@ Package: infwarerr 2019/12/03 v1.5 Providing info/warning/error messages (HO)
 Package pdftexcmds Info: \pdf@primitive is available.
 Package pdftexcmds Info: \pdf@ifprimitive is available.
 Package pdftexcmds Info: \pdfdraftmode found.
-\pdftexcmds@toks=\toks26
 ))
 (/usr/share/texlive/texmf-dist/tex/latex/hycolor/hycolor.sty
 Package: hycolor 2020-01-27 v1.10 Color options for hyperref/bookmark (HO)
@@ -351,30 +665,34 @@ Package: gettitlestring 2019/12/15 v1.6 Cleanup title references (HO)
 (/usr/share/texlive/texmf-dist/tex/latex/kvoptions/kvoptions.sty
 Package: kvoptions 2022-06-15 v3.15 Key value format for package options (HO)
 ))
-\c@section@level=\count300
+\c@section@level=\count303
 )
 (/usr/share/texlive/texmf-dist/tex/latex/etoolbox/etoolbox.sty
 Package: etoolbox 2025/10/02 v2.5m e-TeX tools for LaTeX (JAW)
-\etb@tempcnta=\count301
+\etb@tempcnta=\count304
 )
 (/usr/share/texlive/texmf-dist/tex/generic/stringenc/stringenc.sty
 Package: stringenc 2019/11/29 v1.12 Convert strings between diff. encodings (HO
 )
 )
-\@linkdim=\dimen166
-\Hy@linkcounter=\count302
-\Hy@pagecounter=\count303
+\@linkdim=\dimen167
+\Hy@linkcounter=\count305
+\Hy@pagecounter=\count306
 
 (/usr/share/texlive/texmf-dist/tex/latex/hyperref/pd1enc.def
 File: pd1enc.def 2025-07-12 v7.01o Hyperref: PDFDocEncoding definition (HO)
+Now handling font encoding PD1 ...
+... no UTF-8 mapping file for font encoding PD1
 )
 (/usr/share/texlive/texmf-dist/tex/generic/intcalc/intcalc.sty
 Package: intcalc 2019/12/15 v1.3 Expandable calculations with integers (HO)
 )
-\Hy@SavedSpaceFactor=\count304
+\Hy@SavedSpaceFactor=\count307
 
 (/usr/share/texlive/texmf-dist/tex/latex/hyperref/puenc.def
 File: puenc.def 2025-07-12 v7.01o Hyperref: PDF Unicode definition (HO)
+Now handling font encoding PU ...
+... no UTF-8 mapping file for font encoding PU
 )
 Package hyperref Info: Hyper figures OFF on input line 4195.
 Package hyperref Info: Link nesting OFF on input line 4200.
@@ -383,14 +701,14 @@ Package hyperref Info: Plain pages OFF on input line 4210.
 Package hyperref Info: Backreferencing OFF on input line 4215.
 Package hyperref Info: Implicit mode ON; LaTeX internals redefined.
 Package hyperref Info: Bookmarks ON on input line 4462.
-\c@Hy@tempcnt=\count305
+\c@Hy@tempcnt=\count308
 
 (/usr/share/texlive/texmf-dist/tex/latex/url/url.sty
 \Urlmuskip=\muskip18
 Package: url 2013/09/16  ver 3.4  Verb mode for urls, etc.
 )
 LaTeX Info: Redefining \url on input line 4801.
-\XeTeXLinkMargin=\dimen167
+\XeTeXLinkMargin=\dimen168
 
 (/usr/share/texlive/texmf-dist/tex/generic/bitset/bitset.sty
 Package: bitset 2019/12/09 v1.3 Handle bit-vector datatype (HO)
@@ -399,9 +717,9 @@ Package: bitset 2019/12/09 v1.3 Handle bit-vector datatype (HO)
 Package: bigintcalc 2019/12/15 v1.5 Expandable calculations on big integers (HO
 )
 ))
-\Fld@menulength=\count306
-\Field@Width=\dimen168
-\Fld@charsize=\dimen169
+\Fld@menulength=\count309
+\Field@Width=\dimen169
+\Fld@charsize=\dimen170
 Package hyperref Info: Hyper figures OFF on input line 6078.
 Package hyperref Info: Link nesting OFF on input line 6083.
 Package hyperref Info: Hyper index ON on input line 6086.
@@ -409,20 +727,16 @@ Package hyperref Info: backreferencing OFF on input line 6093.
 Package hyperref Info: Link coloring OFF on input line 6098.
 Package hyperref Info: Link coloring with OCG OFF on input line 6103.
 Package hyperref Info: PDF/A mode OFF on input line 6108.
-\Hy@abspage=\count307
-\c@Item=\count308
-\c@Hfootnote=\count309
+\Hy@abspage=\count310
+\c@Item=\count311
+\c@Hfootnote=\count312
 )
+Package hyperref Info: Driver: hpdftex.
 
-Package hyperref Warning: Wrong driver `hpdftex.def';
-(hyperref)                pdfTeX is running in PDF mode.
-(hyperref)                Forcing driver `hluatex.def'.
-
-Package hyperref Info: Driver: hluatex.
-(/usr/share/texlive/texmf-dist/tex/latex/hyperref/hluatex.def
-File: hluatex.def 2025-07-12 v7.01o Hyperref driver for luaTeX
-\Fld@listcount=\count310
-\c@bookmark@seq@number=\count311
+(/usr/share/texlive/texmf-dist/tex/latex/hyperref/hpdftex.def
+File: hpdftex.def 2025-07-12 v7.01o Hyperref driver for pdfTeX
+\Fld@listcount=\count313
+\c@bookmark@seq@number=\count314
 
 (/usr/share/texlive/texmf-dist/tex/latex/rerunfilecheck/rerunfilecheck.sty
 Package: rerunfilecheck 2025-06-21 v1.11 Rerun checks for auxiliary files (HO)
@@ -452,8 +766,8 @@ Package graphics Info: Driver file: pdftex.def on input line 106.
 (/usr/share/texlive/texmf-dist/tex/latex/graphics-def/pdftex.def
 File: pdftex.def 2025/09/29 v1.2d Graphics/color driver for pdftex
 ))
-\Gin@req@height=\dimen170
-\Gin@req@width=\dimen171
+\Gin@req@height=\dimen171
+\Gin@req@width=\dimen172
 )
 (/usr/share/texlive/texmf-dist/tex/latex/graphics/color.sty
 Package: color 2025/01/14 v1.3e Standard LaTeX Color (DPC)
@@ -472,7 +786,7 @@ Package: natbib 2010/09/13 8.31b (PWD, AO)
 \bibhang=\skip56
 \bibsep=\skip57
 LaTeX Info: Redefining \cite on input line 694.
-\c@NAT@ctr=\count312
+\c@NAT@ctr=\count315
 )
 (/usr/share/texlive/texmf-dist/tex/latex/psnfss/times.sty
 Package: times 2020/03/25 PSNFSS-v9.3 (SPQR) 
@@ -492,26 +806,24 @@ Package: cmap 2021/02/06 v1.0j CMap support: searchable PDF
 )
 (/usr/share/texlive/texmf-dist/tex/latex/microtype/microtype.sty
 Package: microtype 2025/07/09 v3.2b Micro-typographical refinements (RS)
-\MT@toks=\toks27
+\MT@toks=\toks26
 \MT@tempbox=\box55
-\MT@count=\count313
+\MT@count=\count316
 LaTeX Info: Redefining \noprotrusionifhmode on input line 1087.
 LaTeX Info: Redefining \leftprotrusion on input line 1088.
-\MT@prot@toks=\toks28
+\MT@prot@toks=\toks27
 LaTeX Info: Redefining \rightprotrusion on input line 1107.
 LaTeX Info: Redefining \textls on input line 1449.
-\MT@outer@kern=\dimen172
+\MT@outer@kern=\dimen173
 LaTeX Info: Redefining \microtypecontext on input line 2053.
 LaTeX Info: Redefining \textmicrotypecontext on input line 2070.
-\MT@listname@count=\count314
+\MT@listname@count=\count317
 
-(/usr/share/texlive/texmf-dist/tex/latex/microtype/microtype-luatex.def
-File: microtype-luatex.def 2025/07/09 v3.2b Definitions specific to luatex (RS)
+(/usr/share/texlive/texmf-dist/tex/latex/microtype/microtype-pdftex.def
+File: microtype-pdftex.def 2025/07/09 v3.2b Definitions specific to pdftex (RS)
 
-Lua module: microtype 2025/07/09 v3.2b microtype module.
-Module microtype Info: overwriting function `keepligature' on input line 63
-LaTeX Info: Redefining \lsstyle on input line 779.
-LaTeX Info: Redefining \lslig on input line 779.
+LaTeX Info: Redefining \lsstyle on input line 944.
+LaTeX Info: Redefining \lslig on input line 944.
 \MT@outer@space=\skip58
 )
 Package microtype Info: Loading configuration file microtype.cfg.
@@ -534,22 +846,22 @@ Package: amssymb 2013/01/14 v3.01 AMS font symbols
 )
 (/usr/share/texlive/texmf-dist/tex/latex/amscls/amsthm.sty
 Package: amsthm 2020/05/29 v2.20.6
-\thm@style=\toks29
-\thm@bodyfont=\toks30
-\thm@headfont=\toks31
-\thm@notefont=\toks32
-\thm@headpunct=\toks33
+\thm@style=\toks28
+\thm@bodyfont=\toks29
+\thm@headfont=\toks30
+\thm@notefont=\toks31
+\thm@headpunct=\toks32
 \thm@preskip=\skip59
 \thm@postskip=\skip60
 \thm@headsep=\skip61
-\dth@everypar=\toks34
+\dth@everypar=\toks33
 )
 (/usr/share/texlive/texmf-dist/tex/latex/multirow/multirow.sty
 Package: multirow 2024/11/12 v2.9 Span multiple rows of a table
 \multirow@colwidth=\skip62
-\multirow@cntb=\count315
+\multirow@cntb=\count318
 \multirow@dima=\skip63
-\bigstrutjot=\dimen173
+\bigstrutjot=\dimen174
 )
 (/usr/share/texlive/texmf-dist/tex/latex/setspace/setspace.sty
 Package: setspace 2022/12/04 v6.7b set line spacing
@@ -559,33 +871,33 @@ Package: caption 2023/08/05 v3.6o Customizing captions (AR)
 
 (/usr/share/texlive/texmf-dist/tex/latex/caption/caption3.sty
 Package: caption3 2023/07/31 v2.4d caption3 kernel (AR)
-\caption@tempdima=\dimen174
-\captionmargin=\dimen175
-\caption@leftmargin=\dimen176
-\caption@rightmargin=\dimen177
-\caption@width=\dimen178
-\caption@indent=\dimen179
-\caption@parindent=\dimen180
-\caption@hangindent=\dimen181
+\caption@tempdima=\dimen175
+\captionmargin=\dimen176
+\caption@leftmargin=\dimen177
+\caption@rightmargin=\dimen178
+\caption@width=\dimen179
+\caption@indent=\dimen180
+\caption@parindent=\dimen181
+\caption@hangindent=\dimen182
 Package caption Info: Standard document class detected.
 )
-\c@caption@flags=\count316
-\c@continuedfloat=\count317
+\c@caption@flags=\count319
+\c@continuedfloat=\count320
 Package caption Info: hyperref package is loaded.
 )
 (/usr/share/texlive/texmf-dist/tex/latex/subfig/subfig.sty
 Package: subfig 2005/06/28 ver: 1.3 subfig package
-\c@KVtest=\count318
+\c@KVtest=\count321
 \sf@farskip=\skip64
-\sf@captopadj=\dimen182
+\sf@captopadj=\dimen183
 \sf@capskip=\skip65
 \sf@nearskip=\skip66
-\c@subfigure=\count319
-\c@subfigure@save=\count320
-\c@lofdepth=\count321
-\c@subtable=\count322
-\c@subtable@save=\count323
-\c@lotdepth=\count324
+\c@subfigure=\count322
+\c@subfigure@save=\count323
+\c@lofdepth=\count324
+\c@subtable=\count325
+\c@subtable@save=\count326
+\c@lotdepth=\count327
 \sf@top=\skip67
 \sf@bottom=\skip68
 )
@@ -593,28 +905,26 @@ Package: subfig 2005/06/28 ver: 1.3 subfig package
 Package: authblk 2001/02/27 1.3 (PWD)
 \affilsep=\skip69
 \@affilsep=\skip70
-\c@Maxaffil=\count325
-\c@authors=\count326
-\c@affil=\count327
+\c@Maxaffil=\count328
+\c@authors=\count329
+\c@affil=\count330
 )
-LaTeX Font Info:    Trying to load font information for TU+phv on input line 72
-.
-LaTeX Font Info:    No file TUphv.fd. on input line 72.
+LaTeX Font Info:    Trying to load font information for OT1+phv on input line 7
+2.
 
-
-LaTeX Font Warning: Font shape `TU/phv/m/n' undefined
-(Font)              using `TU/lmr/m/n' instead on input line 72.
-
-(/usr/share/texlive/texmf-dist/tex/latex/l3backend/l3backend-luatex.def
-File: l3backend-luatex.def 2025-10-09 L3 backend support: PDF output (LuaTeX)
-\l__color_backend_stack_int=\count328
-Inserting `l3color' in `luaotfload.parse_color'.)
+(/usr/share/texlive/texmf-dist/tex/latex/psnfss/ot1phv.fd
+File: ot1phv.fd 2020/03/25 scalable font definitions for OT1/phv.
+)<<ot1.cmap>>
+(/usr/share/texlive/texmf-dist/tex/latex/l3backend/l3backend-pdftex.def
+File: l3backend-pdftex.def 2025-10-09 L3 backend support: PDF output (pdfTeX)
+\l__color_backend_stack_int=\count331
+)
 
 LaTeX Warning: Unused global option(s):
     [openany].
 
 (./phylosignal.aux)
-\openout1 = phylosignal.aux
+\openout1 = `phylosignal.aux'.
 
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 72.
 LaTeX Font Info:    ... okay on input line 72.
@@ -625,8 +935,6 @@ LaTeX Font Info:    ... okay on input line 72.
 LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 72.
 LaTeX Font Info:    ... okay on input line 72.
 LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 72.
-LaTeX Font Info:    ... okay on input line 72.
-LaTeX Font Info:    Checking defaults for TU/lmr/m/n on input line 72.
 LaTeX Font Info:    ... okay on input line 72.
 LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 72.
 LaTeX Font Info:    ... okay on input line 72.
@@ -673,85 +981,23 @@ LaTeX Font Info:    ... okay on input line 72.
 Package hyperref Info: Link coloring OFF on input line 72.
 (./phylosignal.out) (./phylosignal.out)
 \@outlinefile=\write3
-
-\openout3 = phylosignal.out
-
-! Undefined control sequence.
-<argument> \pdfpagewidth 
-                         
-l.72 \begin{document}
-                     
-? q
-OK, entering \batchmode...
-! Missing number, treated as zero.
-<to be read again> 
-\relax 
-l.72 \begin{document}
-                   
-A number should have been here; I inserted `0'.
-(If you can't figure out why I needed to see a number,
-look up `weird error' in the index to The TeXbook.)
-
-! Illegal unit of measure (pt inserted).
-<to be read again> 
-\relax 
-l.72 \begin{document}
-                   
-Dimensions can be in units of em, ex, in, pt, pc,
-cm, mm, dd, cc, nd, nc, bp, or sp; but yours is a new one!
-I'll assume that you meant to say pt, for printer's points.
-To recover gracefully from this error, it's best to
-delete the erroneous units; e.g., type `2' to delete
-two letters. (See Chapter 27 of The TeXbook.)
-
-! Undefined control sequence.
-<argument> \pdfpageheight 
-               
-l.72 \begin{document}
-                   
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
-
-! Missing number, treated as zero.
-<to be read again> 
-\relax 
-l.72 \begin{document}
-                   
-A number should have been here; I inserted `0'.
-(If you can't figure out why I needed to see a number,
-look up `weird error' in the index to The TeXbook.)
-
-! Illegal unit of measure (pt inserted).
-<to be read again> 
-\relax 
-l.72 \begin{document}
-                   
-Dimensions can be in units of em, ex, in, pt, pc,
-cm, mm, dd, cc, nd, nc, bp, or sp; but yours is a new one!
-I'll assume that you meant to say pt, for printer's points.
-To recover gracefully from this error, it's best to
-delete the erroneous units; e.g., type `2' to delete
-two letters. (See Chapter 27 of The TeXbook.)
+\openout3 = `phylosignal.out'.
 
 
 (/usr/share/texlive/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
-\scratchcounter=\count329
-\scratchdimen=\dimen183
+\scratchcounter=\count332
+\scratchdimen=\dimen184
 \scratchbox=\box56
-\nofMPsegments=\count330
-\nofMParguments=\count331
-\everyMPshowfont=\toks35
-\MPscratchCnt=\count332
-\MPscratchDim=\dimen184
-\MPnumerator=\count333
-\makeMPintoPDFobject=\count334
-\everyMPtoPDFconversion=\toks36
-)
-(/usr/share/texlive/texmf-dist/tex/latex/epstopdf-pkg/epstopdf-base.sty
+\nofMPsegments=\count333
+\nofMParguments=\count334
+\everyMPshowfont=\toks34
+\MPscratchCnt=\count335
+\MPscratchDim=\dimen185
+\MPnumerator=\count336
+\makeMPintoPDFobject=\count337
+\everyMPtoPDFconversion=\toks35
+) (/usr/share/texlive/texmf-dist/tex/latex/epstopdf-pkg/epstopdf-base.sty
 Package: epstopdf-base 2020-01-24 v2.11 Base part for package epstopdf
 Package epstopdf-base Info: Redefining graphics rule for `.eps' on input line 4
 85.
@@ -765,6 +1011,7 @@ Package microtype Info: Applying patch `item' on input line 72.
 Package microtype Info: Applying patch `toc' on input line 72.
 Package microtype Info: Applying patch `eqnum' on input line 72.
 
+
 Package microtype Warning: Unable to apply patch `footnote' on input line 72.
 
 Package microtype Info: Applying patch `verbatim' on input line 72.
@@ -777,69 +1024,20 @@ Package microtype Info: Automatic font expansion enabled (level 2),
 Package microtype Info: Using default expansion set `alltext-nott'.
 Package microtype Info: Patching command `\showhyphens'.
 Package microtype Info: No adjustment of tracking.
-Package microtype Info: No adjustment of spacing.
-Package microtype Info: No adjustment of kerning.
+Package microtype Info: No adjustment of interword spacing.
+Package microtype Info: No adjustment of character kerning.
 Package microtype Info: Loading generic protrusion settings for font family
-(microtype)             `phv' (encoding: TU).
+(microtype)             `phv' (encoding: OT1).
 (microtype)             For optimal results, create family-specific settings.
 (microtype)             See the microtype manual for details.
 Package caption Info: Begin \AtBeginDocument code.
 Package caption Info: subfig package v1.3 is loaded.
 Package caption Info: End \AtBeginDocument code.
-! Undefined control sequence.
-\set@color ->\pdfcolorstack 
-                            \@pdfcolorstack push{\current@color }\aftergroup...
-l.73 \maketitle
-             
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
-
-! Undefined control sequence.
-\reset@color ->\pdfcolorstack 
-                              \@pdfcolorstack pop\relax 
-l.73 \maketitle
-             
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
-
-Missing character: There is no ^^@ (U+0000) in font [lmroman12-regular]:+tlig;!
-Missing character: There is no ^^@ (U+0000) in font [lmroman12-regular]:+tlig;!
-! Undefined control sequence.
-\set@color ->\pdfcolorstack 
-                            \@pdfcolorstack push{\current@color }\aftergroup...
-l.73 \maketitle
-             
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
-
-! Undefined control sequence.
-\reset@color ->\pdfcolorstack 
-                              \@pdfcolorstack pop\relax 
-l.73 \maketitle
-             
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
-
-Missing character: There is no ^^@ (U+0000) in font [lmroman12-regular]:+tlig;!
-Missing character: There is no ^^@ (U+0000) in font [lmroman12-regular]:+tlig;!
 LaTeX Font Info:    Trying to load font information for OT1+ppl on input line 7
 3.
-
 (/usr/share/texlive/texmf-dist/tex/latex/psnfss/ot1ppl.fd
 File: ot1ppl.fd 2001/06/04 font definitions for OT1/ppl.
-)<<ot1.cmap>>
+)
 (/usr/share/texlive/texmf-dist/tex/latex/microtype/mt-ppl.cfg
 File: mt-ppl.cfg 2005/11/16 v1.6 microtype config. file: Palatino (RS)
 )
@@ -891,810 +1089,176 @@ LaTeX Font Info:    Font shape `U/msb/m/n' will be
 (Font)              scaled to size 9.37807pt on input line 73.
 LaTeX Font Info:    Font shape `U/msb/m/n' will be
 (Font)              scaled to size 7.29405pt on input line 73.
+LaTeX Font Info:    Trying to load font information for TS1+phv on input line 7
+3.
 
-LaTeX Font Warning: Font shape `TU/phv/m/it' undefined
-(Font)              using `TU/phv/m/n' instead on input line 73.
-
-LaTeX Font Info:    Font shape `U/msa/m/n' will be
-(Font)              scaled to size 10.42007pt on input line 73.
-LaTeX Font Info:    Font shape `U/msa/m/n' will be
-(Font)              scaled to size 7.91925pt on input line 73.
-LaTeX Font Info:    Font shape `U/msa/m/n' will be
-(Font)              scaled to size 6.25204pt on input line 73.
-LaTeX Font Info:    Font shape `U/msb/m/n' will be
-(Font)              scaled to size 10.42007pt on input line 73.
-LaTeX Font Info:    Font shape `U/msb/m/n' will be
-(Font)              scaled to size 7.91925pt on input line 73.
-LaTeX Font Info:    Font shape `U/msb/m/n' will be
-(Font)              scaled to size 6.25204pt on input line 73.
-LaTeX Font Info:    Trying to load font information for TU+pcr on input line 73
-.
-LaTeX Font Info:    No file TUpcr.fd. on input line 73.
-
-LaTeX Font Warning: Font shape `TU/pcr/m/n' undefined
-(Font)              using `TU/lmr/m/n' instead on input line 73.
-
-
-(/usr/share/texlive/texmf-dist/tex/latex/microtype/mt-LatinModernRoman.cfg
-File: mt-LatinModernRoman.cfg 2021/02/21 v1.1 microtype config. file: Latin Mod
-ern Roman (RS)
+(/usr/share/texlive/texmf-dist/tex/latex/psnfss/ts1phv.fd
+File: ts1phv.fd 2020/03/25 scalable font definitions for TS1/phv.
 )
 Package microtype Info: Loading generic protrusion settings for font family
-(microtype)             `pcr' (encoding: TU).
+(microtype)             `phv' (encoding: TS1).
 (microtype)             For optimal results, create family-specific settings.
 (microtype)             See the microtype manual for details.
-! Undefined control sequence.
-\set@color ->\pdfcolorstack 
-                            \@pdfcolorstack push{\current@color }\aftergroup...
-l.75 \begin{abstract}
-                   
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
+LaTeX Font Info:    Font shape `OT1/phv/m/it' in size <10> not available
+(Font)              Font shape `OT1/phv/m/sl' tried instead on input line 73.
+LaTeX Font Info:    Font shape `U/msa/m/n' will be
+(Font)              scaled to size 10.42007pt on input line 73.
+LaTeX Font Info:    Font shape `U/msa/m/n' will be
+(Font)              scaled to size 7.91925pt on input line 73.
+LaTeX Font Info:    Font shape `U/msa/m/n' will be
+(Font)              scaled to size 6.25204pt on input line 73.
+LaTeX Font Info:    Font shape `U/msb/m/n' will be
+(Font)              scaled to size 10.42007pt on input line 73.
+LaTeX Font Info:    Font shape `U/msb/m/n' will be
+(Font)              scaled to size 7.91925pt on input line 73.
+LaTeX Font Info:    Font shape `U/msb/m/n' will be
+(Font)              scaled to size 6.25204pt on input line 73.
+LaTeX Font Info:    Font shape `OT1/phv/m/it' in size <7.6> not available
+(Font)              Font shape `OT1/phv/m/sl' tried instead on input line 73.
+LaTeX Font Info:    Trying to load font information for OT1+pcr on input line 7
+3.
+
+(/usr/share/texlive/texmf-dist/tex/latex/psnfss/ot1pcr.fd
+File: ot1pcr.fd 2001/06/04 font definitions for OT1/pcr.
+)<<ot1tt.cmap>>
+(./introduction.tex [1
+
+{/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}{/usr/share/texlive/texmf-di
+st/fonts/enc/dvips/base/8r.enc}] [2] [3]
+<figure001.png, id=105, 2321.67375pt x 2754.6915pt>
+File: figure001.png Graphic file (type png)
+<use figure001.png>
+Package pdftex.def Info: figure001.png  used on input line 104.
+(pdftex.def)             Requested size: 433.62pt x 514.48581pt.
+) (./methods.tex
+[4] [5 <./figure001.png>]
+LaTeX Font Info:    Font shape `OT1/phv/m/it' in size <12> not available
+(Font)              Font shape `OT1/phv/m/sl' tried instead on input line 42.
+ [6] [7]
+
+LaTeX Warning: Command \textquoteright invalid in math mode on input line 103.
+
+[8]) (./results.tex [9]
+<figure002.png, id=146, 1096.095pt x 403.5075pt>
+File: figure002.png Graphic file (type png)
+<use figure002.png>
+Package pdftex.def Info: figure002.png  used on input line 32.
+(pdftex.def)             Requested size: 469.75499pt x 172.93224pt.
+
+Overfull \hbox (14.45378pt too wide) in paragraph at lines 32--38
+[]$[]$ 
+ []
+
+[10 <./figure002.png>]
+<figure003a.png, id=153, 878.28125pt x 758.835pt>
+File: figure003a.png Graphic file (type png)
+<use figure003a.png>
+Package pdftex.def Info: figure003a.png  used on input line 61.
+(pdftex.def)             Requested size: 433.62pt x 374.65765pt.
+<figure003b.png, id=154, 1055.945pt x 259.97125pt>
+File: figure003b.png Graphic file (type png)
+<use figure003b.png>
+Package pdftex.def Info: figure003b.png  used on input line 62.
+(pdftex.def)             Requested size: 433.62pt x 106.75551pt.
+
+Overfull \hbox (14.45378pt too wide) in paragraph at lines 60--66
+[]$[]$ 
+ []
+
+<figure004.png, id=155, 962.59625pt x 1042.89626pt>
+File: figure004.png Graphic file (type png)
+<use figure004.png>
+Package pdftex.def Info: figure004.png  used on input line 69.
+(pdftex.def)             Requested size: 469.75499pt x 508.93901pt.
+
+Overfull \hbox (14.45378pt too wide) in paragraph at lines 69--72
+[]$[]$ 
+ []
+
+[11 <./figure003a.png> <./figure003b.png>] [12 <./figure004.png>]
+<good_indicator.png, id=176, 954.56625pt x 537.00626pt>
+File: good_indicator.png Graphic file (type png)
+<use good_indicator.png>
+Package pdftex.def Info: good_indicator.png  used on input line 100.
+(pdftex.def)             Requested size: 245.71754pt x 138.22534pt.
+<random_indicator.png, id=177, 954.56625pt x 537.00626pt>
+File: random_indicator.png Graphic file (type png)
+<use random_indicator.png>
+Package pdftex.def Info: random_indicator.png  used on input line 101.
+(pdftex.def)             Requested size: 245.71754pt x 138.22534pt.
+
+Overfull \hbox (7.22633pt too wide) in paragraph at lines 99--107
+[]$[]$ 
+ []
+
+<good_weighted.png, id=178, 950.55125pt x 537.00626pt>
+File: good_weighted.png Graphic file (type png)
+<use good_weighted.png>
+Package pdftex.def Info: good_weighted.png  used on input line 110.
+(pdftex.def)             Requested size: 245.71754pt x 138.8153pt.
+<random_weighted.png, id=179, 950.55125pt x 537.00626pt>
+File: random_weighted.png Graphic file (type png)
+<use random_weighted.png>
+Package pdftex.def Info: random_weighted.png  used on input line 111.
+(pdftex.def)             Requested size: 245.71754pt x 138.8153pt.
+
+Overfull \hbox (7.22633pt too wide) in paragraph at lines 109--118
+[]$[]$ 
+ []
+
+[13 <./good_indicator.png> <./random_indicator.png> <./good_weighted.png> <./ra
+ndom_weighted.png>]
+<fungal_all.png, id=192, 1090.0725pt x 405.515pt>
+File: fungal_all.png Graphic file (type png)
+<use fungal_all.png>
+Package pdftex.def Info: fungal_all.png  used on input line 128.
+(pdftex.def)             Requested size: 433.62pt x 161.30591pt.
+<fungal_good.png, id=193, 1086.0575pt x 405.515pt>
+File: fungal_good.png Graphic file (type png)
+<use fungal_good.png>
+Package pdftex.def Info: fungal_good.png  used on input line 129.
+(pdftex.def)             Requested size: 433.62pt x 161.90611pt.
+<fungal_random.png, id=194, 1080.035pt x 405.515pt>
+File: fungal_random.png Graphic file (type png)
+<use fungal_random.png>
+Package pdftex.def Info: fungal_random.png  used on input line 130.
+(pdftex.def)             Requested size: 433.62pt x 162.80331pt.
+
+Overfull \hbox (7.22633pt too wide) in paragraph at lines 127--136
+[]$[]$ 
+ []
+
+) (./discussion.tex [14 <./fungal_all.png> <./fungal_good.png> <./fungal_random
+.png>]) (./phylosignal.bbl [15] [16]) [17] (./phylosignal.aux)
+ ***********
+LaTeX2e <2025-11-01>
+L3 programming layer <2026-01-19>
+ ***********
+Package rerunfilecheck Info: File `phylosignal.out' has not changed.
+(rerunfilecheck)             Checksum: F637FA507B06304C2757FC8172A2713C;802.
+ ) 
+Here is how much of TeX's memory you used:
+ 16679 strings out of 467533
+ 265178 string characters out of 5422138
+ 730375 words of memory out of 5000000
+ 44873 multiletter control sequences out of 15000+600000
+ 684842 words of font info for 336 fonts, out of 8000000 for 9000
+ 1141 hyphenation exceptions out of 8191
+ 75i,8n,79p,1171b,671s stack positions out of 10000i,1000n,20000p,200000b,200000s
+</usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></us
+r/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/share
+/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/share/texli
+ve/texmf-dist/fonts/type1/public/mathpazo/fplmr.pfb></usr/share/texlive/texmf-d
+ist/fonts/type1/public/mathpazo/fplmri.pfb></usr/share/texlive/texmf-dist/fonts
+/type1/urw/courier/ucrr8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/he
+lvetic/uhvb8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/helvetic/uhvr8
+a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/helvetic/uhvro8a.pfb></usr
+/share/texlive/texmf-dist/fonts/type1/urw/palatino/uplr8a.pfb></usr/share/texli
+ve/texmf-dist/fonts/type1/urw/palatino/uplri8a.pfb>
+Output written on phylosignal.pdf (17 pages, 2547485 bytes).
+PDF statistics:
+ 301 PDF objects out of 1000 (max. 8388607)
+ 228 compressed objects within 3 object streams
+ 54 named destinations out of 1000 (max. 500000)
+ 77961 words of extra memory for PDF output out of 89155 (max. 10000000)
 
-! Undefined control sequence.
-\reset@color ->\pdfcolorstack 
-                              \@pdfcolorstack pop\relax 
-l.75 \begin{abstract}
-                   
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
-
-Missing character: There is no ^^@ (U+0000) in font [lmroman10-regular]:+tlig;!
-Missing character: There is no ^^@ (U+0000) in font [lmroman10-regular]:+tlig;!
-
-LaTeX Font Warning: Font shape `TU/phv/b/n' undefined
-(Font)              using `TU/phv/m/n' instead on input line 75.
-
-! Undefined control sequence.
-\set@color ->\pdfcolorstack 
-                            \@pdfcolorstack push{\current@color }\aftergroup...
-l.75 \begin{abstract}
-                   
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
-
-! Undefined control sequence.
-\reset@color ->\pdfcolorstack 
-                              \@pdfcolorstack pop\relax 
-l.75 \begin{abstract}
-                   
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
-
-Missing character: There is no ^^@ (U+0000) in font [lmroman10-regular]:+tlig;!
-Missing character: There is no ^^@ (U+0000) in font [lmroman10-regular]:+tlig;!
- (./introduction.tex
-! Undefined control sequence.
-\set@color ->\pdfcolorstack 
-                            \@pdfcolorstack push{\current@color }\aftergroup...
-l.28 
-   
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
-
-Missing character: There is no ^^@ (U+0000) in font [lmroman12-regular]:+tlig;!
-Missing character: There is no ^^@ (U+0000) in font [lmroman12-regular]:+tlig;!
-! Undefined control sequence.
-\reset@color ->\pdfcolorstack 
-                              \@pdfcolorstack pop\relax 
-l.28 
-   
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
-
-Missing character: There is no ^^@ (U+0000) in font [lmroman12-regular]:+tlig;!
-Missing character: There is no ^^@ (U+0000) in font [lmroman12-regular]:+tlig;!
-! Undefined control sequence.
-\set@color ->\pdfcolorstack 
-                            \@pdfcolorstack push{\current@color }\aftergroup...
-l.28 
-   
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
-
-! Undefined control sequence.
-\reset@color ->\pdfcolorstack 
-                              \@pdfcolorstack pop\relax 
-l.28 
-   
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
-
-Missing character: There is no ^^@ (U+0000) in font [lmroman12-regular]:+tlig;!
-Missing character: There is no ^^@ (U+0000) in font [lmroman12-regular]:+tlig;!
-! Undefined control sequence.
-\set@color ->\pdfcolorstack 
-                            \@pdfcolorstack push{\current@color }\aftergroup...
-l.28 
-   
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
-
-! Undefined control sequence.
-\reset@color ->\pdfcolorstack 
-                              \@pdfcolorstack pop\relax 
-l.28 
-   
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
-
-Missing character: There is no ^^@ (U+0000) in font [lmroman12-regular]:+tlig;!
-Missing character: There is no ^^@ (U+0000) in font [lmroman12-regular]:+tlig;!
- [1
-Missing character: There is no ^^@ (U+0000) in font [lmroman12-regular]:+tlig;!
-{/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}
-Missing character: There is no ^^@ (U+0000) in font [lmroman12-regular]:+tlig;!
-
-Missing character: There is no ^^@ (U+0000) in font [lmroman12-regular]:+tlig;!
-Missing character: There is no ^^@ (U+0000) in font [lmroman12-regular]:+tlig;!
-Missing character: There is no ^^@ (U+0000) in font [lmroman12-regular]:+tlig;!
-Missing character: There is no ^^@ (U+0000) in font [lmroman12-regular]:+tlig;!
-Missing character: There is no ^^@ (U+0000) in font [lmroman10-regular]:+tlig;!
-Missing character: There is no ^^@ (U+0000) in font [lmroman10-regular]:+tlig;!
-Missing character: There is no ^^@ (U+0000) in font [lmroman10-regular]:+tlig;!
-Missing character: There is no ^^@ (U+0000) in font [lmroman10-regular]:+tlig;!
-Missing character: There is no ^^@ (U+0000) in font [lmroman12-regular]:+tlig;!
-Missing character: There is no ^^@ (U+0000) in font [lmroman12-regular]:+tlig;!
-Missing character: There is no ^^@ (U+0000) in font [lmroman12-regular]:+tlig;!
-Missing character: There is no ^^@ (U+0000) in font [lmroman12-regular]:+tlig;!
-]
-! Undefined control sequence.
-\set@color ->\pdfcolorstack 
-                            \@pdfcolorstack push{\current@color }\aftergroup...
-l.57 
-   
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
-
-! Undefined control sequence.
-\reset@color ->\pdfcolorstack 
-                              \@pdfcolorstack pop\relax 
-l.57 
-   
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
-
-Missing character: There is no ^^@ (U+0000) in font [lmroman12-regular]:+tlig;!
-Missing character: There is no ^^@ (U+0000) in font [lmroman12-regular]:+tlig;!
-! Undefined control sequence.
-\set@color ->\pdfcolorstack 
-                            \@pdfcolorstack push{\current@color }\aftergroup...
-l.57 
-   
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
-
-! Undefined control sequence.
-\reset@color ->\pdfcolorstack 
-                              \@pdfcolorstack pop\relax 
-l.57 
-   
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
-
-Missing character: There is no ^^@ (U+0000) in font [lmroman12-regular]:+tlig;!
-Missing character: There is no ^^@ (U+0000) in font [lmroman12-regular]:+tlig;!
- [2
-Missing character: There is no ^^@ (U+0000) in font [lmroman12-regular]:+tlig;!
-Missing character: There is no ^^@ (U+0000) in font [lmroman12-regular]:+tlig;!
-Missing character: There is no ^^@ (U+0000) in font [lmroman12-regular]:+tlig;!
-Missing character: There is no ^^@ (U+0000) in font [lmroman12-regular]:+tlig;!
-]
-! Undefined control sequence.
-\set@color ->\pdfcolorstack 
-                            \@pdfcolorstack push{\current@color }\aftergroup...
-l.60 \red{to fill in something}
-                             
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
-
-! Undefined control sequence.
-\reset@color ->\pdfcolorstack 
-                              \@pdfcolorstack pop\relax 
-l.60 \red{to fill in something}
-                             
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
-
-Missing character: There is no ^^@ (U+0000) in font [lmroman12-regular]:+tlig;!
-Missing character: There is no ^^@ (U+0000) in font [lmroman12-regular]:+tlig;!
-Missing character: There is no ^^@ (U+0000) in font [lmroman12-regular]:+tlig;!
-Missing character: There is no ^^@ (U+0000) in font [lmroman12-regular]:+tlig;!
-Missing character: There is no ^^@ (U+0000) in font [lmroman12-regular]:+tlig;!
-Missing character: There is no ^^@ (U+0000) in font [lmroman12-regular]:+tlig;!
-! Undefined control sequence.
-\set@color ->\pdfcolorstack 
-                            \@pdfcolorstack push{\current@color }\aftergroup...
-l.90 
-   
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
-
-! Undefined control sequence.
-\reset@color ->\pdfcolorstack 
-                              \@pdfcolorstack pop\relax 
-l.90 
-   
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
-
-Missing character: There is no ^^@ (U+0000) in font [lmroman12-regular]:+tlig;!
-Missing character: There is no ^^@ (U+0000) in font [lmroman12-regular]:+tlig;!
-! Undefined control sequence.
-\set@color ->\pdfcolorstack 
-                            \@pdfcolorstack push{\current@color }\aftergroup...
-l.90 
-   
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
-
-! Undefined control sequence.
-\reset@color ->\pdfcolorstack 
-                              \@pdfcolorstack pop\relax 
-l.90 
-   
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
-
-Missing character: There is no ^^@ (U+0000) in font [lmroman12-regular]:+tlig;!
-Missing character: There is no ^^@ (U+0000) in font [lmroman12-regular]:+tlig;!
- [3
-Missing character: There is no ^^@ (U+0000) in font [lmroman12-regular]:+tlig;!
-Missing character: There is no ^^@ (U+0000) in font [lmroman12-regular]:+tlig;!
-Missing character: There is no ^^@ (U+0000) in font [lmroman12-regular]:+tlig;!
-Missing character: There is no ^^@ (U+0000) in font [lmroman12-regular]:+tlig;!
-Missing character: There is no ^^@ (U+0000) in font [lmroman12-regular]:+tlig;!
-Missing character: There is no ^^@ (U+0000) in font [lmroman12-regular]:+tlig;!
-]
-! Undefined control sequence.
-\set@color ->\pdfcolorstack 
-                            \@pdfcolorstack push{\current@color }\aftergroup...
-l.103 \begin{figure}[!htbp]
-                         
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
-
-! Undefined control sequence.
-\Gread@pdftex ...\expandafter \relax \pdffilesize 
-                                                  {#1}\relax \expandafter \@...
-l.104 ...includegraphics[width = 6in]{figure001.png}
-                                                  \end{minipage}
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
-
-! Undefined control sequence.
-<argument> \pdfximage 
-           \ifnum 0\ifx \Gin@decode \@empty \else 1\fi \ifGin@interpolate 1\fi 
-l.104 ...includegraphics[width = 6in]{figure001.png}
-                                                  \end{minipage}
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
-
-! Undefined control sequence.
-<argument> ... .png}\setbox \@tempboxa =\hbox {\pdfrefximage 
-                                                  \pdflastximage }\def \Gin@...
-l.104 ...includegraphics[width = 6in]{figure001.png}
-                                                  \end{minipage}
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
-
-! Undefined control sequence.
-<argument> ...@tempboxa =\hbox {\pdfrefximage \pdflastximage 
-                                                  }\def \Gin@llx {0}\let \Gi...
-l.104 ...includegraphics[width = 6in]{figure001.png}
-                                                  \end{minipage}
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
-
-! Undefined control sequence.
-<argument> ... image\Gin@attr@hash \endcsname {\pdfrefximage 
-                                                  \the \pdflastximage }\expa...
-l.104 ...includegraphics[width = 6in]{figure001.png}
-                                                  \end{minipage}
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
-
-! Undefined control sequence.
-<argument> ... \endcsname {\pdfrefximage \the \pdflastximage 
-                                                  }\expandafter \xdef \csnam...
-l.104 ...includegraphics[width = 6in]{figure001.png}
-                                                  \end{minipage}
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
-
-! You can't use `end-group character }' after \the.
-<argument> ...\endcsname {\pdfrefximage \the \pdflastximage }
-                                                  \expandafter \xdef \csname...
-l.104 ...includegraphics[width = 6in]{figure001.png}
-                                                  \end{minipage}
-I'm forgetting what you said and using zero instead.
-
-! Undefined control sequence.
-<argument> ...n@log {<\Gin@base .png, id=\the \pdflastximage 
-                                                  , \ifx \Gin@page \@empty \...
-l.104 ...includegraphics[width = 6in]{figure001.png}
-                                                  \end{minipage}
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
-
-! You can't use `the character ,' after \the.
-<argument> ...@log {<\Gin@base .png, id=\the \pdflastximage ,
-                                                   \ifx \Gin@page \@empty \e...
-l.104 ...includegraphics[width = 6in]{figure001.png}
-                                                  \end{minipage}
-I'm forgetting what you said and using zero instead.
-
-! Undefined control sequence.
-\GenericError  ...                                
-                                                    #4  \errhelp \@err@     ...
-l.104 ...includegraphics[width = 6in]{figure001.png}
-                                                  \end{minipage}
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
-
-! Undefined control sequence.
-\GenericError  ...                                
-                                                  \let \@err@               ...
-l.104 ...includegraphics[width = 6in]{figure001.png}
-                                                  \end{minipage}
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
-
-! Undefined control sequence.
-\GenericError  ...                                
-                                                  \@empty \def \MessageBreak...
-l.104 ...includegraphics[width = 6in]{figure001.png}
-                                                  \end{minipage}
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
-
-! Undefined control sequence.
-\GenericError  ...                                
-                                                     \endgroup 
-l.104 ...includegraphics[width = 6in]{figure001.png}
-                                                  \end{minipage}
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
-
-! Illegal parameter number in definition of \figure001.png image.
-<to be read again> 
-1
-l.104 ...includegraphics[width = 6in]{figure001.png}
-                                                  \end{minipage}
-You meant to type ## instead of #, right?
-Or maybe a } was forgotten somewhere earlier, and things
-are all screwed up? I'm going to assume that you meant ##.
-
-! Illegal parameter number in definition of \figure001.png image.
-<to be read again> 
-1
-l.104 ...includegraphics[width = 6in]{figure001.png}
-                                                  \end{minipage}
-You meant to type ## instead of #, right?
-Or maybe a } was forgotten somewhere earlier, and things
-are all screwed up? I'm going to assume that you meant ##.
-
-! Argument of \@providesfile has an extra }.
-<inserted text> 
-\par 
-l.104 ...includegraphics[width = 6in]{figure001.png}
-                                                  \end{minipage}
-I've run across a `}' that doesn't seem to match anything.
-For example, `\def\a#1{...}' and `\a}' would produce
-this error. If you simply proceed now, the `\par' that
-I've just inserted will cause me to report a runaway
-argument that might be the root of the problem. But if
-your `}' was spurious, just type `2' and it will go away.
-
-Runaway argument?
-{\Gin@base \Gin@ext }
-! Paragraph ended before \@providesfile was complete.
-<to be read again> 
-\par 
-l.104 ...includegraphics[width = 6in]{figure001.png}
-                                                  \end{minipage}
-I suspect you've forgotten a `}', causing me to apply this
-control sequence to too much text. How can we recover?
-My plan is to forget the whole thing and hope for the best.
-
-Runaway argument?
-{[}\def \@tempb {\@providesfile {\Gin@base \Gin@ext }[]}\ifx \@tempa \ETC.
-! Paragraph ended before \@tempa was complete.
-<to be read again> 
-\par 
-l.116 
-    
-I suspect you've forgotten a `}', causing me to apply this
-control sequence to too much text. How can we recover?
-My plan is to forget the whole thing and hope for the best.
-
-)
-Runaway definition?
-->0\xdef \figure001.png height {0.0pt}\xdef \figure001.png width {0.0pt\ETC.
-! File ended while scanning definition of \figure001.png image.
-<inserted text> 
-}
-l.94 \input{introduction}
-                       
-I suspect you have forgotten a `}', causing me
-to read past where you wanted me to stop.
-I'll try to recover; but if the error is serious,
-you'd better type `E' or `X' now and fix your file.
-
- (./methods.tex
-! Undefined control sequence.
-\set@color ->\pdfcolorstack 
-                            \@pdfcolorstack push{\current@color }\aftergroup...
-l.28 \red{describe the vector}
-                            
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
-
-! Undefined control sequence.
-\reset@color ->\pdfcolorstack 
-                              \@pdfcolorstack pop\relax 
-l.28 \red{describe the vector}
-                            
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
-
-Missing character: There is no ^^@ (U+0000) in font [lmroman12-regular]:+tlig;!
-Missing character: There is no ^^@ (U+0000) in font [lmroman12-regular]:+tlig;!
-Missing character: There is no ^^@ (U+0000) in font [lmroman12-regular]:+tlig;!
-Missing character: There is no ^^@ (U+0000) in font [lmroman12-regular]:+tlig;!
-
-Package natbib Warning: Citation `Martins2016' on page 4 undefined on input lin
-e 43.
-
-Missing character: There is no ’ (U+2019) in font pplr7t!
-) (./results.tex
-
-! LaTeX Error: Not in outer par mode.
-
-See the LaTeX manual or LaTeX Companion for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.31 \begin{figure}[!htbp]
-                        
-You've lost some text.  Try typing  <return>  to proceed.
-If that doesn't work, type  X <return>  to quit.
-
-! Undefined control sequence.
-\set@color ->\pdfcolorstack 
-                            \@pdfcolorstack push{\current@color }\aftergroup...
-l.31 \begin{figure}[!htbp]
-                        
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
-
-! Undefined control sequence.
-\Gread@pdftex ...\expandafter \relax \pdffilesize 
-                                                  {#1}\relax \expandafter \@...
-l.32 ...ncludegraphics[width = 6.5in]{figure002.png}
-                                                  \end{minipage}
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
-
-! Undefined control sequence.
-<argument> \pdfximage 
-           \ifnum 0\ifx \Gin@decode \@empty \else 1\fi \ifGin@interpolate 1\fi 
-l.32 ...ncludegraphics[width = 6.5in]{figure002.png}
-                                                  \end{minipage}
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
-
-! Undefined control sequence.
-<argument> ... .png}\setbox \@tempboxa =\hbox {\pdfrefximage 
-                                                  \pdflastximage }\def \Gin@...
-l.32 ...ncludegraphics[width = 6.5in]{figure002.png}
-                                                  \end{minipage}
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
-
-! Undefined control sequence.
-<argument> ...@tempboxa =\hbox {\pdfrefximage \pdflastximage 
-                                                  }\def \Gin@llx {0}\let \Gi...
-l.32 ...ncludegraphics[width = 6.5in]{figure002.png}
-                                                  \end{minipage}
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
-
-! Undefined control sequence.
-<argument> ... image\Gin@attr@hash \endcsname {\pdfrefximage 
-                                                  \the \pdflastximage }\expa...
-l.32 ...ncludegraphics[width = 6.5in]{figure002.png}
-                                                  \end{minipage}
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
-
-! Undefined control sequence.
-<argument> ... \endcsname {\pdfrefximage \the \pdflastximage 
-                                                  }\expandafter \xdef \csnam...
-l.32 ...ncludegraphics[width = 6.5in]{figure002.png}
-                                                  \end{minipage}
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
-
-! You can't use `end-group character }' after \the.
-<argument> ...\endcsname {\pdfrefximage \the \pdflastximage }
-                                                  \expandafter \xdef \csname...
-l.32 ...ncludegraphics[width = 6.5in]{figure002.png}
-                                                  \end{minipage}
-I'm forgetting what you said and using zero instead.
-
-! Undefined control sequence.
-<argument> ...n@log {<\Gin@base .png, id=\the \pdflastximage 
-                                                  , \ifx \Gin@page \@empty \...
-l.32 ...ncludegraphics[width = 6.5in]{figure002.png}
-                                                  \end{minipage}
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
-
-! You can't use `the character ,' after \the.
-<argument> ...@log {<\Gin@base .png, id=\the \pdflastximage ,
-                                                   \ifx \Gin@page \@empty \e...
-l.32 ...ncludegraphics[width = 6.5in]{figure002.png}
-                                                  \end{minipage}
-I'm forgetting what you said and using zero instead.
-
-! Undefined control sequence.
-\GenericError  ...                                
-                                                    #4  \errhelp \@err@     ...
-l.32 ...ncludegraphics[width = 6.5in]{figure002.png}
-                                                  \end{minipage}
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
-
-! Undefined control sequence.
-\GenericError  ...                                
-                                                  \let \@err@               ...
-l.32 ...ncludegraphics[width = 6.5in]{figure002.png}
-                                                  \end{minipage}
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
-
-! Undefined control sequence.
-\GenericError  ...                                
-                                                  \@empty \def \MessageBreak...
-l.32 ...ncludegraphics[width = 6.5in]{figure002.png}
-                                                  \end{minipage}
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
-
-! Undefined control sequence.
-\GenericError  ...                                
-                                                     \endgroup 
-l.32 ...ncludegraphics[width = 6.5in]{figure002.png}
-                                                  \end{minipage}
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
-
-! Illegal parameter number in definition of \figure002.png image.
-<to be read again> 
-1
-l.32 ...ncludegraphics[width = 6.5in]{figure002.png}
-                                                  \end{minipage}
-You meant to type ## instead of #, right?
-Or maybe a } was forgotten somewhere earlier, and things
-are all screwed up? I'm going to assume that you meant ##.
-
-! Illegal parameter number in definition of \figure002.png image.
-<to be read again> 
-1
-l.32 ...ncludegraphics[width = 6.5in]{figure002.png}
-                                                  \end{minipage}
-You meant to type ## instead of #, right?
-Or maybe a } was forgotten somewhere earlier, and things
-are all screwed up? I'm going to assume that you meant ##.
-
-! Argument of \@providesfile has an extra }.
-<inserted text> 
-\par 
-l.32 ...ncludegraphics[width = 6.5in]{figure002.png}
-                                                  \end{minipage}
-I've run across a `}' that doesn't seem to match anything.
-For example, `\def\a#1{...}' and `\a}' would produce
-this error. If you simply proceed now, the `\par' that
-I've just inserted will cause me to report a runaway
-argument that might be the root of the problem. But if
-your `}' was spurious, just type `2' and it will go away.
-
-Runaway argument?
-{\Gin@base \Gin@ext }
-! Paragraph ended before \@providesfile was complete.
-<to be read again> 
-\par 
-l.32 ...ncludegraphics[width = 6.5in]{figure002.png}
-                                                  \end{minipage}
-I suspect you've forgotten a `}', causing me to apply this
-control sequence to too much text. How can we recover?
-My plan is to forget the whole thing and hope for the best.
-
-Runaway argument?
-{[}\def \@tempb {\@providesfile {\Gin@base \Gin@ext }[]}\ifx \@tempa \ETC.
-! Paragraph ended before \@tempa was complete.
-<to be read again> 
-\par 
-l.39 
-   
-I suspect you've forgotten a `}', causing me to apply this
-control sequence to too much text. How can we recover?
-My plan is to forget the whole thing and hope for the best.
-
-)
-! Incomplete \iffalse; all text was ignored after line 63.
-<inserted text> 
-\fi 
-l.96 \input{results}
-                  
-The file ended while I was skipping conditional text.
-This kind of error happens when you say `\if...' and forget
-the matching `\fi'. I've inserted a `\fi'; this might work.
-
-)
-! Incomplete \iffalse; all text was ignored after line 63.
-<inserted text> 
-\fi 
-<*> phylosignal.tex
-                
-The file ended while I was skipping conditional text.
-This kind of error happens when you say `\if...' and forget
-the matching `\fi'. I've inserted a `\fi'; this might work.
-
-! Emergency stop.
-<*> phylosignal.tex
-                
-*** (job aborted, no legal \end found)
-
-
-
-Here is how much of LuaTeX's memory you used:
- 16632 strings out of 476076
- 125129,794899 words of node,token memory allocated 117540 words of node memory still in use:
-   270 hlist, 3 vlist, 10 rule, 900 disc, 29 local_par, 7 dir, 60 math, 2545 glu
-e, 701 kern, 90 penalty, 58 margin_kern, 11524 glyph, 407 attribute, 103 glue_sp
-ec, 204 attribute_list, 11 temp, 10 if_stack, 10 write, 11 pdf_dest nodes
-   avail lists: 1:1,2:5,3:37,4:25,5:2,6:11,7:220,8:69,10:23
- 38557 multiletter control sequences out of 65536+600000
- 129 fonts using 8204103 bytes
- 72i,11n,75p,1187b,662s stack positions out of 10000i,1000n,20000p,200000b,200000s
-!  ==> Fatal error occurred, no output PDF file produced!

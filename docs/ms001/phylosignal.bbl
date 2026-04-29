@@ -1,4 +1,4 @@
-\begin{thebibliography}{16}
+\begin{thebibliography}{17}
 \providecommand{\natexlab}[1]{#1}
 \providecommand{\url}[1]{\texttt{#1}}
 \expandafter\ifx\csname urlstyle\endcsname\relax
@@ -13,6 +13,17 @@ C~Colijn and G~Plazzotta.
 \newblock ISSN 1063-5157, 1076-836X.
 \newblock \doi{10.1093/sysbio/syx046}.
 \newblock URL \url{http://dx.doi.org/10.1093/sysbio/syx046}.
+
+\bibitem[De~Oliveira~Martins et~al.(2016)De~Oliveira~Martins, Mallo, and
+  Posada]{Martins2016}
+Leonardo De~Oliveira~Martins, Diego Mallo, and David Posada.
+\newblock {A Bayesian Supertree Model for Genome-Wide Species Tree
+  Reconstruction}.
+\newblock \emph{Systematic biology}, 65\penalty0 (3):\penalty0 397--416, May
+  2016.
+\newblock ISSN 1063-5157, 1076-836X.
+\newblock \doi{10.1093/sysbio/syu082}.
+\newblock URL \url{http://dx.doi.org/10.1093/sysbio/syu082}.
 
 \bibitem[Gori et~al.(2016)Gori, Suchan, Alvarez, Goldman, and
   Dessimoz]{Gori2016}
