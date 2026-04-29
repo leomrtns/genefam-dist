@@ -37,7 +37,6 @@ reference trees (results not shown).
  SPR branch swappings) defined in the simulation. 
 }\end{figure}
 
-
 The second simulation scenario was based on a genome-level simulation, where the gene trees are simulated , using the
 software Simphy (Mallo, de Oliveira Martins, and Posada 2015), according to the multispecies coalescent within a locus
 tree, which is generated under a duplication-loss model from a species tree. We generated 4 species trees with 20
@@ -57,7 +56,6 @@ families with less than half the species represented, and with very few (less th
 The result for a typical simulation is shown in figure 3, where we see that gene families from distinct species trees
 can be discriminated.
 
-
 \begin{figure}[!htbp]
 \begin{minipage}{7in}\centering
   \includegraphics[width = 6in]{figure003a.png}
@@ -74,3 +72,34 @@ Fungal data set
 }\end{figure}
 
 
+\subsection{Fungal data set}
+The data set to estimate the reference species trees were a set of gene families inferred to have a homolog 
+at the ancestor of fungi, that is root HOGs (rHOGs) \textcolor{red}{(as of 2018; more details or rerun with recent data)}.
+In particular, we chose around 50 rHOGs with more than 46 species, and a further 120 arbitrily large gene families. 
+To create the set of reference trees, we used {\tt guenomu}\cite{Martins2016} to estimate a posterior distribution of species
+trees from the gene family trees, and from the resulting set of species trees, we emulated further five gene family
+trees and used guenomu again to estimate some 30 further good likelihood species trees from these. 
+This set of 70 reference trees (with a few random ones added to round up) was then expanded into 250 by
+branch-length-dependent ``noise addition'' as described in \cite{Martins2016}, and finally the {\tt treesignal} library
+was used to simulate another set of 250 ``random'' reference trees based on these 250 ``good'' trees.
+\textcolor{red}{perhaps explanation is easier as a separate section/preprint}.
+
+The final set included around 11k gene families, over 49 species. 
+By decomposing the resulting feature matrices with sparse PCA, such that only a fraction of the features (combinations
+of reference species tree and distances to gene family tree) are retained, we see that results chagen if we use ``good''
+reference trees, that is, those based on maximum likelihood estimation by {\tt guenomu}, or if we use random trees.
+Good reference trees lead to first sparse PCA components strongly correlated with specifi distances, for instance the
+first component seems to keep the RF and ILS distances, while the second component points to the number of duplications
+(and to a lesser extent to the number of losses). On the other hand, when using random trees, the first sparse PCA
+components don't seem to be correlated with any particular distance.
+
+\begin{figure}[!htbp]
+  \begin{minipage}{7in}\centering
+  \includegraphics[width = 3.4in]{good_indicator.png}
+  \includegraphics[width = 3.4in]{random_indicator.png}
+\end{minipage}
+  \caption{\label{figure005}
+    Correlation between the first eight sparse PCA components and the distances to the reference trees, when using good
+    reference trees (left) or random reference trees (right). 
+    Each bar represents the number of genes with a component different from zero.
+  }\end{figure}
