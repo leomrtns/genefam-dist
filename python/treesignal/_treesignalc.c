@@ -3,130 +3,332 @@
 
 #include "genefam_dist.h"
 
+typedef struct {
+  PyObject_HEAD
+  topology_space space;
+  int rooted;
+} TreeSpaceObject;
+
 static PyObject *TreesignalcError;
+static PyTypeObject TreeSpaceType;
 
-// TODO: replace three versions with one that accepts option about scaling
 static PyObject *
-treesignalc_fromtrees (PyObject *self, PyObject *args)
+distance_vector_to_tuple (double *values, int length)
 {
-  const char *gtree_str, *splist_str;
-  PyObject *res_tuple;
-  double *res_doublevector=NULL; /* output with distances, allocated by library function and freed here */
-  int i, n_res = -1;
+  PyObject *item, *result;
+  int i;
 
-  if (!PyArg_ParseTuple(args, "ss", &gtree_str, &splist_str)) return NULL;
-
-  // printf ("I got [%s] and [%s] \n", gtree_str, splist_str); // DEBUG
-  n_res = genefam_module_treesignal_fromtrees (gtree_str, splist_str, &res_doublevector);
-  if (n_res < 1) { PyErr_SetString(TreesignalcError, "gene and species trees can't be compared"); return NULL; }
-
-  res_tuple = PyTuple_New(n_res);
-  for (i = 0; i < n_res; i++) PyTuple_SetItem(res_tuple, i, PyFloat_FromDouble (res_doublevector[i]));
-  if (res_doublevector) free (res_doublevector);
-
-  return res_tuple;
+  if (length < 1) {
+    if (values) free (values);
+    PyErr_SetString (TreesignalcError, "gene and species trees cannot be compared");
+    return NULL;
+  }
+  result = PyTuple_New (length);
+  if (!result) {
+    free (values);
+    return NULL;
+  }
+  for (i = 0; i < length; i++) {
+    item = PyFloat_FromDouble (values[i]);
+    if (!item) {
+      free (values);
+      Py_DECREF (result);
+      return NULL;
+    }
+    PyTuple_SET_ITEM (result, i, item);
+  }
+  free (values);
+  return result;
 }
 
 static PyObject *
-treesignalc_fromtrees_rescale (PyObject *self, PyObject *args)
+TreeSpace_new (PyTypeObject *type, PyObject *args, PyObject *kwargs)
 {
-  const char *gtree_str, *splist_str;
-  PyObject *res_tuple;
-  double *res_doublevector=NULL; /* output with distances, allocated by library function and freed here */
-  int i, n_res = -1;
+  TreeSpaceObject *self = (TreeSpaceObject*) type->tp_alloc (type, 0);
+  if (self) {
+    self->space = NULL;
+    self->rooted = 0;
+  }
+  return (PyObject*) self;
+}
 
-  if (!PyArg_ParseTuple(args, "ss", &gtree_str, &splist_str)) return NULL;
-  // printf ("I got [%s] and [%s] \n", gtree_str, splist_str); // DEBUG
-  n_res = genefam_module_treesignal_fromtrees_rescale (gtree_str, splist_str, &res_doublevector);
-  if (n_res < 1) { PyErr_SetString(TreesignalcError, "gene and species trees can't be compared"); return NULL; }
+static int
+TreeSpace_init (TreeSpaceObject *self, PyObject *args, PyObject *kwargs)
+{
+  static char *keywords[] = {"newick", "rooted", NULL};
+  const char *newick;
+  int rooted = 0;
+  topology_space parsed;
 
-  res_tuple = PyTuple_New(n_res);
-  for (i = 0; i < n_res; i++) PyTuple_SetItem(res_tuple, i, PyFloat_FromDouble (res_doublevector[i]));
-  if (res_doublevector) free (res_doublevector);
+  if (!PyArg_ParseTupleAndKeywords (args, kwargs, "s|p:TreeSpace", keywords, &newick, &rooted)) return -1;
+  parsed = genefam_module_parse_newick_trees (newick, rooted != 0);
+  if (!parsed) {
+    PyErr_SetString (TreesignalcError, "could not parse the Newick tree data");
+    return -1;
+  }
+  if (self->space) del_topology_space (self->space);
+  self->space = parsed;
+  self->rooted = rooted;
+  return 0;
+}
 
-  return res_tuple;
+static void
+TreeSpace_dealloc (TreeSpaceObject *self)
+{
+  if (self->space) del_topology_space (self->space);
+  Py_TYPE (self)->tp_free ((PyObject*) self);
 }
 
 static PyObject *
-treesignalc_fromtrees_pvalue (PyObject *self, PyObject *args)
+TreeSpace_repr (TreeSpaceObject *self)
 {
-  const char *gtree_str, *splist_str;
-  PyObject *res_tuple;
-  double *res_doublevector=NULL; /* output with distances, allocated by library function and freed here */
-  int i, n_replicates = 1000, n_res = -1;
+  if (!self->space) return PyUnicode_FromString ("<treesignal._treesignalc.TreeSpace (uninitialized)>");
+  return PyUnicode_FromFormat (
+      "<treesignal._treesignalc.TreeSpace trees=%d distinct=%d rooted=%s>",
+      self->space->ntrees,
+      self->space->ndistinct,
+      self->rooted ? "True" : "False");
+}
 
-  if (!PyArg_ParseTuple(args, "ss|i", &gtree_str, &splist_str, &n_replicates)) return NULL;
+static PyObject *
+TreeSpace_get_ntrees (TreeSpaceObject *self, void *closure)
+{
+  if (!self->space) return PyLong_FromLong (0);
+  return PyLong_FromLong (self->space->ntrees);
+}
+
+static PyObject *
+TreeSpace_get_ndistinct (TreeSpaceObject *self, void *closure)
+{
+  if (!self->space) return PyLong_FromLong (0);
+  return PyLong_FromLong (self->space->ndistinct);
+}
+
+static PyObject *
+TreeSpace_get_rooted (TreeSpaceObject *self, void *closure)
+{
+  return PyBool_FromLong (self->rooted);
+}
+
+static PyGetSetDef TreeSpace_getset[] = {
+  {"ntrees", (getter) TreeSpace_get_ntrees, NULL, "Number of input trees.", NULL},
+  {"ndistinct", (getter) TreeSpace_get_ndistinct, NULL, "Number of distinct native topologies.", NULL},
+  {"rooted", (getter) TreeSpace_get_rooted, NULL, "Whether root location distinguishes topologies.", NULL},
+  {NULL, NULL, NULL, NULL, NULL}
+};
+
+PyDoc_STRVAR (
+    TreeSpace_doc,
+    "TreeSpace(newick, rooted=False)\n--\n\n"
+    "Owning native representation of one or more trees. Distance functions use "
+    "the first gene tree and all distinct species trees.\n\n"
+    "Newick data is parsed once during construction. The underlying C topology_space "
+    "is retained until this Python object is destroyed, so object-based distance "
+    "functions avoid repeated string serialization and parsing.");
+
+static PyTypeObject TreeSpaceType = {
+  PyVarObject_HEAD_INIT (NULL, 0)
+  .tp_name = "treesignal._treesignalc.TreeSpace",
+  .tp_basicsize = sizeof (TreeSpaceObject),
+  .tp_dealloc = (destructor) TreeSpace_dealloc,
+  .tp_repr = (reprfunc) TreeSpace_repr,
+  .tp_flags = Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE,
+  .tp_doc = TreeSpace_doc,
+  .tp_getset = TreeSpace_getset,
+  .tp_init = (initproc) TreeSpace_init,
+  .tp_new = TreeSpace_new,
+};
+
+static int
+parse_tree_spaces (PyObject *args, TreeSpaceObject **gene, TreeSpaceObject **species, const char *function_name)
+{
+  if (!PyArg_ParseTuple (args, "O!O!", &TreeSpaceType, gene, &TreeSpaceType, species)) return 0;
+  if ((!(*gene)->space) || (!(*species)->space)) {
+    PyErr_Format (TreesignalcError, "%s received an uninitialized TreeSpace", function_name);
+    return 0;
+  }
+  return 1;
+}
+
+/* Native object API. These functions receive owning TreeSpace Python objects
+ * and reuse their already-parsed C topology_space structures. The C library
+ * creates calculation-specific copies where existing algorithms mutate tree
+ * or reconciliation state, leaving the Python-held topologies reusable. */
+static PyObject *
+treesignalc_from_tree_spaces (PyObject *self, PyObject *args)
+{
+  TreeSpaceObject *gene, *species;
+  double *values = NULL;
+  int length;
+
+  if (!parse_tree_spaces (args, &gene, &species, "from_tree_spaces")) return NULL;
+  length = genefam_module_treesignal_from_topology_spaces (gene->space, species->space, &values);
+  return distance_vector_to_tuple (values, length);
+}
+
+static PyObject *
+treesignalc_from_tree_spaces_rescale (PyObject *self, PyObject *args)
+{
+  TreeSpaceObject *gene, *species;
+  double *values = NULL;
+  int length;
+
+  if (!parse_tree_spaces (args, &gene, &species, "from_tree_spaces_rescale")) return NULL;
+  length = genefam_module_treesignal_from_topology_spaces_rescale (gene->space, species->space, &values);
+  return distance_vector_to_tuple (values, length);
+}
+
+static PyObject *
+treesignalc_from_tree_spaces_pvalue (PyObject *self, PyObject *args)
+{
+  TreeSpaceObject *gene, *species;
+  double *values = NULL;
+  int n_replicates = 1000, length;
+
+  if (!PyArg_ParseTuple (args, "O!O!|i", &TreeSpaceType, &gene, &TreeSpaceType, &species, &n_replicates)) return NULL;
+  if ((!gene->space) || (!species->space)) {
+    PyErr_SetString (TreesignalcError, "from_tree_spaces_pvalue received an uninitialized TreeSpace");
+    return NULL;
+  }
   if (n_replicates < 10) n_replicates = 10;
-  //printf ("I got [%s] and [%s] \n n = %d\n", gtree_str, splist_str, n_replicates); // DEBUG
-  n_res = genefam_module_treesignal_fromtrees_pvalue (gtree_str, splist_str, n_replicates, &res_doublevector);
-  if (n_res < 1) { PyErr_SetString(TreesignalcError, "gene and species trees can't be compared"); return NULL; }
+  length = genefam_module_treesignal_from_topology_spaces_pvalue (
+      gene->space, species->space, n_replicates, &values);
+  return distance_vector_to_tuple (values, length);
+}
 
-  res_tuple = PyTuple_New(n_res);
-  for (i = 0; i < n_res; i++) PyTuple_SetItem(res_tuple, i, PyFloat_FromDouble (res_doublevector[i]));
-  if (res_doublevector) free (res_doublevector);
+/* Legacy string-based API. These names are retained for compatibility. Each
+ * call parses its Newick strings into temporary C structures; new code should
+ * construct TreeSpace objects once and use from_tree_spaces* above. */
+static PyObject *
+treesignalc_fromtrees_string (PyObject *self, PyObject *args)
+{
+  const char *gene_newick, *species_newick;
+  double *values = NULL;
+  int length;
 
-  return res_tuple;
+  if (!PyArg_ParseTuple (args, "ss", &gene_newick, &species_newick)) return NULL;
+  length = genefam_module_treesignal_fromtrees (gene_newick, species_newick, &values);
+  return distance_vector_to_tuple (values, length);
 }
 
 static PyObject *
-treesignalc_randomise_trees_with_spr (PyObject *self, PyObject *args)
+treesignalc_fromtrees_rescale_string (PyObject *self, PyObject *args)
 {
-  char *output_trees = NULL;
-  const char *splist_str;
-  PyObject *res_string;
-  int n_copies = 2, n_spr = 1;  
+  const char *gene_newick, *species_newick;
+  double *values = NULL;
+  int length;
 
-  if (!PyArg_ParseTuple(args, "s|ii", &splist_str, &n_copies, &n_spr)) return NULL;
-  output_trees = genefam_module_randomise_trees_with_spr (splist_str, n_copies, n_spr);
-  if (!output_trees) { PyErr_SetString(TreesignalcError, "Could not expand trees with SPR neighbours"); return NULL; }
-  
-  res_string = PyUnicode_FromString ((const char *)output_trees);
-  if (output_trees) free (output_trees);
-  return res_string;
+  if (!PyArg_ParseTuple (args, "ss", &gene_newick, &species_newick)) return NULL;
+  length = genefam_module_treesignal_fromtrees_rescale (gene_newick, species_newick, &values);
+  return distance_vector_to_tuple (values, length);
 }
 
 static PyObject *
-treesignalc_generate_spr_trees (PyObject *self, PyObject *args)
+treesignalc_fromtrees_pvalue_string (PyObject *self, PyObject *args)
+{
+  const char *gene_newick, *species_newick;
+  double *values = NULL;
+  int n_replicates = 1000, length;
+
+  if (!PyArg_ParseTuple (args, "ss|i", &gene_newick, &species_newick, &n_replicates)) return NULL;
+  if (n_replicates < 10) n_replicates = 10;
+  length = genefam_module_treesignal_fromtrees_pvalue (
+      gene_newick, species_newick, n_replicates, &values);
+  return distance_vector_to_tuple (values, length);
+}
+
+static PyObject *
+treesignalc_randomise_trees_with_spr_string (PyObject *self, PyObject *args)
 {
   char *output_trees = NULL;
-  PyObject *res_string;
-  int n_leaves, n_iter, n_spr;  
+  const char *species_newick;
+  PyObject *result;
+  int n_copies = 2, n_spr = 1;
 
-  if (!PyArg_ParseTuple(args,  "iii", &n_leaves, &n_iter, &n_spr))  return NULL; 
-  output_trees = genefam_module_generate_spr_trees (n_leaves, n_iter, n_spr); 
-  if (!output_trees) { PyErr_SetString(TreesignalcError, "Could not create chain of SPR trees"); return NULL; }
-  
-  res_string = PyUnicode_FromString ((const char *)output_trees);
-  if (output_trees) free (output_trees);
-  return res_string;
+  if (!PyArg_ParseTuple (args, "s|ii", &species_newick, &n_copies, &n_spr)) return NULL;
+  output_trees = genefam_module_randomise_trees_with_spr (species_newick, n_copies, n_spr);
+  if (!output_trees) {
+    PyErr_SetString (TreesignalcError, "could not expand trees with SPR neighbours");
+    return NULL;
+  }
+  result = PyUnicode_FromString (output_trees);
+  free (output_trees);
+  return result;
 }
+
+static PyObject *
+treesignalc_generate_spr_trees_string (PyObject *self, PyObject *args)
+{
+  char *output_trees = NULL;
+  PyObject *result;
+  int n_leaves, n_iter, n_spr;
+
+  if (!PyArg_ParseTuple (args, "iii", &n_leaves, &n_iter, &n_spr)) return NULL;
+  output_trees = genefam_module_generate_spr_trees (n_leaves, n_iter, n_spr);
+  if (!output_trees) {
+    PyErr_SetString (TreesignalcError, "could not create a chain of SPR trees");
+    return NULL;
+  }
+  result = PyUnicode_FromString (output_trees);
+  free (output_trees);
+  return result;
+}
+
+static PyMethodDef TreesignalcMethods[] = {
+  {"from_tree_spaces", treesignalc_from_tree_spaces, METH_VARARGS,
+   "Calculate distances using reusable native TreeSpace objects."},
+  {"from_tree_spaces_rescale", treesignalc_from_tree_spaces_rescale, METH_VARARGS,
+   "Calculate theoretically rescaled distances using reusable native TreeSpace objects."},
+  {"from_tree_spaces_pvalue", treesignalc_from_tree_spaces_pvalue, METH_VARARGS,
+   "Calculate p-values and empirically rescaled distances using reusable native TreeSpace objects."},
+  {"fromtrees", treesignalc_fromtrees_string, METH_VARARGS,
+   "Legacy string-based API: parse Newick strings and calculate distances."},
+  {"fromtrees_rescale", treesignalc_fromtrees_rescale_string, METH_VARARGS,
+   "Legacy string-based API: parse Newick strings and calculate rescaled distances."},
+  {"fromtrees_pvalue", treesignalc_fromtrees_pvalue_string, METH_VARARGS,
+   "Legacy string-based API: parse Newick strings and calculate p-values."},
+  {"randomise_trees_with_spr", treesignalc_randomise_trees_with_spr_string, METH_VARARGS,
+   "Legacy string-based API: return Newick strings for SPR neighbours."},
+  {"generate_spr_trees", treesignalc_generate_spr_trees_string, METH_VARARGS,
+   "Legacy string-based API: return a Newick string containing an SPR tree chain."},
+  {NULL, NULL, 0, NULL}
+};
+
+PyDoc_STRVAR (
+    treesignalc_doc,
+    "Native tree structures and low-level distance functions for treesignal.\n\n"
+    "Prefer TreeSpace and from_tree_spaces* for new code. The fromtrees* names "
+    "are retained as legacy string-based compatibility functions.");
+
+static struct PyModuleDef treesignalcmodule = {
+  PyModuleDef_HEAD_INIT,
+  "_treesignalc",
+  treesignalc_doc,
+  -1,
+  TreesignalcMethods
+};
 
 PyMODINIT_FUNC
-PyInit__treesignalc(void) /* it has to be named PyInit_<module name in python> */
+PyInit__treesignalc (void)
 {
-  PyObject *m;
-  static PyMethodDef TreesignalcMethods[] = {
-     {"fromtrees", (PyCFunction) treesignalc_fromtrees, METH_VARARGS, 
-      "given a set of sptrees and a gene tree, calculates a set of distances."},
-     {"fromtrees_rescale", (PyCFunction) treesignalc_fromtrees_rescale, METH_VARARGS, 
-      "given a set of sptrees and a gene tree, calculates a set of distances and normalise them through division by theoretical upper bounds."},
-     {"fromtrees_pvalue", (PyCFunction) treesignalc_fromtrees_pvalue, METH_VARARGS, 
-      "given sptrees and a genetree, returns concatenated vectors of p-values (% trees more similar) and distances rescaled to 0-1 using empirical bounds."},
-     {"randomise_trees_with_spr", (PyCFunction) treesignalc_randomise_trees_with_spr, METH_VARARGS, 
-      "expands set of give trees by generating SPR neighbours."},
-     {"generate_spr_trees", (PyCFunction) treesignalc_generate_spr_trees, METH_VARARGS, 
-      "creates a chain of trees with given SPR step."},
-     {NULL, NULL, 0, NULL}        /* Sentinel */
-  };
-  PyDoc_STRVAR(treesignalc__doc__,"lowlevel functions in C for treesignal module");
+  PyObject *module;
 
-  static struct PyModuleDef treesignalcmodule = { PyModuleDef_HEAD_INIT, "_treesignalc", treesignalc__doc__, -1, TreesignalcMethods};
+  if (PyType_Ready (&TreeSpaceType) < 0) return NULL;
+  module = PyModule_Create (&treesignalcmodule);
+  if (!module) return NULL;
 
-  m = PyModule_Create(&treesignalcmodule);
-  if (m == NULL) return NULL;
+  TreesignalcError = PyErr_NewException ("treesignal._treesignalc.error", NULL, NULL);
+  if (!TreesignalcError || PyModule_AddObject (module, "error", TreesignalcError) < 0) {
+    Py_XDECREF (TreesignalcError);
+    Py_DECREF (module);
+    return NULL;
+  }
 
-  TreesignalcError = PyErr_NewException("treesignal._treesignalc.error", NULL, NULL);
-  Py_INCREF(TreesignalcError);
-  PyModule_AddObject(m, "error", TreesignalcError);
-  return m;
+  Py_INCREF (&TreeSpaceType);
+  if (PyModule_AddObject (module, "TreeSpace", (PyObject*) &TreeSpaceType) < 0) {
+    Py_DECREF (&TreeSpaceType);
+    Py_DECREF (module);
+    return NULL;
+  }
+  return module;
 }

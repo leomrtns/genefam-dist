@@ -38,6 +38,19 @@
 #include "empirical_frequency.h" // called by topology_mrca.h, nexus_common.h  and alignment.h 
 #endif // of THESE_ARE_COMMENTS
 
+/*! \brief Parse one or more Newick trees into an owning native tree-space object. */
+topology_space genefam_module_parse_newick_trees (const char *treelist_string, bool use_root_location);
+
+/*! \brief Calculate unnormalized distances from already-parsed native tree spaces. */
+int genefam_module_treesignal_from_topology_spaces (topology_space genetree, topology_space sptree, double **output_distances);
+/*! \brief Calculate theoretically rescaled distances from already-parsed native tree spaces. */
+int genefam_module_treesignal_from_topology_spaces_rescale (topology_space genetree, topology_space sptree, double **output_distances);
+/*! \brief Calculate p-values from already-parsed native tree spaces without changing their topologies. */
+int genefam_module_treesignal_from_topology_spaces_pvalue (topology_space genetree, topology_space sptree, int n_reps, double **output_distances);
+
+/* Legacy string-based API. These compatibility functions parse Newick input on
+ * every call and then delegate to the native topology-space API above. New code
+ * should retain topology_space objects and use the functions above instead. */
 /*! \brief given a gene tree and a group of species trees, both in newick format, return the spectrum of unnormalized distances */
 int genefam_module_treesignal_fromtrees (const char *gtree_str, const char *splist_str, double **output_distances);
 /*! \brief given a gene tree and a group of species trees, both in newick format, return the spectrum of rescaled distances */

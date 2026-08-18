@@ -13,10 +13,6 @@ license-files = ["LICENSE", "COPYING"]
 authors = [
   { name = "Leonardo de Oliveira Martins", email = "leomrtns@gmail.com" },
 ]
-dependencies = [
-  "DendroPy>=4.6",
-  "numpy>=1.23",
-]
 classifiers = [
   "Development Status :: 4 - Beta",
   "Intended Audience :: Science/Research",
@@ -31,7 +27,15 @@ Homepage = "https://github.com/leomrtns/genefam-dist"
 Repository = "https://github.com/leomrtns/genefam-dist"
 
 [project.optional-dependencies]
-test = ["pytest>=7"]
+legacy = [
+  "DendroPy>=4.6",
+  "numpy>=1.23",
+]
+test = [
+  "pytest>=7",
+  "DendroPy>=4.6",
+  "numpy>=1.23",
+]
 
 [tool.setuptools]
 package-dir = { "" = "python" }

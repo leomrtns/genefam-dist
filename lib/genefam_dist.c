@@ -14,14 +14,86 @@
 #include "genefam_dist.h"
 #define NDISTS 6
 
-/*! \brief create a new topology_space from string with list of trees in newick format */
-topology_space topology_space_from_newick_string (const char *treelist_string, bool use_root_location);
 /*! \brief calculate distances between gene tree and collection of sptrees, and storing into newly allocated distances[] */ 
 bool generate_output_distances (topology_space gtree, topology_space stree, double **distances, int *n, bool rescale);
 /*! \brief calculate distances between gene tree and random sptrees, accumulating into previously allocated pvalues[] */ 
 int update_randomized_distances (topology gtree, topology stree, int n_obs, double *obs_dist, int *pvalues, int n_reps, double *maxdist);
 /*! \brief defines upper bound for all distances based on theory, not empirical as p-value above */
 bool calculate_max_distances (topology gt, double *maxd, splitset split);
+/*! \brief copy a topology for calculations which mutate reconciliation or tree state */
+static topology copy_topology_for_calculation (topology source);
+/*! \brief wrap a copied topology in a minimal owning topology space */
+static topology_space new_calculation_tree_space (topology source);
+
+topology_space
+genefam_module_parse_newick_trees (const char *treelist_string, bool use_root_location)
+{
+  size_t str_size;
+  char *str_start, *str_end;
+  topology_space ts = NULL;
+
+  str_start = strchr (treelist_string, '(');
+  if (!str_start) biomcmc_error ("Couldn't read first tree (single or from list) in newick format");
+  while (str_start) {
+    str_end = strchr (str_start, ';');
+    if (str_end == NULL) str_size = strlen (str_start);
+    else str_size = str_end - str_start;
+    add_string_with_size_to_topology_space (&ts, str_start, str_size, use_root_location);
+    if (str_end) str_start = strchr (str_end, '(');
+    else str_start = NULL;
+  }
+  return ts;
+}
+
+static topology
+copy_topology_for_calculation (topology source)
+{
+  topology copy = new_topology (source->nleaves);
+  copy_topology_from_topology (copy, source);
+  if (source->taxlabel) {
+    copy->taxlabel = source->taxlabel;
+    copy->taxlabel->ref_counter++;
+  }
+  return copy;
+}
+
+static topology_space
+new_calculation_tree_space (topology source)
+{
+  topology_space working = new_topology_space ();
+  working->ndistinct = working->ntrees = 1;
+  working->distinct = (topology*) biomcmc_malloc (sizeof (topology));
+  working->tree = (topology*) biomcmc_malloc (sizeof (topology));
+  working->distinct[0] = copy_topology_for_calculation (source);
+  working->tree[0] = working->distinct[0];
+  return working;
+}
+
+int
+genefam_module_treesignal_from_topology_spaces (topology_space genetree, topology_space sptree, double **output_distances)
+{
+  int n_output = 0;
+  topology_space working_gene;
+
+  if ((!genetree) || (!sptree) || (genetree->ndistinct < 1) || (sptree->ndistinct < 1)) return 0;
+  working_gene = new_calculation_tree_space (genetree->distinct[0]);
+  generate_output_distances (working_gene, sptree, output_distances, &n_output, false);
+  del_topology_space (working_gene);
+  return n_output;
+}
+
+int
+genefam_module_treesignal_from_topology_spaces_rescale (topology_space genetree, topology_space sptree, double **output_distances)
+{
+  int n_output = 0;
+  topology_space working_gene;
+
+  if ((!genetree) || (!sptree) || (genetree->ndistinct < 1) || (sptree->ndistinct < 1)) return 0;
+  working_gene = new_calculation_tree_space (genetree->distinct[0]);
+  generate_output_distances (working_gene, sptree, output_distances, &n_output, true);
+  del_topology_space (working_gene);
+  return n_output;
+}
 
 int
 genefam_module_treesignal_fromtrees (const char *gtree_str, const char *splist_str, double **output_distances)
@@ -29,8 +101,8 @@ genefam_module_treesignal_fromtrees (const char *gtree_str, const char *splist_s
   int n_output = 0;
   topology_space genetree = NULL, sptree = NULL;
 
-  genetree = topology_space_from_newick_string (gtree_str, false); /* bool -> use_root_location */
-  sptree = topology_space_from_newick_string (splist_str, true);
+  genetree = genefam_module_parse_newick_trees (gtree_str, false);
+  sptree = genefam_module_parse_newick_trees (splist_str, true);
   // TODO: reduce sptrees to genetree species here (and notice that afterwards some sptrees may be same)
   /* 
   int i;
@@ -39,7 +111,7 @@ genefam_module_treesignal_fromtrees (const char *gtree_str, const char *splist_s
     s = topology_to_string_by_id (sptree->distinct[i], NULL);    printf ("DEBUG2 s[%d]: %s\n", i, s); free(s); 
   } */
 
-  generate_output_distances (genetree, sptree, output_distances, &n_output, false);
+  n_output = genefam_module_treesignal_from_topology_spaces (genetree, sptree, output_distances);
   del_topology_space (genetree);
   del_topology_space (sptree);
   return n_output;
@@ -52,32 +124,36 @@ genefam_module_treesignal_fromtrees_rescale (const char *gtree_str, const char *
   topology_space genetree = NULL, sptree = NULL;
 
 
-  sptree = topology_space_from_newick_string (splist_str, true);
-  genetree = topology_space_from_newick_string (gtree_str, false);
+  sptree = genefam_module_parse_newick_trees (splist_str, true);
+  genetree = genefam_module_parse_newick_trees (gtree_str, false);
 
-  generate_output_distances (genetree, sptree, output_distances, &n_output, true);
+  n_output = genefam_module_treesignal_from_topology_spaces_rescale (genetree, sptree, output_distances);
   del_topology_space (genetree);
   del_topology_space (sptree);
   return n_output;
 }
 
 int
-genefam_module_treesignal_fromtrees_pvalue (const char *gtree_str, const char *splist_str, int n_reps, double **output_distances)
+genefam_module_treesignal_from_topology_spaces_pvalue (topology_space genetree, topology_space sptree, int n_reps, double **output_distances)
 {
   int n_output = 0, i, j, k, *pvalues, n_samples = 0;
-  double *obs_distances;
+  double *obs_distances = NULL;
   double dist_bounds[2 * NDISTS]; // min and max values (first and last values, respect.)
   bool valid_trees = true;
-  topology_space genetree = NULL, sptree = NULL;
+  topology_space working_gene;
+  topology working_species;
 
-  genetree = topology_space_from_newick_string (gtree_str, false);
-  sptree = topology_space_from_newick_string (splist_str, true);
+  if ((!genetree) || (!sptree) || (genetree->ndistinct < 1) || (sptree->ndistinct < 1)) return 0;
+  working_gene = new_calculation_tree_space (genetree->distinct[0]);
+  working_species = copy_topology_for_calculation (sptree->distinct[0]);
 
-  valid_trees = generate_output_distances (genetree, sptree, &obs_distances, &n_output, false);
+  valid_trees = generate_output_distances (working_gene, sptree, &obs_distances, &n_output, false);
   *output_distances = (double*) biomcmc_malloc (sizeof (double) * 2 * n_output); /* pointer used (and freed) by calling function */
   if (! valid_trees) { // exit now, returning bogus vector 
     for (i=0; i < 2 * n_output; i++) (*output_distances)[i] = -1.;
     if (obs_distances) free (obs_distances);
+    del_topology (working_species);
+    del_topology_space (working_gene);
     return 2 * n_output;
   }
 
@@ -95,7 +171,7 @@ genefam_module_treesignal_fromtrees_pvalue (const char *gtree_str, const char *s
   }
 
   n_samples = sptree->ndistinct - 1; /* number of comparisons per tree, for calculating p-value */
-  n_samples += update_randomized_distances (genetree->distinct[0], sptree->distinct[0], sptree->ndistinct, obs_distances, pvalues, n_reps, dist_bounds);
+  n_samples += update_randomized_distances (working_gene->distinct[0], working_species, sptree->ndistinct, obs_distances, pvalues, n_reps, dist_bounds);
   for (i=0; i < n_output; i++) (*output_distances)[i] = ((double)pvalues[i])/(double)(n_samples); /* first trees X NDISTS are p-values */
 
   /* second half of output vector has tree-distance pairs, scaled to min and max observed values */
@@ -104,12 +180,25 @@ genefam_module_treesignal_fromtrees_pvalue (const char *gtree_str, const char *s
   for (i=0; i < sptree->ndistinct; i++) for (k=0; k < NDISTS; k++) // y = (x-min)/(max-min)
     (*output_distances)[n_output + NDISTS * i + k] = (obs_distances[NDISTS * i + k] - dist_bounds[k])/(dist_bounds[NDISTS+k] - dist_bounds[k]);
 
-  del_topology_space (genetree);
-  del_topology_space (sptree);
+  del_topology (working_species);
+  del_topology_space (working_gene);
   if (pvalues) free (pvalues);
   if (obs_distances) free (obs_distances);
   biomcmc_random_number_finalize(); /* free the global variable */
   return 2 * n_output;
+}
+
+int
+genefam_module_treesignal_fromtrees_pvalue (const char *gtree_str, const char *splist_str, int n_reps, double **output_distances)
+{
+  int n_output;
+  topology_space genetree = genefam_module_parse_newick_trees (gtree_str, false);
+  topology_space sptree = genefam_module_parse_newick_trees (splist_str, true);
+
+  n_output = genefam_module_treesignal_from_topology_spaces_pvalue (genetree, sptree, n_reps, output_distances);
+  del_topology_space (genetree);
+  del_topology_space (sptree);
+  return n_output;
 }
 
 bool
@@ -212,7 +301,7 @@ genefam_module_randomise_trees_with_spr (const char *splist_str, int n_copies, i
   char *s, *output_tree_string;
 
   biomcmc_random_number_init(0ULL);
-  strees = topology_space_from_newick_string (splist_str, true);
+  strees = genefam_module_parse_newick_trees (splist_str, true);
   n_strees = strees->ndistinct;
 
   for (i=0; i < n_strees; i++) for (j = 0; j < n_copies; j++) {
@@ -289,24 +378,4 @@ genefam_module_generate_spr_trees (int n_leaves, int n_iter, int n_spr)
   del_splitset (split);
 
   return output_tree_string;
-}
-
-topology_space
-topology_space_from_newick_string (const char *treelist_string, bool use_root_location)
-{
-  size_t str_size;
-  char *str_start, *str_end;
-  topology_space ts = NULL;
-
-  str_start = strchr (treelist_string, '(');
-  if (!str_start) biomcmc_error ("Couldn't read first tree (single or from list) in newick format");
-  while (str_start) {
-    str_end = strchr (str_start, ';');
-    if (str_end == NULL) str_size = strlen (str_start); /* function strchrnul() does this, but may not be portable? */
-    else str_size = str_end - str_start; 
-    add_string_with_size_to_topology_space (&ts, str_start, str_size, use_root_location);
-    if (str_end) str_start = strchr (str_end, '('); 
-    else str_start = NULL;
-  }
-  return ts;
 }

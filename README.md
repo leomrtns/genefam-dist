@@ -20,10 +20,33 @@ The Python package uses the native [CPython C API](https://docs.python.org/3/c-a
 runtime linker configuration is needed. 
 A C compiler and Python development headers are required. 
 
-Install from the repository root:
+Install the dependency-free native API from the repository root:
 
 ```console
 python -m pip install .
+```
+
+The reusable native API does not require DendroPy or NumPy:
+
+```python
+from treesignal import TreeSpace, from_tree_spaces
+
+gene = TreeSpace("(((A,B),(C,D)),((E,F),(G,H)));")
+species = TreeSpace(
+    "(((A,B),(C,D)),((E,F),(G,H)));"
+    "(((A,C),(B,D)),((E,G),(F,H)));",
+    rooted=True,
+)
+distances = from_tree_spaces(gene, species)
+```
+
+`TreeSpace` owns the parsed C `topology_space` and can be reused across calls.
+The original string-based functions remain available in `treesignal._treesignalc`
+for compatibility, but parse their Newick arguments on every call. Install the
+DendroPy/NumPy-based `TreeSignal` API with:
+
+```console
+python -m pip install '.[legacy]'
 ```
 
 For development, use an editable installation and run the tests:
