@@ -8,17 +8,17 @@ The software is composed of a low-level C library to handle mul-trees, a Python 
 The Python module is called `treesignal` and is the standard way of creating tree signatures. It uses
 [DendroPy](https://www.dendropy.org/) for tree manipulation and NumPy for its result arrays. The standalone programs are described below.
 
-The library is written in C, with functions to calculate distances between mul-trees (gene families) and species trees. It is a branched version of the 
-internal biomcmc library which is part of the [guenomu software](https://bitbucket.org/leomrtns/guenomu/) for
-phylogenomic species tree inference. 
+The library is written in C, with functions to calculate distances between mul-trees (gene families) and species trees. 
+It uses a modified internal biomcmc library, part of the [guenomu software](https://bitbucket.org/leomrtns/guenomu/). 
 
 ## Installation
 
 ### Python package
 
-The Python package uses the native [CPython C API](https://docs.python.org/3/c-api/) directly; it does not use Cython. Its build compiles the
-`genefam_dist` C sources into `treesignal._treesignalc`, so no separate library installation, hard-coded paths, or runtime linker configuration is
-needed. A C compiler and Python development headers are required.
+The Python package uses the native [CPython C API](https://docs.python.org/3/c-api/) directly. Its build compiles the
+`genefam_dist` C sources into `treesignal._treesignalc`, so no separate library installation, hard-coded paths, or 
+runtime linker configuration is needed. 
+A C compiler and Python development headers are required. 
 
 Install from the repository root:
 
@@ -46,7 +46,7 @@ there and the corresponding C implementation can be added under `lib/`.
 
 ### C library and standalone programs
 
-The standalone programs continue to use the Autotools build system. A clean out-of-tree build can be installed with:
+The standalone programs use the Autotools build system. A clean out-of-tree build can be installed with:
 
 ```console
 mkdir build
