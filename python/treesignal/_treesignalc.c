@@ -1,5 +1,7 @@
-#include <Python.h>  // timestamp 2017.03.06 
-#include <genefam/genefam_dist.h>
+#include <Python.h>
+#include <stdlib.h>
+
+#include "genefam_dist.h"
 
 static PyObject *TreesignalcError;
 
@@ -8,13 +10,11 @@ static PyObject *
 treesignalc_fromtrees (PyObject *self, PyObject *args)
 {
   const char *gtree_str, *splist_str;
-  PyObject *arg1, *arg2, *res_tuple;
+  PyObject *res_tuple;
   double *res_doublevector=NULL; /* output with distances, allocated by library function and freed here */
   int i, n_res = -1;
 
-  if (!PyArg_ParseTuple(args,  "UU", &arg1, &arg2))  return NULL; 
-  gtree_str  = PyBytes_AsString(PyUnicode_AsUTF8String(arg1));
-  splist_str = PyBytes_AsString(PyUnicode_AsUTF8String(arg2));
+  if (!PyArg_ParseTuple(args, "ss", &gtree_str, &splist_str)) return NULL;
 
   // printf ("I got [%s] and [%s] \n", gtree_str, splist_str); // DEBUG
   n_res = genefam_module_treesignal_fromtrees (gtree_str, splist_str, &res_doublevector);
@@ -31,13 +31,11 @@ static PyObject *
 treesignalc_fromtrees_rescale (PyObject *self, PyObject *args)
 {
   const char *gtree_str, *splist_str;
-  PyObject *arg1, *arg2, *res_tuple;
+  PyObject *res_tuple;
   double *res_doublevector=NULL; /* output with distances, allocated by library function and freed here */
   int i, n_res = -1;
 
-  if (!PyArg_ParseTuple(args,  "UU", &arg1, &arg2))  return NULL; 
-  gtree_str  = PyBytes_AsString(PyUnicode_AsUTF8String(arg1));
-  splist_str = PyBytes_AsString(PyUnicode_AsUTF8String(arg2));
+  if (!PyArg_ParseTuple(args, "ss", &gtree_str, &splist_str)) return NULL;
   // printf ("I got [%s] and [%s] \n", gtree_str, splist_str); // DEBUG
   n_res = genefam_module_treesignal_fromtrees_rescale (gtree_str, splist_str, &res_doublevector);
   if (n_res < 1) { PyErr_SetString(TreesignalcError, "gene and species trees can't be compared"); return NULL; }
@@ -53,13 +51,11 @@ static PyObject *
 treesignalc_fromtrees_pvalue (PyObject *self, PyObject *args)
 {
   const char *gtree_str, *splist_str;
-  PyObject *arg1, *arg2, *res_tuple;
+  PyObject *res_tuple;
   double *res_doublevector=NULL; /* output with distances, allocated by library function and freed here */
   int i, n_replicates = 1000, n_res = -1;
 
-  if (!PyArg_ParseTuple(args,  "UU|i", &arg1, &arg2, &n_replicates))  return NULL; 
-  gtree_str  = PyBytes_AsString(PyUnicode_AsUTF8String(arg1));
-  splist_str = PyBytes_AsString(PyUnicode_AsUTF8String(arg2));
+  if (!PyArg_ParseTuple(args, "ss|i", &gtree_str, &splist_str, &n_replicates)) return NULL;
   if (n_replicates < 10) n_replicates = 10;
   //printf ("I got [%s] and [%s] \n n = %d\n", gtree_str, splist_str, n_replicates); // DEBUG
   n_res = genefam_module_treesignal_fromtrees_pvalue (gtree_str, splist_str, n_replicates, &res_doublevector);
@@ -77,11 +73,10 @@ treesignalc_randomise_trees_with_spr (PyObject *self, PyObject *args)
 {
   char *output_trees = NULL;
   const char *splist_str;
-  PyObject *arg1, *res_string;
+  PyObject *res_string;
   int n_copies = 2, n_spr = 1;  
 
-  if (!PyArg_ParseTuple(args,  "U|ii", &arg1, &n_copies, &n_spr))  return NULL; 
-  splist_str = PyBytes_AsString(PyUnicode_AsUTF8String(arg1));
+  if (!PyArg_ParseTuple(args, "s|ii", &splist_str, &n_copies, &n_spr)) return NULL;
   output_trees = genefam_module_randomise_trees_with_spr (splist_str, n_copies, n_spr);
   if (!output_trees) { PyErr_SetString(TreesignalcError, "Could not expand trees with SPR neighbours"); return NULL; }
   
@@ -125,27 +120,13 @@ PyInit__treesignalc(void) /* it has to be named PyInit_<module name in python> *
   };
   PyDoc_STRVAR(treesignalc__doc__,"lowlevel functions in C for treesignal module");
 
-  static struct PyModuleDef treesignalcmodule = { PyModuleDef_HEAD_INIT, "treesignalc", treesignalc__doc__, -1, TreesignalcMethods};
+  static struct PyModuleDef treesignalcmodule = { PyModuleDef_HEAD_INIT, "_treesignalc", treesignalc__doc__, -1, TreesignalcMethods};
 
   m = PyModule_Create(&treesignalcmodule);
   if (m == NULL) return NULL;
 
-  TreesignalcError = PyErr_NewException("__treesignalc.error", NULL, NULL);
+  TreesignalcError = PyErr_NewException("treesignal._treesignalc.error", NULL, NULL);
   Py_INCREF(TreesignalcError);
   PyModule_AddObject(m, "error", TreesignalcError);
   return m;
 }
-
-int
-main (int argc, char *argv[])
-{
-  wchar_t *program = Py_DecodeLocale(argv[0], NULL);
-  if (program == NULL) { fprintf(stderr, "Fatal error: cannot decode argv[0]\n"); exit(1); }
-  
-  PyImport_AppendInittab("_treesignalc", PyInit__treesignalc); /* Add a built-in module, before Py_Initialize */
-  Py_SetProgramName(program); /* Pass argv[0] to the Python interpreter */
-  Py_Initialize(); /* Initialize the Python interpreter.  Required. */
- 
-  PyMem_RawFree(program);
-  return 0;
-} 

@@ -1,4 +1,7 @@
-import _treesignalc, dendropy, numpy
+from . import _treesignalc
+
+import dendropy
+import numpy
 
 class TreeSignal(object):
     """

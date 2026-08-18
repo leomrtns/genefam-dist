@@ -1,0 +1,14 @@
+name: treesignal
+channels:
+  - conda-forge
+dependencies:
+  - python>=3.9
+  - c-compiler
+  - pip
+  - setuptools>=77
+  - wheel
+  - numpy>=1.23
+  - dendropy>=4.6
+  - pytest
+  - pip:
+      - -e .

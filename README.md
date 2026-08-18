@@ -4,46 +4,59 @@ The main goal of *genefam_dist* is to describe the "tree signal" of a gene famil
 supported this gene family is by a set of reference species trees. You can download [here (PDF)](docs/Evolution2018_LeoMartinsPoster.pdf) 
 a low-resolution version of the poster presented at [Evolution 2018](https://www.evolutionmontpellier2018.org/).
 
-The software is composed of a (low-level) library to handle mul-trees, and both a python module and standalone programs using this library.
-The python module is called `treesignal` and is the standard way of creating the tree signatures. It uses
-[dendropy](https://www.dendropy.org/) for tree manipulation and [scikit-learn](http://scikit-learn.org) for storing the signature data into
-a tidy data set. The standalone programs are described below.
+The software is composed of a low-level C library to handle mul-trees, a Python module, and standalone programs using the library.
+The Python module is called `treesignal` and is the standard way of creating tree signatures. It uses
+[DendroPy](https://www.dendropy.org/) for tree manipulation and NumPy for its result arrays. The standalone programs are described below.
 
 The library is written in C, with functions to calculate distances between mul-trees (gene families) and species trees. It is a branched version of the 
 internal biomcmc library which is part of the [guenomu software](https://bitbucket.org/leomrtns/guenomu/) for
 phylogenomic species tree inference. 
 
 ## Installation
-The software should be installed in two stages: first the `genefam_dist` library is compiled and installed (only once, maybe globally). Then the python
-module can be installed (one per python version, for instance). I provide below one example of installation (change as appropriate). 
 
-The C library (and the standalone programs) use the autotools build system. Assuming you downloaded the zip file for the master version:
+### Python package
 
-```
-/home/simpson/$ unzip genefam-dist-master.zip 
-/home/simpson/$ mkdir build
-/home/simpson/$ cd build
-/home/simpson/$ ../genefam_dist-master/configure --prefix /usr/local
-/home/simpson/$ make; sudo make install
-```
+The Python package uses the native [CPython C API](https://docs.python.org/3/c-api/) directly; it does not use Cython. Its build compiles the
+`genefam_dist` C sources into `treesignal._treesignalc`, so no separate library installation, hard-coded paths, or runtime linker configuration is
+needed. A C compiler and Python development headers are required.
 
-As seen above, it is usually good idea to compile the code on a dedicated clean directory (`build`, in the example). 
-The example above will install the `libgenefamdist` family globally, in `/usr/local`. If you don't have administrative priviledges you can
-chose a local directory (and drop the "sudo" command).
+Install from the repository root:
 
-The python module can be installed with
-```
-/home/simpson/$ cd ../genefam_dist-master/python
-/home/simpson/genefam_dist-master/python$ vi setup.py   ### here you have to add the prefix by hand into the parameters
-/home/simpson/genefam_dist-master/python$ python3 setup.py build;
-/home/simpson/genefam_dist-master/python$ python3 setup.py install --user
+```console
+python -m pip install .
 ```
 
-The parameters that need to be changed are `include_dirs`, `library_dirs`, and `runtime_library_dirs`, and they need to point to the
-*include* and *lib* sudirectories of the library installation (e.g. `include_dirs = /usr/local/include`).
-Yes, this is less than ideal, I will fix that (probably by making autotools generate this file...)
+For development, use an editable installation and run the tests:
 
-After that, you can use the module in your python code by calling `import treesignal` --- see notebook (*ipynb*) examples in the [docs directory](docs).
+```console
+python -m pip install --editable '.[test]'
+python -m pytest
+```
+
+To use conda, the included environment file creates an isolated environment and installs the extension in editable mode:
+
+```console
+conda env create --file environment.yml
+conda activate treesignal
+python -m pytest
+```
+
+You can then use the package with `import treesignal`. The extension source is in `python/treesignal/_treesignalc.c`; new low-level wrappers can be added
+there and the corresponding C implementation can be added under `lib/`.
+
+### C library and standalone programs
+
+The standalone programs continue to use the Autotools build system. A clean out-of-tree build can be installed with:
+
+```console
+mkdir build
+cd build
+../configure --prefix="$HOME/.local"
+make
+make install
+```
+
+This standalone installation is independent of the Python package. See the notebooks in the [docs directory](docs) for examples.
 
 
 ## Programs
@@ -97,4 +110,3 @@ Copyright (C) 2016-today  [Leonardo de Oliveira Martins](https://github.com/leom
 genefam-dist is free software; you can redistribute it and/or modify it under the terms of the GNU General Public
 License as published by the Free Software Foundation; either version 2 of the License, or (at your option) any later
 version (http://www.gnu.org/copyleft/gpl.html).
-

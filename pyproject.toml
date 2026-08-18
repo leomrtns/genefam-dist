@@ -1,0 +1,46 @@
+[build-system]
+requires = ["setuptools>=77", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "treesignal"
+version = "1.0.0"
+description = "Calculate phylogenetic signals for gene-family trees"
+readme = "README.md"
+requires-python = ">=3.9"
+license = "GPL-3.0-or-later"
+license-files = ["LICENSE", "COPYING"]
+authors = [
+  { name = "Leonardo de Oliveira Martins", email = "leomrtns@gmail.com" },
+]
+dependencies = [
+  "DendroPy>=4.6",
+  "numpy>=1.23",
+]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Intended Audience :: Science/Research",
+  "Programming Language :: C",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3 :: Only",
+  "Topic :: Scientific/Engineering :: Bio-Informatics",
+]
+
+[project.urls]
+Homepage = "https://github.com/leomrtns/genefam-dist"
+Repository = "https://github.com/leomrtns/genefam-dist"
+
+[project.optional-dependencies]
+test = ["pytest>=7"]
+
+[tool.setuptools]
+package-dir = { "" = "python" }
+include-package-data = false
+
+[tool.setuptools.packages.find]
+where = ["python"]
+include = ["treesignal*"]
+namespaces = false
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

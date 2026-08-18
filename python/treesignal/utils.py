@@ -1,4 +1,7 @@
-import _treesignalc, dendropy, numpy
+from . import _treesignalc
+
+import dendropy
+import numpy
 
 def lowlevel_create_random_tree_string (ntax = 16):
     t1 = dendropy.simulate.treesim.birth_death_tree(birth_rate=1.0, death_rate=0.5, ntax=ntax)
@@ -26,7 +29,7 @@ def lowlevel_calculate_spectrum_from_tree_strings(gene_tree_str, species_tree_st
 def lowlevel_calculate_spectrum_from_tree_strings_rescale(gene_tree_str, species_tree_str):
     """ Direct call to C function that calculates scaled distances from gene tree (newick string) to set of species
     trees (newick trees) """
-    return numpy.array(_treesignalc.fromtrees_pvalue(gene_tree_str, species_tree_str, ntrees))
+    return numpy.array(_treesignalc.fromtrees_rescale(gene_tree_str, species_tree_str))
 
 def lowlevel_calculate_spectrum_from_tree_strings_pvalue(gene_tree_str, species_tree_str, ntrees=100):
     """ Direct call to C function that calculates p-valued distances from gene tree (newick string) to set of species

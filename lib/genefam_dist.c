@@ -209,7 +209,7 @@ genefam_module_randomise_trees_with_spr (const char *splist_str, int n_copies, i
   topology randtree;
   int n_strees, i, j, k;
   size_t  new_str_size;
-  char *s, *output_tree_string, *tmp_string;
+  char *s, *output_tree_string;
 
   biomcmc_random_number_init(0ULL);
   strees = topology_space_from_newick_string (splist_str, true);
@@ -226,22 +226,20 @@ genefam_module_randomise_trees_with_spr (const char *splist_str, int n_copies, i
   }
 
   s = topology_to_string_by_name (strees->distinct[0], NULL); /* second parameter is vector with branch lengths */
-  new_str_size = strlen (s);
-  output_tree_string = (char*) biomcmc_malloc (sizeof(char) * strlen(s));
-  sprintf (output_tree_string, "%s;", s); free (s); /* s[] is recycled (malloc'ed again when new topol string is created) */
+  new_str_size = strlen (s) + 2; /* semicolon and terminating NUL */
+  output_tree_string = (char*) biomcmc_malloc (new_str_size);
+  snprintf (output_tree_string, new_str_size, "%s;", s);
+  free (s);
   for (i=1; i < strees->ndistinct; i++) {
-    new_str_size = strrchr (output_tree_string, ';') - output_tree_string + 1; // size of output_tree_string[] with extra '\0'
-    tmp_string = (char*) biomcmc_malloc (sizeof(char) * new_str_size + 1);
-    strncpy (tmp_string, output_tree_string, new_str_size); /* adds '\0' only if output_tree_string is smaller!! */
-    tmp_string[new_str_size] = '\0'; /* one after the semicolon */
-    s = topology_to_string_by_name (strees->distinct[i], NULL); /* second parameter is vector with branch lengths */
-    new_str_size += strlen (s) + 3;
-    output_tree_string = (char*) biomcmc_realloc ((char*) output_tree_string, sizeof(char) * new_str_size);
-    sprintf (output_tree_string, "%s %s;", tmp_string, s);  if (s) free (s); if (tmp_string) free (tmp_string); 
+    size_t current_size = strlen (output_tree_string);
+    s = topology_to_string_by_name (strees->distinct[i], NULL);
+    new_str_size = current_size + strlen (s) + 3; /* space, semicolon, NUL */
+    output_tree_string = (char*) biomcmc_realloc (output_tree_string, new_str_size);
+    snprintf (output_tree_string + current_size, new_str_size - current_size, " %s;", s);
+    free (s);
   }
 
   biomcmc_random_number_finalize(); /* free the global variable */
-  del_topology (randtree);
   del_topology_space (strees);
 
   return output_tree_string;
@@ -251,7 +249,7 @@ char*
 genefam_module_generate_spr_trees (int n_leaves, int n_iter, int n_spr)
 {
   topology origtree, randtree; /* these trees don't have taxa labels */
-  char *s, *output_tree_string, *tmp_string;
+  char *s, *output_tree_string;
   int i, j;
   size_t  new_str_size;
   splitset split;
@@ -266,26 +264,23 @@ genefam_module_generate_spr_trees (int n_leaves, int n_iter, int n_spr)
 
   randomize_topology (randtree);
   s = topology_to_string_create_name (randtree, NULL); /* second parameter is vector with branch lengths */
-  new_str_size = strlen (s);
-  output_tree_string = (char*) biomcmc_malloc (sizeof(char) * new_str_size);
-  sprintf (output_tree_string, "%s;", s); free (s); /* s[] is recycled (malloc'ed again when new topol string is created) */
+  new_str_size = strlen (s) + 2; /* semicolon and terminating NUL */
+  output_tree_string = (char*) biomcmc_malloc (new_str_size);
+  snprintf (output_tree_string, new_str_size, "%s;", s);
+  free (s);
 
   for (i=0; i < n_iter; i++) {
     copy_topology_from_topology (origtree, randtree);
     do {
       for (j = 0; j < n_spr; j++) topology_apply_spr_unrooted (randtree, false);
     } while (topology_is_equal_unrooted (origtree, randtree, split, false));
-    /* temporary string with copy of current trees */
-    new_str_size = strrchr (output_tree_string, ';') - output_tree_string + 1;
-    tmp_string = (char*) biomcmc_malloc (sizeof(char) * new_str_size + 1);
-    strncpy (tmp_string, output_tree_string, new_str_size); /* adds '\0' only if output_tree_string is smaller!! */
-    tmp_string[new_str_size] = '\0'; /* one after the semicolon */
     /* add random tree to list (string) */
-    s = topology_to_string_create_name (randtree, NULL); /* second parameter is vector with branch lengths */
-    new_str_size += strlen (s) + 3;
-    output_tree_string = (char*) biomcmc_realloc ((char*) output_tree_string, sizeof(char) * new_str_size);
-    sprintf (output_tree_string, "%s %s;", tmp_string, s);  if (s) free (s); /* s[] is recycled (malloc'ed again when new topol string is created) */
-    if (tmp_string) free (tmp_string); 
+    size_t current_size = strlen (output_tree_string);
+    s = topology_to_string_create_name (randtree, NULL);
+    new_str_size = current_size + strlen (s) + 3; /* space, semicolon, NUL */
+    output_tree_string = (char*) biomcmc_realloc (output_tree_string, new_str_size);
+    snprintf (output_tree_string + current_size, new_str_size - current_size, " %s;", s);
+    free (s);
   }
 
   biomcmc_random_number_finalize(); /* free the global variable */
