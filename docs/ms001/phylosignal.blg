@@ -3,47 +3,44 @@ Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
 The top-level auxiliary file: phylosignal.aux
 The style file: plainnat.bst
 Database file #1: references.bib
-Warning--empty note in Mallo2015-ag
-Warning--empty journal in Yoshida2015
 You've used 25 entries,
             2773 wiz_defined-function locations,
-            833 strings with 11857 characters,
-and the built_in function-call counts, 14720 in all, are:
-= -- 1422
+            834 strings with 11867 characters,
+and the built_in function-call counts, 14867 in all, are:
+= -- 1440
 > -- 917
 < -- 11
 + -- 307
 - -- 282
-* -- 1412
-:= -- 2310
-add.period$ -- 139
+* -- 1426
+:= -- 2323
+add.period$ -- 140
 call.type$ -- 25
 change.case$ -- 169
 chr.to.int$ -- 25
-cite$ -- 52
-duplicate$ -- 529
-empty$ -- 1041
+cite$ -- 50
+duplicate$ -- 532
+empty$ -- 1064
 format.name$ -- 319
-if$ -- 3024
+if$ -- 3064
 int.to.chr$ -- 1
 int.to.str$ -- 1
 missing$ -- 24
-newline$ -- 195
+newline$ -- 196
 num.names$ -- 100
-pop$ -- 243
+pop$ -- 245
 preamble$ -- 1
 purify$ -- 144
 quote$ -- 0
-skip$ -- 398
+skip$ -- 400
 stack$ -- 0
-substring$ -- 717
-swap$ -- 55
+substring$ -- 742
+swap$ -- 57
 text.length$ -- 3
 text.prefix$ -- 0
 top$ -- 0
 type$ -- 275
-warning$ -- 2
-while$ -- 122
+warning$ -- 0
+while$ -- 124
 width$ -- 0
-write$ -- 455
-(There were 2 warnings)
+write$ -- 460

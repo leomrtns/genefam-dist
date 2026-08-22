@@ -1,13 +1,13 @@
 # Fdb version 4
-["bibtex phylosignal"] 1787425021.33465 "phylosignal.aux" "phylosignal.bbl" "phylosignal" 1787425025.98121 0
-  "./references.bib" 1787424933.49023 63676 c43042ddfcfd0e5baf2f7294a135b580 ""
+["bibtex phylosignal"] 1787425177.28865 "phylosignal.aux" "phylosignal.bbl" "phylosignal" 1787425182.02385 0
+  "./references.bib" 1787425167.14238 63736 6100ad368f06f8115962dc6760122c28 ""
   "/usr/share/texlive/texmf-dist/bibtex/bst/natbib/plainnat.bst" 1233624470 26816 ffe5423d2019860bad9f54bc402fac15 ""
-  "phylosignal.aux" 1787425025.30067 10255 d484269253cd51f7baf864859ac7ee5d "pdflatex"
+  "phylosignal.aux" 1787425181.27346 10255 0e137a023764f36fe238cb9233bb14a6 "pdflatex"
   (generated)
   "phylosignal.bbl"
   "phylosignal.blg"
   (rewritten before read)
-["pdflatex"] 1787425021.60876 "phylosignal.tex" "phylosignal.pdf" "phylosignal" 1787425025.9822 0
+["pdflatex"] 1787425177.52229 "phylosignal.tex" "phylosignal.pdf" "phylosignal" 1787425182.02414 0
   "/etc/texmf/web2c/texmf.cnf" 1736769452.87456 475 c0e671620eb5563b2130f56340a5fde8 ""
   "/usr/share/texlive/texmf-dist/fonts/enc/dvips/base/8r.enc" 1165713224 4850 80dc9bab7f31fb78a000ccfed0e27cab ""
   "/usr/share/texlive/texmf-dist/fonts/map/fontname/texfonts.map" 1577235249 3524 cb3e574dea2d1052e39280babc910dc8 ""
@@ -178,9 +178,9 @@
   "good_weighted.png" 1787044127.35311 27621 0d9b3019f089ffcf4b3d93a28bd8b070 ""
   "introduction.tex" 1787424784.87658 5799 4fb05d78fcd41f122f9f65b7f517b301 ""
   "methods.tex" 1787424817.99772 7979 65a5873ca54fe62ea43d1776f73a4091 ""
-  "phylosignal.aux" 1787425025.30067 10255 d484269253cd51f7baf864859ac7ee5d "pdflatex"
-  "phylosignal.bbl" 1787425021.59965 11494 93d600f6550f9383b65d659490563a9b "bibtex phylosignal"
-  "phylosignal.out" 1787425025.30367 1934 822a0fb9ba02f83bc02fc2804c440479 "pdflatex"
+  "phylosignal.aux" 1787425181.27346 10255 0e137a023764f36fe238cb9233bb14a6 "pdflatex"
+  "phylosignal.bbl" 1787425177.51344 11607 1537891eb5e95b0bd1e18282aec1a26c "bibtex phylosignal"
+  "phylosignal.out" 1787425181.27646 1934 822a0fb9ba02f83bc02fc2804c440479 "pdflatex"
   "phylosignal.tex" 1787424737.98639 5283 63950afff2d63cbb41d02dfb345d8d1c ""
   "random_indicator.png" 1787044127.37011 28233 7b23d4aa2b88a2eeea47af3b17c5bf59 ""
   "random_weighted.png" 1787044127.37011 28243 46128b8900fef7c7074e2c91d738f1ce ""
