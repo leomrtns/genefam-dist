@@ -67,6 +67,63 @@ python -m pytest
 You can then use the package with `import treesignal`. The extension source is in `python/treesignal/_treesignalc.c`; new low-level wrappers can be added
 there and the corresponding C implementation can be added under `lib/`.
 
+## Downloading gene families from OMA
+
+[`scripts/download_oma_hogs.py`](scripts/download_oma_hogs.py) downloads the
+extant protein or coding sequences descended from genes inferred in an OMA
+ancestral genome. It uses only the Python standard library and caches API
+responses so an interrupted run can be resumed.
+
+There are two useful ways to define an output family:
+
+- `--grouping ancestral-gene` (the default) writes one FASTA for each HOG at
+  the selected ancestral level. If a root family had already duplicated before
+  that ancestor, its copies are independent output families.
+- `--grouping root-hog` merges all ancestral copies that share a root HOG.
+  The accompanying member table retains the level-specific `ancestor_hog_id`,
+  so the merged family can be split again without another OMA query.
+
+Start with a small Enterobacterales run:
+
+```console
+python scripts/download_oma_hogs.py \
+  --level o__Enterobacterales \
+  --output-dir data/oma-enterobacterales \
+  --grouping ancestral-gene \
+  --max-families 10
+```
+
+To download every family passing the default filters (completeness at least
+0.3 and at least four member genes in four species), explicitly use `--all`.
+In root-HOG mode, a root family is selected if at least one ancestral-gene
+component passes the completeness threshold, then all components of that root
+family are retained:
+
+```console
+python scripts/download_oma_hogs.py \
+  --level o__Enterobacterales \
+  --output-dir data/oma-enterobacterales-root-hogs \
+  --grouping root-hog \
+  --all
+```
+
+The result contains:
+
+- `families/*.faa`: one unaligned protein FASTA per output family (`*.fna`
+  with `--sequence-type cdna`);
+- `members/*.members.tsv`: OMA protein, species, ancestral-HOG, and root-HOG
+  metadata for every sequence;
+- `families.tsv`: a family-level manifest;
+- `run.json`: the level, grouping, filters, and API endpoint used;
+- `.cache/`: cached OMA JSON responses used to resume or repeat a run.
+
+OMA levels are data-release-specific. The same command works for fungi or any
+other ancestral genome after replacing `--level` with the exact level shown by
+the [OMA ancestral-genome browser](https://omabrowser.org/oma/genomes/). Use a
+small `--max-families` run first to validate the name and sampling. The OMA API
+defines HOGs at a taxonomic level and exposes their member proteins in its
+[REST documentation](https://omabrowser.org/api/docs).
+
 ### C library and standalone programs
 
 The standalone programs use the Autotools build system. A clean out-of-tree build can be installed with:
