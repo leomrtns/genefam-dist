@@ -1,37 +1,70 @@
-% Christophe comment: - acknowledge weaknesses of the approach (e.g. interpretation of mulSPR, not that many distances
-% available (e.g. how to capture rooting errors?)
-% - alternative to what we do is mechanistic approach french-swedish school DLTI+Species tree. complementary to this.
 \section{Discussion}
-Euclid’s first theorem states that “things which are equal to the same thing are equal to each other”.  We make use of
-this principle to compare gene family trees, which cannot be compared to each other but that can be compared to the same
-thing – species trees. They will be equal, however, only in terms of the biologically-inspired dissimilarity measures
-that we can compute, and therefore we should use as many measures as possible.
 
-We propose a method that allows for the partition/visualisation of gene families integrated with the species tree estimation.
+Tree signatures convert heterogeneous gene family trees into vectors indexed by common reference species trees. Their
+main practical advantage is a separation between fitting the coordinate system and projecting observations: once the
+reference collection is fixed, a new gene tree can be evaluated without recomputing distances among all previously
+observed trees. Unlike an opaque generic embedding, every coordinate retains an interpretation as a particular
+gene--species tree dissimilarity. The reusable native tree-space interface strengthens this design by avoiding repeated
+Newick parsing when the same trees are used across calculations.
 
-As has been noted before (Gori et al. 2016), the SPR distance is a strong candidate for describing differences between
-trees in the context of gene partitioning, and here we show that indeed it can be successfully used to visualise and
-cluster gene families.
+The representation is process-agnostic only in a limited sense. It does not fit a joint generative model of gene and
+species evolution, but several coordinates are motivated by reconciliation events. A small duplication score, for
+example, is evidence of topological compatibility under an LCA mapping; it is not an estimate of a duplication rate or
+proof that duplication generated the observed discordance. Methods such as ASTRAL-Pro and SpeciesRax instead optimise a
+species-tree objective that explicitly accommodates multi-copy families \citep{astral-pro,Morel2022SpeciesRax}. Tree
+signatures are complementary: they are intended for exploration and prediction across gene families rather than as a
+replacement for mechanistic species-tree inference.
 
-Our proposed algorithm is a combination of concatenation of multiple views (Zhao et al. 2017; Xu, Tao, and Xu 2013)
-(where each gene-species tree pair dissimilarity is a view) and centroidQR or landmark-based representation (Chen and
-Cai 2011; Rafailidis, Constantinou, and Manolopoulos 2017; Vin De Silva 2003), where the landmarks are sensible species
-trees. As such, it can be improved through recent developments on both multi-view learning and landmark-based manifolds.
-In special we expect more improvement over the choice of reference trees, and its relation to species tree inference. In
-particular we are working on an iterative version of our algorithm where the gene tree space informs species tree
-inference algorithms, which in turn may allow for more detailed tree spaces.
+The reference trees determine the coordinate system and therefore influence distances, projections, and clusters. This
+dependence is a feature when the landmarks encode hypotheses of interest, but it also creates risks. Landmarks inferred
+from the same gene families can introduce circularity, and a basis covering one sample may represent future families
+poorly. Informed and random references produced different loading patterns in the archived analyses, but those examples
+do not identify an optimal selection rule. Landmark stability, redundancy, and out-of-sample coverage should be treated
+as model-selection questions.
 
-All results here employed unsupervised learning, but it is now straightforward to extend the analysis to supervised
-cases, where the samples may belong to e.g. posterior distributions of gene trees and each class is a gene family.
-Another idea is to split the gene family trees into well-supported and weakly-supported classes, to see if there is a
-reasonable separation between them. Since the features are associated to species trees, feature selection techniques can
-be interpreted in terms of the underlying species tree signals.
+Several limitations arise from the dissimilarities. The present implementation discards branch lengths, and three
+scores ignore the reference root. Reconciliation scores depend on the species mapping and on minimisation over gene-tree
+rootings. The extended-species-tree construction permits multi-copy comparisons but can be difficult to interpret for
+large copy-number imbalances. Hdist and the approximate SPR score require independent correctness and sensitivity
+benchmarks. Finally, rescaling does not remove all effects of gene-family size or taxon coverage, so these quantities
+must be measured as possible confounders rather than assumed to have been normalised away.
 
+Gene-tree uncertainty is another unresolved dimension. Bootstrap or posterior trees can be projected as separate rows,
+but the current API does not prescribe whether a gene family should be represented by a mean signature, a distribution,
+or a hierarchical model. Collapsing uncertainty to one tree may create apparent clusters driven by inference error;
+treating every sampled topology as independent would instead exaggerate the effective sample size. A future extension
+should retain the grouping of topologies by family and propagate within-family uncertainty into downstream analyses.
 
-% Christophe's comment: expand this discussion: - choice of species tree indeed influence result, but noteworthy that
-% the embedding and clustering was somewhat robust (fig. 2) ?
-It is important to notice that we are not interested in the (unconditional, theoretical problem of) comparison between
-trees, but in the specific problem of gene tree comparison conditional on possible scenarios of species trees. This
-means that choosing the set of relevant species trees will influence the resulting space, and that it should be like
-this. <feature, not a bug>
+The current results are therefore evidence of feasibility, not comparative superiority. The SPR-chain example is
+confounded by shared missingness within groups, the genome-level example is a single selected realisation, and the fungal
+partition lacks external biological validation. A publication-ready evaluation should use repeated simulations,
+predefined quantitative criteria, held-out families, simple nuisance-feature controls, and pairwise or quartet-based
+baselines where their input assumptions are satisfied. Empirical clusters should be tested for stability and enrichment
+against annotations that were not used to construct the signatures.
 
+Subject to these validations, landmark representations offer a useful bridge between phylogenetic algorithms and
+general statistical learning. They allow multi-view feature selection, supervised prediction, and incremental analysis
+while keeping the phylogenetic meaning of the coordinates visible. The central claim is correspondingly modest: a fixed
+set of species-tree landmarks and complementary dissimilarities provides a workable common feature space for gene trees
+that cannot all be compared directly under standard same-leaf-set distances.
+
+\iffalse
+DISCUSSION DEVELOPMENT NOTES (not rendered)
+
+1. Add a runtime and memory benchmark for the native API. Compare reusable TreeSpace calls against the legacy
+string-parsing API, then compare the O(nL) landmark design with O(n^2) all-pairs construction while clearly separating
+parsing time from distance-calculation time.
+
+2. Investigate whether the apparent clusters are better represented as a continuum. Isolated HGT, ILS, missing data,
+and inference error may shift signatures continuously rather than create discrete classes.
+
+3. Potential hallucination/overclaim to avoid: Euclid's common-notion analogy does not establish that closeness to the
+same reference trees makes two gene trees close under a metric. Landmark vectors can collide, and the chosen
+dissimilarities are not necessarily metrics.
+
+4. Potential hallucination/overclaim to avoid: do not describe RF, Hdist, and SPR features as identifying RF, matching,
+or SPR-generating biological processes. They are topological summaries.
+
+5. Add a software and data availability section only after deciding the archival location and release identifier. The
+repository currently contains the implementation and partial notebooks but not the empirical workflow.
+\fi

@@ -62,7 +62,7 @@
 \setcounter{bottomnumber}{50} % max figures per page
 
 \renewcommand*{\familydefault}{\sfdefault}
-\title{Tree signature of gene families}
+\title{Landmark embeddings of multi-copy gene family trees}
 \author[1]{Leonardo de Oliveira Martins\thanks{{\tt Leonardo.de-Oliveira-Martins@liverpool.ac.uk}}}
 \author[1]{Simon Maskell\thanks{{\tt S.Maskell@liverpool.ac.uk}}}
 \author[2]{Christophe Dessimoz\thanks{{\tt cdessimoz@unil.ch}}}
@@ -73,23 +73,24 @@
 \maketitle
 
 \begin{abstract}
-Genome-scale data sets routinely comprise thousands of genes from hundreds of species, which tell us complementary
-aspects of their evolution --- the evolution of the species is a mosaic of the evolutionary history of its composing
-genes.
-Several methods have been developed to visualise the similarity between histories told by each gene, under certain
-circumstances.
-This visualisation and comparison is essential to detect outliers, clusters of similar genes, and possibly description
-of the reason for disagreement between them.
-However the circumstances under which we can quantify this disagreement relies on being able to map 
-the leaves of one gene tree to another --- in practice this is equivalent to removing the effects of paralogy, and
-working only with single copy genes or inferred orthologous groups.
-Here we present a way of comparing whole gene families, even when they have vastly different sizes (due to duplications,
-losses) and few overlapping species. 
-The idea is to describe gene family trees within a coordinate system imposed by a set of possible species trees, what we
-call their tree signature.
-Gene families can not be compared directly, but we use the fact that those with a similar history (of duplications,
-losses, coalescences) should have resembling signatures.
+Phylogenomic data sets contain gene trees that differ because of biological processes, sampling, and inference error.
+Direct comparison is particularly difficult when gene families contain paralogs, differ in taxon coverage, or have few
+species in common. We introduce a landmark representation in which each gene family tree is mapped to a fixed-length
+vector of dissimilarities to a common collection of reference species trees. The dissimilarities describe complementary
+aspects of gene--species tree disagreement, including duplication, loss, deep coalescence, Robinson--Foulds,
+split-matching, and approximate subtree-prune-and-regraft scores. Once the reference trees are fixed, new gene trees can
+be projected independently without recomputing an all-pairs distance matrix. Simulations with missing taxa and
+multi-copy gene trees, together with an exploratory fungal data set, illustrate how these vectors can be visualised and
+clustered. The present analyses establish a proof of concept: replicated benchmarking, explicit treatment of gene-tree
+uncertainty, and biological validation of the empirical clusters remain necessary before comparative performance or
+biological conclusions can be claimed.
 \end{abstract}
+
+\iffalse
+AUTHOR NOTE (2026 revision): Replace the deliberately cautious final abstract sentence with quantitative results only
+after the simulation study has been rerun with multiple seeds and the fungal analysis has been rebuilt from a frozen OMA
+release. Do not report a performance advantage until a predefined metric and baseline support it.
+\fi
 
 \input{introduction}
 \input{methods}

@@ -1,56 +1,78 @@
 \relax 
-\providecommand \babel@aux [2]{\global \let \babel@toc \@gobbletwo }
+\providecommand\babel@aux[2]{}
 \@nameuse{bbl@beforestart}
 \providecommand\hyper@newdestlabel[2]{}
 \providecommand\HyField@AuxAddToFields[1]{}
 \providecommand\HyField@AuxAddToCoFields[2]{}
 \bibstyle{plainnat}
-\citation{astral,astrid}
 \babel@aux{english}{}
-\citation{Leigh2008,Leigh2011,Susko2006,Narechania2016,Nye2011,Yoshida2015,Lewitus2015,Kendall2016,Colijn2018}
+\@writefile{toc}{\contentsline {section}{\numberline {1}Introduction}{1}{section.1}\protected@file@percent }
+\citation{astral,astrid}
+\citation{astral-pro}
+\citation{Morel2022SpeciesRax}
 \citation{Gori2016,Jombart2017,Huang2016}
-\citation{Kendall2018}
-\citation{Smith2018}
-\@writefile{toc}{\contentsline {section}{\numberline {1}Methods}{4}{section.1}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces  Schematic representation of the tree signal calculation. In panel A we show two simple cases for a sample of 8 gene family trees: at the top we compare each gene tree to two distinct reference (species) trees using the minimum number of duplications (duplication distance), and at the bottom we compare all sample gene trees to a single reference tree, but using two distinct metrics --- the Robinson-Foulds (RF) distance and the duplication distance. Both comparisons provide little information in isolation, but when combined allow for distinguishing the two groups of gene families (represented by distinct colours). Panel B shows how the tree signal of a single gene family tree can be calculated, given a set of species trees and a set of distances. Notice that currently we work with unrooted gene trees and rooted species trees. In panel C we show that once we have the tree signal from each gene family, then we can create a feature matrix (‘design matrix’) which can be used in downstream analyses. }}{5}{figure.caption.1}\protected@file@percent }
-\newlabel{figure01}{{1}{5}{Schematic representation of the tree signal calculation. In panel A we show two simple cases for a sample of 8 gene family trees: at the top we compare each gene tree to two distinct reference (species) trees using the minimum number of duplications (duplication distance), and at the bottom we compare all sample gene trees to a single reference tree, but using two distinct metrics --- the Robinson-Foulds (RF) distance and the duplication distance. Both comparisons provide little information in isolation, but when combined allow for distinguishing the two groups of gene families (represented by distinct colours). Panel B shows how the tree signal of a single gene family tree can be calculated, given a set of species trees and a set of distances. Notice that currently we work with unrooted gene trees and rooted species trees. In panel C we show that once we have the tree signal from each gene family, then we can create a feature matrix (‘design matrix’) which can be used in downstream analyses}{figure.caption.1}{}}
+\citation{Leigh2008,Leigh2011,Susko2006,Narechania2016,Nye2011,Yoshida2015,Lewitus2015,Kendall2016,Colijn2018}
+\citation{Allman2022}
+\citation{Jeon2001-qa,Park2003,Chen2011-bp,Vin_De_Silva2003-fq}
+\@writefile{toc}{\contentsline {section}{\numberline {2}Methods}{3}{section.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.1}Inputs and tree signatures}{3}{subsection.2.1}\protected@file@percent }
+\newlabel{eq:signature}{{1}{3}{Inputs and tree signatures}{equation.2.1}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces  Schematic representation of a tree-signature calculation. In panel A, gene trees are compared either with two reference species trees using one dissimilarity, or with one reference species tree using two dissimilarities. Either view alone has limited resolution, whereas their combination distinguishes the illustrated groups. Panel B shows the signature of one gene tree across combinations of reference trees and dissimilarities. The current implementation treats gene trees as unrooted and reference species trees as rooted, although some dissimilarities ignore the reference root. Panel C shows the resulting design matrix used by downstream analyses. }}{4}{figure.caption.1}\protected@file@percent }
+\providecommand*\caption@xref[2]{\@setref\relax\@undefined{#1}}
+\newlabel{figure01}{{1}{4}{Schematic representation of a tree-signature calculation. In panel A, gene trees are compared either with two reference species trees using one dissimilarity, or with one reference species tree using two dissimilarities. Either view alone has limited resolution, whereas their combination distinguishes the illustrated groups. Panel B shows the signature of one gene tree across combinations of reference trees and dissimilarities. The current implementation treats gene trees as unrooted and reference species trees as rooted, although some dissimilarities ignore the reference root. Panel C shows the resulting design matrix used by downstream analyses}{figure.caption.1}{}}
 \citation{Martins2016}
-\@writefile{toc}{\contentsline {subsection}{\numberline {1.1}Distances}{6}{subsection.1.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {1.2}Normalisation}{7}{subsection.1.2}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {1.3}Choice of reference trees}{8}{subsection.1.3}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {2}Results}{9}{section.2}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces  SPR chain simulation with missing data. On the left panel we see the MDS projections of the samples when their signal is calculated from similar reference trees, and on the right we have the projections when random species trees are used. The colors represent the four groupings (consecutive trees in the SPR chain, separated from each other by more SPR branch swappings) defined in the simulation. }}{10}{figure.caption.2}\protected@file@percent }
-\newlabel{figure002}{{2}{10}{SPR chain simulation with missing data. On the left panel we see the MDS projections of the samples when their signal is calculated from similar reference trees, and on the right we have the projections when random species trees are used. The colors represent the four groupings (consecutive trees in the SPR chain, separated from each other by more SPR branch swappings) defined in the simulation}{figure.caption.2}{}}
+\citation{Chaudhary2015MulRF}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.2}Dissimilarities}{5}{subsection.2.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.3}Normalisation}{5}{subsection.2.3}\protected@file@percent }
+\newlabel{eq:theoretical-rescale}{{2}{5}{Normalisation}{equation.2.2}{}}
+\newlabel{eq:empirical-rank}{{3}{6}{Normalisation}{equation.2.3}{}}
+\newlabel{eq:empirical-rescale}{{4}{6}{Normalisation}{equation.2.4}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.4}Choice of reference trees}{6}{subsection.2.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.5}Downstream analyses}{7}{subsection.2.5}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {3}Results}{7}{section.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.1}SPR-chain simulation with missing taxa}{7}{subsection.3.1}\protected@file@percent }
+\citation{Mallo2015-ag}
+\citation{Altenhoff2024OMA}
+\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces  SPR-chain simulation with missing taxa. MDS projections use signatures calculated from informed reference trees drawn from the SPR chain (left) or random reference trees (right). Colours denote four groups sampled from separated portions of the chain. The plot is one exploratory realisation; points do not represent independent simulation replicates. }}{8}{figure.caption.2}\protected@file@percent }
+\newlabel{figure002}{{2}{8}{SPR-chain simulation with missing taxa. MDS projections use signatures calculated from informed reference trees drawn from the SPR chain (left) or random reference trees (right). Colours denote four groups sampled from separated portions of the chain. The plot is one exploratory realisation; points do not represent independent simulation replicates}{figure.caption.2}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.2}Genome-level simulation}{8}{subsection.3.2}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces  One SimPhy realisation. The upper image compares MDS, t-SNE, Isomap, and nearest-neighbour spectral embeddings of the tree signatures; colours denote the four generating species trees. The lower image summarises gene-tree leaf counts, species coverage, and pairwise species overlap. Axis coordinates in the embeddings have no direct biological units. }}{9}{figure.caption.3}\protected@file@percent }
+\newlabel{figure003}{{3}{9}{One SimPhy realisation. The upper image compares MDS, t-SNE, Isomap, and nearest-neighbour spectral embeddings of the tree signatures; colours denote the four generating species trees. The lower image summarises gene-tree leaf counts, species coverage, and pairwise species overlap. Axis coordinates in the embeddings have no direct biological units}{figure.caption.3}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.3}Archived fungal example}{9}{subsection.3.3}\protected@file@percent }
 \citation{Martins2016}
-\citation{Martins2016}
-\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces  Typical case (simphy simulation). Colors represent underlying species trees. }}{11}{figure.caption.3}\protected@file@percent }
-\newlabel{figure003}{{3}{11}{Typical case (simphy simulation). Colors represent underlying species trees}{figure.caption.3}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {2.1}Fungal data set}{11}{subsection.2.1}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces  Fungal data set \textcolor {red}{(not same as below BTW)} }}{12}{figure.caption.4}\protected@file@percent }
-\newlabel{figure004}{{4}{12}{Fungal data set \red {(not same as below BTW)}}{figure.caption.4}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces  Correlation between the first eight sparse PCA components and the distances to the reference trees, when using good reference trees (left) or random reference trees (right). Each bar represents, per distance, the number of genes with a load different from zero, for that sparse principal component. }}{13}{figure.caption.5}\protected@file@percent }
-\newlabel{figure005}{{5}{13}{Correlation between the first eight sparse PCA components and the distances to the reference trees, when using good reference trees (left) or random reference trees (right). Each bar represents, per distance, the number of genes with a load different from zero, for that sparse principal component}{figure.caption.5}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {6}{\ignorespaces  Correlation between the first eight sparse PCA components and the distances to the reference trees, when using good reference trees (left) or random reference trees (right). Each bar represents, per distance, the sum of squares of the loads of all genes, for each sparse PCA component. \textcolor {red}{(todo: plot only first 4 components?)} }}{13}{figure.caption.6}\protected@file@percent }
-\newlabel{figure006}{{6}{13}{Correlation between the first eight sparse PCA components and the distances to the reference trees, when using good reference trees (left) or random reference trees (right). Each bar represents, per distance, the sum of squares of the loads of all genes, for each sparse PCA component. \textcolor {red}{(todo: plot only first 4 components?)}}{figure.caption.6}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {7}{\ignorespaces  Clustering of the gene families based on the rescaled min-max distances, when using all reference trees (top), only good reference trees (middle) or only random reference trees (bottom). We show several dimension reduction methods (PCA, Isomap, and Spectral Embedding). The colouring is based on k-means clustering with five clusters using all reference trees. }}{14}{figure.caption.7}\protected@file@percent }
-\newlabel{figure007}{{7}{14}{Clustering of the gene families based on the rescaled min-max distances, when using all reference trees (top), only good reference trees (middle) or only random reference trees (bottom). We show several dimension reduction methods (PCA, Isomap, and Spectral Embedding). The colouring is based on k-means clustering with five clusters using all reference trees}{figure.caption.7}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces  Composition of the first eight sparse principal components for informed reference trees (left) and random reference trees (right). Each bar counts non-zero feature loadings, grouped by dissimilarity. A feature is one reference-tree--dissimilarity combination, not one gene family. }}{10}{figure.caption.4}\protected@file@percent }
+\newlabel{figure005}{{4}{10}{Composition of the first eight sparse principal components for informed reference trees (left) and random reference trees (right). Each bar counts non-zero feature loadings, grouped by dissimilarity. A feature is one reference-tree--dissimilarity combination, not one gene family}{figure.caption.4}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces  Loading weight of the first eight sparse principal components for informed reference trees (left) and random reference trees (right). Each bar is the sum of squared feature loadings for one dissimilarity type. }}{11}{figure.caption.5}\protected@file@percent }
+\newlabel{figure006}{{5}{11}{Loading weight of the first eight sparse principal components for informed reference trees (left) and random reference trees (right). Each bar is the sum of squared feature loadings for one dissimilarity type}{figure.caption.5}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.4}Reproducibility status}{11}{subsection.3.4}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {6}{\ignorespaces  Exploratory projections of archived fungal gene families using all reference trees (top), informed reference trees (middle), or random reference trees (bottom). Columns show PCA, Isomap, and spectral embedding. Colours are five-means labels estimated from the full signature matrix and reused in every panel. }}{12}{figure.caption.6}\protected@file@percent }
+\newlabel{figure007}{{6}{12}{Exploratory projections of archived fungal gene families using all reference trees (top), informed reference trees (middle), or random reference trees (bottom). Columns show PCA, Isomap, and spectral embedding. Colours are five-means labels estimated from the full signature matrix and reused in every panel}{figure.caption.6}{}}
+\citation{astral-pro,Morel2022SpeciesRax}
+\@writefile{toc}{\contentsline {section}{\numberline {4}Discussion}{13}{section.4}\protected@file@percent }
 \bibdata{references}
-\bibcite{Colijn2018}{{1}{2018}{{Colijn and Plazzotta}}{{}}}
-\@writefile{toc}{\contentsline {section}{\numberline {3}Discussion}{15}{section.3}\protected@file@percent }
-\bibcite{Martins2016}{{2}{2016}{{De~Oliveira~Martins et~al.}}{{De~Oliveira~Martins, Mallo, and Posada}}}
-\bibcite{Gori2016}{{3}{2016}{{Gori et~al.}}{{Gori, Suchan, Alvarez, Goldman, and Dessimoz}}}
-\bibcite{Huang2016}{{4}{2016}{{Huang et~al.}}{{Huang, Zhou, Marchand, Ash, Morris, Van~Dooren, Brown, Gallivan, and Wilgenbusch}}}
-\bibcite{Jombart2017}{{5}{2017}{{Jombart et~al.}}{{Jombart, Kendall, Almagro-Garcia, and Colijn}}}
-\bibcite{Kendall2016}{{6}{2016}{{Kendall and Colijn}}{{}}}
-\bibcite{Kendall2018}{{7}{2018}{{Kendall et~al.}}{{Kendall, Eldholm, and Colijn}}}
-\bibcite{Leigh2008}{{8}{2008}{{Leigh et~al.}}{{Leigh, Susko, Baumgartner, and Roger}}}
-\bibcite{Leigh2011}{{9}{2011}{{Leigh et~al.}}{{Leigh, Schliep, Lopez, and Bapteste}}}
-\bibcite{Lewitus2015}{{10}{2015}{{Lewitus and Morlon}}{{}}}
-\bibcite{astral}{{11}{2015}{{Mirarab and Warnow}}{{}}}
-\bibcite{Narechania2016}{{12}{2016}{{Narechania et~al.}}{{Narechania, Baker, DeSalle, Mathema, Kolokotronis, Kreiswirth, and Planet}}}
-\bibcite{Nye2011}{{13}{2011}{{Nye}}{{}}}
-\bibcite{Smith2018}{{14}{2018}{{Smith et~al.}}{{Smith, Brown, and Walker}}}
-\bibcite{Susko2006}{{15}{2006}{{Susko et~al.}}{{Susko, Leigh, Doolittle, and Bapteste}}}
-\bibcite{astrid}{{16}{2015}{{Vachaspati and Warnow}}{{}}}
-\bibcite{Yoshida2015}{{17}{2015}{{Yoshida et~al.}}{{Yoshida, Fukumizu, and Vogiatzis}}}
-\gdef \@abspage@last{17}
+\bibcite{Allman2022}{{1}{2022}{{Allman et~al.}}{{Allman, Mitchell, and Rhodes}}}
+\bibcite{Altenhoff2024OMA}{{2}{2024}{{Altenhoff et~al.}}{{Altenhoff, Vesztrocy, Bernard, Train, Nicheperovich, Prieto Ba\~{n}os, Julca, Moi, Nevers, Majidian, Dessimoz, and Glover}}}
+\bibcite{Chaudhary2015MulRF}{{3}{2015}{{Chaudhary et~al.}}{{Chaudhary, Fern\'{a}ndez-Baca, and Burleigh}}}
+\bibcite{Chen2011-bp}{{4}{2011}{{Chen and Cai}}{{}}}
+\bibcite{Colijn2018}{{5}{2018}{{Colijn and Plazzotta}}{{}}}
+\bibcite{Martins2016}{{6}{2016}{{De~Oliveira~Martins et~al.}}{{De~Oliveira~Martins, Mallo, and Posada}}}
+\bibcite{Gori2016}{{7}{2016}{{Gori et~al.}}{{Gori, Suchan, Alvarez, Goldman, and Dessimoz}}}
+\bibcite{Huang2016}{{8}{2016}{{Huang et~al.}}{{Huang, Zhou, Marchand, Ash, Morris, Van~Dooren, Brown, Gallivan, and Wilgenbusch}}}
+\bibcite{Jeon2001-qa}{{9}{2001}{{Jeon et~al.}}{{Jeon, Park, and Rosen}}}
+\bibcite{Jombart2017}{{10}{2017}{{Jombart et~al.}}{{Jombart, Kendall, Almagro-Garcia, and Colijn}}}
+\bibcite{Kendall2016}{{11}{2016}{{Kendall and Colijn}}{{}}}
+\bibcite{Leigh2008}{{12}{2008}{{Leigh et~al.}}{{Leigh, Susko, Baumgartner, and Roger}}}
+\bibcite{Leigh2011}{{13}{2011}{{Leigh et~al.}}{{Leigh, Schliep, Lopez, and Bapteste}}}
+\bibcite{Lewitus2015}{{14}{2015}{{Lewitus and Morlon}}{{}}}
+\bibcite{Mallo2015-ag}{{15}{2015}{{Mallo et~al.}}{{Mallo, de~Oliveira~Martins, and Posada}}}
+\bibcite{astral}{{16}{2015}{{Mirarab and Warnow}}{{}}}
+\bibcite{Morel2022SpeciesRax}{{17}{2022}{{Morel et~al.}}{{Morel, Schade, Lutteropp, Williams, Sz{\"o}ll{\H {o}}si, and Stamatakis}}}
+\bibcite{Narechania2016}{{18}{2016}{{Narechania et~al.}}{{Narechania, Baker, DeSalle, Mathema, Kolokotronis, Kreiswirth, and Planet}}}
+\bibcite{Nye2011}{{19}{2011}{{Nye}}{{}}}
+\bibcite{Park2003}{{20}{2003}{{Park et~al.}}{{Park, Jeon, and Ben~Rosen}}}
+\bibcite{Susko2006}{{21}{2006}{{Susko et~al.}}{{Susko, Leigh, Doolittle, and Bapteste}}}
+\bibcite{astrid}{{22}{2015}{{Vachaspati and Warnow}}{{}}}
+\bibcite{Vin_De_Silva2003-fq}{{23}{2003}{{Vin De~Silva}}{{}}}
+\bibcite{Yoshida2015}{{24}{2015}{{Yoshida et~al.}}{{Yoshida, Fukumizu, and Vogiatzis}}}
+\bibcite{astral-pro}{{25}{2020}{{Zhang et~al.}}{{Zhang, Scornavacca, Molloy, and Mirarab}}}
+\gdef \@abspage@last{16}

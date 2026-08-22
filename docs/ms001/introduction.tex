@@ -1,117 +1,73 @@
-%Christophe's comments: Finish drafting paragraphs that are in outline form.
-%* In particular, check consistency of terms gene/sample and species/reference (stick to ‘gene’ and ‘reference’?)
-%* Interpretation of fungi example. What does this tell us? (give an example of “gene shopping”?)
-%Abstract
-%--- nice to have ---
-%* On empirical data, cluster (either using an automated method, or quadrants, or by hand), and try to reconstruct a consensus tree for each cluster vs. overall consensus tree.
-%* Potential discussion point: discrete clusters or continuum? ILS and “isolated” HGT events, missing data, inference errors -> probably better modeled as a continuum -> interesting to see the extremes?
+\section{Introduction}
 
-A fundamental unit in phylogenomic analysis is the gene (or genomic locus), and the most detailed evolutionary
-history of a gene includes the duplication and loss events by which an ancestral locus gave rise to all
-observed diversity of loci and genes --- the so-called gene family, of which a single copy gene is a particular case.
-Each gene family will then be described by all the loci within a species connected through an common ancestor 
-(i.e. inferred to be homologous to each other).
-And their histories are expected to differ from one another due to the coalescent, duplications, losses, and
-other biological events.
-Therefore, even for the simplest case of single copy genes, we might still observe distinct patterns of their presence and
-absence amongst species, and conflicting inferred phylogenies due to the coalescent, lateral transfers, and the very
-inference process. 
-The accumulation of large-scale phylogenomic data sets leads to new challenges of comparison and visualisation of
-distinct gene families, as well as of detecting the influence of each genomic region into the overall phylogenomic
-signals.
-Many state-of-the-art phylogenetic methods take gene trees as input, and model the incongruence among them in
-various ways, based on parametric and non-parametric assumptions \citep{astral, astrid}.
-Many of these methods require the input gene trees to have at most one
-representative from each species (e.g. by requiring the user to first run an orthology inference pipeline). 
-This limitation is hard to circumvent since almost all tree distance measures (required to measure incongruence between
-two trees) assume that the same leaves are present on both trees.
+A gene tree is an estimate of the evolutionary history of a genomic locus or gene family. Gene trees need not agree
+with one another or with a species tree: incomplete lineage sorting, duplication, loss, horizontal transfer,
+hybridisation, recombination, taxon sampling, model misspecification, and finite sequence information can all contribute
+to discordance. The most general input is therefore a multi-copy gene family tree, in which several leaves can map to the
+same species and some species can be absent.
 
-There has been several attempts at describing phylogenetic trees as vectors of features, suitable for statistical
-comparison, such as \cite{Leigh2008, Leigh2011, Susko2006, Narechania2016, Nye2011, Yoshida2015, Lewitus2015,
-Kendall2016, Colijn2018}. 
-There are also a few methods that rely on pairwise tree distance matrices, which could then be projected into a new
-coordinate system.
+Collections of gene trees are used both to infer species histories and to investigate heterogeneity across the genome.
+Coalescent summary methods such as ASTRAL and ASTRID were originally formulated for single-copy inputs
+\citep{astral,astrid}. More recent methods explicitly use multi-copy gene trees. ASTRAL-Pro defines paralogy-aware quartet
+similarity \citep{astral-pro}, whereas SpeciesRax estimates rooted species trees under a duplication--transfer--loss model
+\citep{Morel2022SpeciesRax}. These methods demonstrate that paralogs need not be discarded, but their primary objective
+is species-tree inference. Our objective is complementary: to construct a reusable coordinate representation of each
+gene family tree for exploratory comparison, visualisation, clustering, or supervised learning.
 
-Unsupervised learning algorithms accept one of two forms of input: a design (also called feature) matrix $X$ of size
-$n\times p$ (n samples with $p$ dimensions each), or a dissimilarity matrix $D$ of size $n\times n$ 
-describing the distances between each pair of samples. 
-Given $D$, one can project the samples into a feature space for further analysis (using multidimensional
-scaling, for instance). 
-However, this projection needs to be recalculated if new samples arise. 
-Our method, on the other
-hand, allows for disentangling the acquisition of sample gene trees and their projection, since their feature space can
-be described without resorting to the whole set of existing sample trees. 
-This can become particularly relevant when the
-number of sample gene trees exceeds largely the number of reference species trees.
+Many tree-set visualisation methods begin with pairwise distances between all trees and then use multidimensional
+scaling, spectral methods, or related projections \citep{Gori2016,Jombart2017,Huang2016}. Other work maps trees directly
+to vectors of splits, shape descriptors, or other features
+\citep{Leigh2008,Leigh2011,Susko2006,Narechania2016,Nye2011,Yoshida2015,Lewitus2015,Kendall2016,Colijn2018}.
+Quartet concordance factors and simplex plots provide a further model-based summary when gene trees share taxa
+\citep{Allman2022}. These approaches are valuable, but an all-pairs dissimilarity matrix must be extended when new trees
+arrive, and many standard distances require compatible leaf labels. Both issues become acute for large collections of
+multi-copy families with heterogeneous taxon coverage.
 
-Visualisation and comparison of gene trees has been increasingly recognised as a way to objectively partition
-phylogenetic signal and to detect potential sources of heterogeneity \citep{Gori2016,Jombart2017, Huang2016}.
-So far all these methods rely on pairwise tree distance matrices, which implies that only uniquely labelled
-trees can be compared (with the potential exception of \cite{Kendall2018}). 
-However in many cases we cannot or prefer not to decide beforehand the orthologous groups. 
-In these cases we must work with  the so-called
-multi-labelled trees (or mul-trees, for short), which are trees with potentially more than one leaf with same label
-(labelled by the same species, in our case). 
-At the same time, dissimilarity matrices are not the only input for
-classification algorithms, and describing samples through a coordinate system can have advantages.
+We instead represent a gene tree by its dissimilarities to a fixed collection of landmark trees. The landmarks are
+rooted candidate species trees containing the full species set. This construction is related to landmark-based manifold
+representations and centroid methods \citep{Jeon2001-qa,Park2003,Chen2011-bp,Vin_De_Silva2003-fq}: after choosing the
+landmarks, any gene tree can be projected independently. More than one dissimilarity can be evaluated against each
+landmark, so distinct summaries of duplication, loss, coalescence, and topological disagreement form complementary
+views of the same gene tree.
 
-There are many new algorithms thanks to big data, and our data sets are also increasing, therefore we can make use of their
-novelties if we write our problem as a big data one.
-\red{to fill in something}
-This analysis can also help in ‘gene shopping’, i.e. when
-only genomic regions with desired properties are selected \citep{Smith2018}.
-On the other hand, we might be concerned if a certain selection of genes can be responsible for a bias in the results.
+The resulting vector is called a \emph{tree signature}. Two gene trees with similar signatures make similar patterns of
+agreement and disagreement with the reference trees under the selected measures. This does not imply that their
+histories are identical, nor does the representation by itself identify the biological cause of discordance. It provides
+a common feature space in which downstream statistical methods can be applied and in which individual features remain
+associated with explicit reference trees and dissimilarities.
 
-Each gene family tree is represented by a set of features, and may contain paralogs or missing species. 
-Each gene family
-can be represented by several trees, all sharing same pattern of missing/duplicate species, as in Bayesian posterior
-distributions. (However for testing purposes we might prune individual trees from a gene family.)
-
-A “gene family” and a “cluster” will usually be used interchangeably, although we know that several gene families with
-their sets of trees may cluster together etc. The term “cluster” will be preferred for the resulting statistic or
-observation in general, and not to the underlying process it tries to capture. “gene family” will be used to a set of
-trees that should always be clustered together (never be split between clusters).
-
-The features are distance measures to a set of common, full reference trees. The reference trees are species trees, and
-are full (or complete) in the sense that must have all species under analysis (even if missing from some gene family).
-
-The selection of ‘reference’ species trees follow the same rationale behind centroidQR (Jeon, Park, and Rosen 2001;
-Park, Jeon, and Ben Rosen 2003), pivot-based indexing, or landmark-based manifolds in machine learning: instead of
-comparing all gene family trees with each other using a predefined tree distance, we first compare them to a potentially
-smaller number of ‘landmark’ (species) trees. However there is an important difference: in our case there may be very
-few, if any, dissimilarities that can be calculated between arbitrary gene family trees with several leaves with same
-species label (e.g. paralogs), or with no species in common. On the other hand there are several tree distances
-available that can cope with gene-species tree pairs – and the species trees should have all species present.
-
-If we are only interested in a few alternative hypothesis, let’s say a particular branch/node, then most distances fail
-since they give equal weight to all distances (since we compare gene trees directly). OTOH by using anchoring sptrees we
-can "weight" these hypotheses by their representativity in the reference sptrees (minimal case is to use just two
-sptrees, as "only" dimensions in the eigenbasis).
-
-At the same time, choosing just ``a few'' sptrees allows our matrix to be lower dimensional than a full pairwise distance.
-This becomes more evident when 1) gene families are much larger than sptrees (more leaves), and 2) many samples from
-many genefams are analysed (e.g. 1M trees per family).
-
-The idea is that although we may lose a lot of resolution when comparing two gene family trees directly (assuming such
-comparison can be accomplished), we may have higher resolution [signal] by comparing each gene family to a species tree.
-The difference lies in the number of species in common: when comparing two gene families $G_1$ and $G_2$ representing
-respectively $n_1$ and $n_2$ species (over possibly $N$ species), they will have in the worst case only
-$\max\left(0,n1+n2-N\right) \leq \min\left(n1,n2\right)$  --- where $\min\left(n1,n2\right)$ 
-is the worst case comparison between $G_1$ or $G_2$ and the species tree.
-
+This fixed-coordinate property distinguishes the proposal from an embedding derived only from the sample's pairwise
+distance matrix. It also creates an important dependence: the geometry is conditional on the selected reference trees.
+Reference selection is therefore part of the model rather than a neutral preprocessing step, and its stability must be
+evaluated when signatures are used out of sample.
 
 \begin{figure}[!htbp]
 \begin{minipage}{6.5in}\centering\includegraphics[width = 6in]{figure001.png}\end{minipage}
 \caption{\label{figure01}
-Schematic representation of the tree signal calculation. In panel A we show two simple cases for a sample of 8 gene
-family trees: at the top we compare each gene tree to two distinct reference (species) trees using the minimum number of
-duplications (duplication distance), and at the bottom we compare all sample gene trees to a single reference tree, but
-using two distinct metrics --- the Robinson-Foulds (RF) distance and the duplication distance. Both comparisons provide
-little information in isolation, but when combined allow for distinguishing the two groups of gene families (represented
-by distinct colours). Panel B shows how the tree signal of a single gene family tree can be calculated, given a set of
-species trees and a set of distances. Notice that currently we work with unrooted gene trees and rooted species trees.
-In panel C we show that once we have the tree signal from each gene family, then we can create a feature matrix (‘design
-matrix’) which can be used in downstream analyses.
+Schematic representation of a tree-signature calculation. In panel A, gene trees are compared either with two
+reference species trees using one dissimilarity, or with one reference species tree using two dissimilarities. Either
+view alone has limited resolution, whereas their combination distinguishes the illustrated groups. Panel B shows the
+signature of one gene tree across combinations of reference trees and dissimilarities. The current implementation treats
+gene trees as unrooted and reference species trees as rooted, although some dissimilarities ignore the reference root.
+Panel C shows the resulting design matrix used by downstream analyses.
 }\end{figure}
 
+\iffalse
+EDITORIAL AND VALIDATION NOTES (not rendered)
 
+1. Novelty claim: keep the distinction between comparison/embedding and species-tree inference. ASTRAL-Pro and
+SpeciesRax handle paralogy, so the manuscript must not claim that modern phylogenetic methods generally require one copy
+per species. The defensible contribution is the fixed landmark coordinate system for heterogeneous multi-copy trees.
+
+2. Terminology: use ``gene tree'' for one topology, ``gene family'' for the underlying homologous set, ``reference
+tree'' for a landmark species tree, and ``cluster'' only for a downstream statistical grouping. Avoid using gene family
+and cluster interchangeably. Use ``tree signature'' consistently; ``spectral signature'' can be mistaken for a graph
+Laplacian representation.
+
+3. Potentially unsupported inference: similar signatures are expected, but are not guaranteed, for similar histories.
+The embedding can collapse distinct trees or biological mechanisms. Quantify collisions/sensitivity in simulations
+before strengthening that statement.
+
+4. Gene shopping is a possible application, but selecting loci on the same data used to estimate a species tree can
+introduce circularity. Reintroduce that application only with a validation design and an appropriate citation.
+\fi

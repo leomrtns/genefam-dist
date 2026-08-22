@@ -1,49 +1,49 @@
-This is BibTeX, Version 0.99e (TeX Live 2026/Debian)
+This is BibTeX, Version 0.99d (TeX Live 2023/Debian)
 Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
 The top-level auxiliary file: phylosignal.aux
 The style file: plainnat.bst
 Database file #1: references.bib
-Warning--empty note in Kendall2018
+Warning--empty note in Mallo2015-ag
 Warning--empty journal in Yoshida2015
-You've used 17 entries,
+You've used 25 entries,
             2773 wiz_defined-function locations,
-            759 strings with 9272 characters,
-and the built_in function-call counts, 9920 in all, are:
-= -- 979
-> -- 589
-< -- 6
-+ -- 197
-- -- 180
-* -- 966
-:= -- 1561
-add.period$ -- 98
-call.type$ -- 17
-change.case$ -- 111
-chr.to.int$ -- 17
-cite$ -- 36
-duplicate$ -- 343
-empty$ -- 701
-format.name$ -- 207
-if$ -- 2024
+            833 strings with 11857 characters,
+and the built_in function-call counts, 14720 in all, are:
+= -- 1422
+> -- 917
+< -- 11
++ -- 307
+- -- 282
+* -- 1412
+:= -- 2310
+add.period$ -- 139
+call.type$ -- 25
+change.case$ -- 169
+chr.to.int$ -- 25
+cite$ -- 52
+duplicate$ -- 529
+empty$ -- 1041
+format.name$ -- 319
+if$ -- 3024
 int.to.chr$ -- 1
 int.to.str$ -- 1
-missing$ -- 16
-newline$ -- 140
-num.names$ -- 68
-pop$ -- 144
+missing$ -- 24
+newline$ -- 195
+num.names$ -- 100
+pop$ -- 243
 preamble$ -- 1
-purify$ -- 94
+purify$ -- 144
 quote$ -- 0
-skip$ -- 256
+skip$ -- 398
 stack$ -- 0
-substring$ -- 544
-swap$ -- 32
-text.length$ -- 0
+substring$ -- 717
+swap$ -- 55
+text.length$ -- 3
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 187
+type$ -- 275
 warning$ -- 2
-while$ -- 84
+while$ -- 122
 width$ -- 0
-write$ -- 318
+write$ -- 455
 (There were 2 warnings)

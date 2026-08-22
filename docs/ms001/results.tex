@@ -1,137 +1,155 @@
 \section{Results}
-We tested this model using two simulation scenarios and one real data set. The simulations include both
-uniquely-labelled trees, to allow for comparison with traditional pairwise distance-based methods, as well as
-genome-level simulation scenarios, leading to mul-trees.
 
-For the first simulation scenario, starting from a random tree T0 on n leaves, we applied a series of consecutive SPR
-branch swapping, storing all resulting trees  ${Ti} (0 \leq i leq N)$.  
-As a result we know that Ti  and Ti-1 disagree by only
-one SPR, Ti  and Ti-2 by two SPRs, etc., neglecting cases where the branch swappings cancel each other out. Therefore we
-can use their relative location in this series (the ‘SPR chain’) as an indicator of their dissimilarity. We collected
-them into 4 sets of 10 consecutive trees each to serve as our sample gene trees, separated by <y> trees – some of which
-were used as reference trees. To test the effect of missing data we randomly removed leaves from each sample tree, such
-that trees belonging to the same ‘group’ (i.e. consecutives in our chain of trees) have the same leaves removed. Only
-the sample trees have missing leaves, but not the reference trees (by design of our model). [ Both the sample trees
-(representing gene trees) and the reference trees (representing species trees) belong to the chain, but only the sample
-trees have missing leaves. ]
+We evaluated the representation in two simulation scenarios and one archived empirical example. These analyses were
+designed as demonstrations of the geometry of tree signatures. They were not replicated sufficiently to support formal
+comparisons between algorithms, and the empirical example is reported as exploratory pending reconstruction from a
+versioned data release.
 
-The results are shown in figure 2, where we compare the effect of using reference trees belonging to the SPR chain (i.e.
-similar to the sample trees in an SPR sense) or using randomly selected reference trees on the metric multidimensional
-scaling (MDS) projection of the trees. We can conclude that choosing carefully the reference trees (i.e. that are close
-to the samples) can help separating the sample gene family trees, even when these sample trees have missing data. On the
-other hand using random trees did not seem to compromise the overall separation between groups. In this simulation
-scenario all gene tree pairs can be directly compared since we do not have mul-trees (each species is uniquely
-represented in the gene family tree), and therefore can be compared using distance matrix-based models (Gori et al.
-2016). We therefore used our library to emulate the behaviour of treeCL (Gori et al. 2016) but using the approximate SPR
-distance in addition to the RF distance, normalised to account for the unequal number of leaf comparisons. Pairwise
-distance matrices creating using both measures provided MDS coordinates comparable to our tree signal using good
-reference trees (results not shown). 
+\subsection{SPR-chain simulation with missing taxa}
 
+Starting from a random tree on 16 leaves, we generated a chain in which consecutive trees differed by an SPR move. Four
+groups of ten gene trees were sampled from separated portions of the chain. Eight leaves were removed from each sampled
+tree; trees in the same group shared the same removed leaves. Reference trees retained all leaves. We compared an
+informed reference collection drawn from portions of the SPR chain with a collection of random reference trees.
+
+Figure~\ref{figure002} shows metric multidimensional-scaling (MDS) projections of the resulting signatures. The four
+generating groups are visually separated with the informed landmarks. Separation is also apparent with random
+landmarks, although the geometry changes. Because taxon-removal patterns were shared within groups, this demonstration
+does not distinguish phylogenetic signal from signal introduced by missingness. No accuracy statistic or uncertainty
+interval was recorded for the archived run.
+
+The trees in this scenario are single-copy and can therefore also be compared by conventional pairwise distances. An
+archived exploratory comparison used normalised RF and approximate SPR pairwise distances and produced qualitatively
+similar MDS plots; those unrecorded plots are not treated as evidence here.
 
 \begin{figure}[!htbp]
-\begin{minipage}{7in}\centering\includegraphics[width = 6.5in]{figure002.png}\end{minipage}
+\begin{minipage}{\textwidth}\centering\includegraphics[width = 0.96\textwidth]{figure002.png}\end{minipage}
 \caption{\label{figure002}
- SPR chain simulation with missing data. On the left panel we see the MDS projections of the samples when their signal
- is calculated from similar reference trees, and on the right we have the projections when random species trees are
- used. The colors represent the four groupings (consecutive trees in the SPR chain, separated from each other by more
- SPR branch swappings) defined in the simulation. 
+SPR-chain simulation with missing taxa. MDS projections use signatures calculated from informed reference trees drawn
+from the SPR chain (left) or random reference trees (right). Colours denote four groups sampled from separated portions
+of the chain. The plot is one exploratory realisation; points do not represent independent simulation replicates.
 }\end{figure}
 
-The second simulation scenario was based on a genome-level simulation, where the gene trees are simulated , using the
-software Simphy (Mallo, de Oliveira Martins, and Posada 2015), according to the multispecies coalescent within a locus
-tree, which is generated under a duplication-loss model from a species tree. We generated 4 species trees with 20
-species and from each species tree we simulated 50 gene families, assuming randomly between one or two genomes from each
-species (simulating the sampling process of populations under the coalescent). Finally we removed up to half the leaves
-from each gene family, and we used 116 trees similar to the true species trees as reference trees --- generated by random
-branch swapping on the original ones.
+\subsection{Genome-level simulation}
 
-There are many parameters controlling Simphy (from the multispecies coalescent to the birth-death process), and for most
-of them we let the software sample from distributions, in order to allow for heterogeneity between gene families. We
-tried several such combinations and show here a typical case, based on the observed distribution of leaves and species
-per gene family tree, and where a bit less than half the species are common to gene family pairs. The parameters chosen
-led to an expectation of one duplication and one loss per branch of the species tree, with 0.2 expected horizontal gene
-transfers per branch, and moderate levels of incomplete lineage sorting. Parameter values more extreme led to large gene
-families with less than half the species represented, and with very few (less than four) species in common per pair.
+The second scenario used SimPhy \citep{Mallo2015-ag} to generate gene trees within locus trees evolving inside species
+trees. The archived notebook generated four species trees with 20 species and 50 gene families per species tree, sampled
+one or two individuals per species, and removed up to approximately half of the gene-tree leaves. Reference trees were
+generated by applying SPR perturbations to the four species trees; the true species trees themselves were excluded from
+the signature basis.
 
-The result for a typical simulation is shown in figure 3, where we see that gene families from distinct species trees
-can be discriminated.
+The archived parameterisation included duplication, loss, transfer, and incomplete lineage sorting. Figure
+\ref{figure003} shows the family-size and taxon-overlap distributions and four two-dimensional projections from one run.
+MDS and Isomap show visible separation among the four generating species trees. The t-SNE projection overlaps strongly,
+and the spectral embedding arranges the groups along narrow branches. Thus, the demonstration is sensitive to the
+projection method and should not be interpreted as a general clustering benchmark.
 
 \begin{figure}[!htbp]
-\begin{minipage}{7in}\centering
-  \includegraphics[width = 6in]{figure003a.png}
-  \includegraphics[width = 6in]{figure003b.png}
+\begin{minipage}{\textwidth}\centering
+  \includegraphics[width = 0.88\textwidth]{figure003a.png}
+  \includegraphics[width = 0.88\textwidth]{figure003b.png}
 \end{minipage}
 \caption{\label{figure003}
-Typical case (simphy simulation). Colors represent underlying species trees.
+One SimPhy realisation. The upper image compares MDS, t-SNE, Isomap, and nearest-neighbour spectral embeddings of the tree
+signatures; colours denote the four generating species trees. The lower image summarises gene-tree leaf counts, species
+coverage, and pairwise species overlap. Axis coordinates in the embeddings have no direct biological units.
 }\end{figure}
 
-\begin{figure}[!htbp]
-\begin{minipage}{7in}\centering\includegraphics[width = 6.5in]{figure004.png}\end{minipage}
-\caption{\label{figure004}
-  Fungal data set \red{(not same as below BTW)}
-}\end{figure}
+\subsection{Archived fungal example}
 
+The archived fungal analysis used root hierarchical orthologous groups (root HOGs) from an approximately 2018 OMA
+snapshot. At a specified taxonomic level, a HOG represents orthologs and paralogs descending from a common ancestral gene
+\citep{Altenhoff2024OMA}. The original analysis records do not identify a frozen OMA release, HOG manifest, taxon list,
+or complete gene-tree inference pipeline. Approximate counts are retained here only to document the historical proof of
+concept: about 11,000 gene families across 49 species, with approximately 50 high-coverage root HOGs and 120 additional
+large families used to help infer reference trees.
 
-\subsection{Fungal data set}
-The data set to estimate the reference species trees were a set of gene families inferred to have a homolog 
-at the ancestor of fungi, that is root HOGs (rHOGs) \textcolor{red}{(as of 2018; more details or rerun with recent data)}.
-In particular, we chose around 50 rHOGs with more than 46 species, and a further 120 arbitrily large gene families. 
-To create the set of reference trees, we used {\tt guenomu}\cite{Martins2016} to estimate a posterior distribution of species
-trees from the gene family trees, and from the resulting set of species trees, we emulated further five gene family
-trees and used guenomu again to estimate some 30 further good likelihood species trees from these. 
-This set of 70 reference trees (with a few random ones added to round up) was then expanded into 250 by
-branch-length-dependent ``noise addition'' as described in \cite{Martins2016}, and finally the {\tt treesignal} library
-was used to simulate another set of 250 ``random'' reference trees based on these 250 ``good'' trees.
-The final set included around 11k gene families, over 49 species. 
-We ditched the p-valued distances and work only with the min-max ones, since the former didn't perform well. 
-\textcolor{red}{perhaps explanation is easier as a separate section/preprint; why describe p-value if not using it?}.
+Reference candidates were inferred with \textit{guenomu} \citep{Martins2016}, augmented by topology perturbations, and
+contrasted with randomised references. The archived notes describe approximately 250 informed and 250 random reference
+trees. The downstream analysis used the empirical MinMax block and omitted the empirical-rank block because the latter
+did not appear useful in preliminary projections. No predefined criterion for that decision was recorded.
 
-By decomposing the resulting feature matrices with sparse PCA, such that only a fraction of the features (combinations
-of reference species tree and distances to gene family tree) are retained, we see that results chagen if we use ``good''
-reference trees, that is, those based on maximum likelihood estimation by {\tt guenomu}, or if we use random trees
-(see Figures \ref{figure005} and \ref{figure006}).
-Good reference trees lead to first sparse PCA components strongly correlated with specifi distances, for instance the
-first component seems to keep the RF and ILS distances, while the second component points to the number of duplications
-(and to a lesser extent to the number of losses). On the other hand, when using random trees, the first sparse PCA
-components don't seem to be correlated with any particular distance.
+Sparse principal-component analysis (PCA) selected different mixtures of dissimilarities when using informed and random
+reference trees (Figures~\ref{figure005} and \ref{figure006}). For the informed references, individual components were
+often dominated by one or two dissimilarity types. The random-reference components were less readily attributable to a
+single type. This is a descriptive loading analysis; it does not establish that a selected dissimilarity corresponds to
+a unique evolutionary process.
 
 \begin{figure}[!htbp]
-  \begin{minipage}{6.9in}\centering
-  \includegraphics[width = 3.4in]{good_indicator.png}
-  \includegraphics[width = 3.4in]{random_indicator.png}
+  \begin{minipage}{\textwidth}\centering
+  \includegraphics[width = 0.49\textwidth]{good_indicator.png}
+  \includegraphics[width = 0.49\textwidth]{random_indicator.png}
 \end{minipage}
   \caption{\label{figure005}
-    Correlation between the first eight sparse PCA components and the distances to the reference trees, when using good
-    reference trees (left) or random reference trees (right). 
-    Each bar represents, per distance, the number of genes with a load different from zero, for that sparse principal component.
+    Composition of the first eight sparse principal components for informed reference trees (left) and random reference
+    trees (right). Each bar counts non-zero feature loadings, grouped by dissimilarity. A feature is one
+    reference-tree--dissimilarity combination, not one gene family.
   }\end{figure}
+
 \begin{figure}[!htbp]
-  \begin{minipage}{6.9in}\centering
-  \includegraphics[width = 3.4in]{good_weighted.png}
-  \includegraphics[width = 3.4in]{random_weighted.png}
+  \begin{minipage}{\textwidth}\centering
+  \includegraphics[width = 0.49\textwidth]{good_weighted.png}
+  \includegraphics[width = 0.49\textwidth]{random_weighted.png}
 \end{minipage}
   \caption{\label{figure006}
-    Correlation between the first eight sparse PCA components and the distances to the reference trees, when using good
-    reference trees (left) or random reference trees (right). 
-    Each bar represents, per distance, the sum of squares of the loads of all genes, for each sparse PCA component.
-    \textcolor{red}{(todo: plot only first 4 components?)} 
+    Loading weight of the first eight sparse principal components for informed reference trees (left) and random
+    reference trees (right). Each bar is the sum of squared feature loadings for one dissimilarity type.
   }\end{figure}
 
-This indicates that each distance is capturing a different aspect of the gene family trees, and that having good
-reference trees allows us to capture this difference better than random trees.
-The clustering, however, seems to profit from a combination of reference trees (Figure \ref{figure007}).
-\red{say something about the gene families going into different clusters? check score of different features subsets,
-e.g. only good ref trees or only a particular distance, as plot in notebook}
+The full signature matrix also produces visible structure under PCA, Isomap, and spectral embedding
+(Figure~\ref{figure007}). The colours in all panels are five-means labels fitted to the full feature matrix; they are not
+external biological annotations. Their persistence across projections illustrates the geometry imposed by that fitted
+partition, but does not validate five biological classes or show that informed references outperform random references.
 
 \begin{figure}[!htbp]
-  \begin{minipage}{6.9in}\centering
-  \includegraphics[width = 6in]{fungal_all.png}
-  \includegraphics[width = 6in]{fungal_good.png}
-  \includegraphics[width = 6in]{fungal_random.png}
+  \begin{minipage}{\textwidth}\centering
+  \includegraphics[width = 0.88\textwidth]{fungal_all.png}
+  \includegraphics[width = 0.88\textwidth]{fungal_good.png}
+  \includegraphics[width = 0.88\textwidth]{fungal_random.png}
 \end{minipage}
   \caption{\label{figure007}
-    Clustering of the gene families based on the rescaled min-max distances, when using all reference trees (top), only good reference trees (middle) or only random reference trees (bottom).
-    We show several dimension reduction methods (PCA, Isomap, and Spectral Embedding).
-    The colouring is based on k-means clustering with five clusters using all reference trees. 
+    Exploratory projections of archived fungal gene families using all reference trees (top), informed reference trees
+    (middle), or random reference trees (bottom). Columns show PCA, Isomap, and spectral embedding. Colours are
+    five-means labels estimated from the full signature matrix and reused in every panel.
   }\end{figure}
 
+\subsection{Reproducibility status}
+
+The simulations can be reconstructed from notebooks in the software repository, but they currently contain absolute
+paths, unrecorded random states, and version-dependent analysis calls. The empirical input data and analysis code are not
+present. Consequently, all results in this section should be considered provisional until the workflows are made
+portable, parameterised, and repeatable from archived inputs.
+
+\clearpage
+
+\iffalse
+RESULTS REVISION PLAN AND HALLUCINATION GUARDRAILS (not rendered)
+
+1. Do not fill in the exact separation between sampled SPR-chain blocks from memory. Recover it from a deterministic
+script or rerun the simulation. Vary missing taxa independently within and across groups so that missingness is not a
+surrogate class label.
+
+2. Replace every ``typical case'' with a factorial simulation design and multiple seeds. Vary duplication, loss, HGT,
+ILS, gene-family size, taxon coverage, and reference-tree misspecification. Simulate sequences and infer gene trees in at
+least one experiment so that gene-tree estimation error is represented.
+
+3. Predefine quantitative outcomes: adjusted Rand index or classification accuracy for known groups, neighbourhood
+preservation for embeddings, stability across landmark sets, and runtime/memory relative to all-pairs RF/SPR where
+those baselines are defined. Report distributions across replicates, not a selected panel.
+
+4. The archived manuscript stated expectations of one duplication and loss and 0.2 transfers per branch. Those values
+have not been verified against the SimPhy command semantics and must not be restored without checking the simulator
+version and parameterisation.
+
+5. Rebuild the fungal example from a frozen OMA release. Record release/date, taxa and genome identifiers, root-HOG IDs,
+completeness thresholds, sequences, alignments, gene-tree software/models, filtering, reference-tree construction,
+software versions, seeds, and output checksums. The approximate historical counts above are not publication-ready.
+
+6. Test nuisance explanations before interpreting clusters: gene-copy count, number and identity of represented species,
+missingness, alignment length, tree support, duplication count, and sequence-composition or rate effects. Use external
+functional or evolutionary annotations and cluster-stability analyses; colours derived from k-means on the displayed
+features are not biological validation.
+
+7. figure004.png was previously rendered with the note ``not same as below''. It has been removed from the paper until
+its provenance and relationship to the fungal analysis can be established.
+\fi
