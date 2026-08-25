@@ -124,6 +124,31 @@ Completed family files and `families.tsv` are written atomically and act as
 checkpoints. Re-running the same command skips complete families and reuses
 the cached JSON unless `--force` or `--refresh-cache` is supplied.
 
+To download the exact AlphaFold models matching those OMA sequences and build
+structure-based amino-acid alignments with FoldMason:
+
+```console
+python scripts/align_oma_hogs.py \
+  --input-dir data/oma-enterobacterales
+```
+
+The script resolves each OMA member through `members/*.members.tsv` when
+available, queries the AlphaFold DB API using its canonical/UniProt ID, and
+accepts a model only when its amino-acid sequence exactly matches OMA. Cached
+OMA protein JSON supplies IDs when a member table is absent or incomplete.
+Results are written below
+`structure-alignments/`:
+
+- `structures/<family>/*.cif`: downloaded AlphaFold models;
+- `alignments/<family>_aa.fa`: FoldMason amino-acid alignment;
+- `alignments/<family>_3di.fa`: matching FoldMason 3Di alignment;
+- `structure-alignments.tsv`: restartable family-level manifest;
+- `.cache/afdb/`: reusable AlphaFold metadata.
+
+Use `--download-only` to fetch and validate coordinates without running
+FoldMason. Existing models and completed alignments are reused by default;
+`--refresh` replaces them.
+
 OMA levels are data-release-specific. The same command works for fungi or any
 other ancestral genome after replacing `--level` with the exact level shown by
 the [OMA ancestral-genome browser](https://omabrowser.org/oma/genome/). Use a

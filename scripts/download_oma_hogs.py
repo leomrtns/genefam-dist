@@ -334,15 +334,8 @@ def download_family(
 
     assignments: list[tuple[dict[str, Any], str]] = []
     seen_entries: set[Any] = set()
-    for component_index, component in enumerate(family.components, start=1):
+    for component in family.components:
         component_id = str(component["hog_id"])
-        print(
-            f"[{elapsed_minutes(started_at):.1f} min] {family.family_id}: "
-            f"retrieving member list for component "
-            f"{component_index}/{len(family.components)} ({component_id})",
-            file=sys.stderr,
-            flush=True,
-        )
         for member in get_members(client, component_id, level):
             key = member.get("entry_nr", member.get("omaid"))
             if key in seen_entries:
@@ -381,16 +374,8 @@ def download_family(
             executor.submit(get_protein, client, pair[0]): index
             for index, pair in enumerate(assignments)
         }
-        report_every = max(1, len(assignments) // 10)
-        for downloaded, future in enumerate(as_completed(futures), start=1):
+        for future in as_completed(futures):
             proteins[futures[future]] = future.result()
-            if downloaded == 1 or downloaded == len(assignments) or downloaded % report_every == 0:
-                print(
-                    f"[{elapsed_minutes(started_at):.1f} min] {family.family_id}: "
-                    f"downloaded {downloaded}/{len(assignments)} protein JSON records",
-                    file=sys.stderr,
-                    flush=True,
-                )
 
     fasta_parts: dict[str, list[str]] = {kind: [] for kind in fasta_paths}
     metadata: list[dict[str, Any]] = []
