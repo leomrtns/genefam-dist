@@ -1,4 +1,4 @@
-name: treesignal
+name: genefam-dist
 channels:
   - conda-forge
   - bioconda

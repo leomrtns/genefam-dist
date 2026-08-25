@@ -60,7 +60,7 @@ To use conda, the included environment file creates an isolated environment and 
 
 ```console
 conda env create --file environment.yml
-conda activate treesignal
+conda activate genefam-dist
 python -m pytest
 ```
 
