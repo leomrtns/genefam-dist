@@ -70,7 +70,8 @@ there and the corresponding C implementation can be added under `lib/`.
 ## Downloading gene families from OMA
 
 [`scripts/download_oma_hogs.py`](scripts/download_oma_hogs.py) downloads the
-extant protein or coding sequences descended from genes inferred in an OMA
+extant protein, coding-DNA, and AlphaFold 3Di sequences descended from genes
+inferred in an OMA
 ancestral genome. It uses only the Python standard library and caches API
 responses so an interrupted run can be resumed.
 
@@ -94,7 +95,7 @@ python scripts/download_oma_hogs.py \
 ```
 
 To download every family passing the default filters (completeness at least
-0.3 and at least four member genes in four species), explicitly use `--all`.
+0.2 and at least four member genes in four species), explicitly use `--all`.
 In root-HOG mode, a root family is selected if at least one ancestral-gene
 component passes the completeness threshold, then all components of that root
 family are retained:
@@ -109,13 +110,19 @@ python scripts/download_oma_hogs.py \
 
 The result contains:
 
-- `families/*.faa`: one unaligned protein FASTA per output family (`*.fna`
-  with `--sequence-type cdna`);
+- `families/*.faa`, `*.fna`, and `*.3di.fasta`: protein, coding-DNA, and 3Di
+  FASTA files (use `--sequence-type` to request only one type);
 - `members/*.members.tsv`: OMA protein, species, ancestral-HOG, and root-HOG
   metadata for every sequence;
 - `families.tsv`: a family-level manifest;
 - `run.json`: the level, grouping, filters, and API endpoint used;
-- `.cache/`: cached OMA JSON responses used to resume or repeat a run.
+- `.cache/`: cached OMA JSON responses used to resume or repeat a run. The
+  cache is deliberately retained; it can be deleted after a successful run if
+  disk space is more important than a fast restart.
+
+Completed family files and `families.tsv` are written atomically and act as
+checkpoints. Re-running the same command skips complete families and reuses
+the cached JSON unless `--force` or `--refresh-cache` is supplied.
 
 OMA levels are data-release-specific. The same command works for fungi or any
 other ancestral genome after replacing `--level` with the exact level shown by

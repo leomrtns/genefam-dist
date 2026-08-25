@@ -115,6 +115,8 @@ def test_download_merged_family_records_component_assignment(tmp_path):
             "omaid": member["omaid"],
             "canonicalid": f"CAN{index}",
             "sequence": "MPEPTIDE",
+            "cdna": "ATGCCCGAACTGACCATCGATGAA",
+            "structure": {"source": "AlphaFold", "sequence_3di": "ACDEFGHI"},
             "sequence_md5": f"md5-{index}",
         }
 
@@ -136,7 +138,7 @@ def test_download_merged_family_records_component_assignment(tmp_path):
         family,
         "o__Enterobacterales",
         tmp_path,
-        "protein",
+        "all",
         workers=2,
         min_members=4,
         min_species=4,
@@ -147,6 +149,9 @@ def test_download_merged_family_records_component_assignment(tmp_path):
     assert row is not None
     fasta = (tmp_path / row["fasta"]).read_text()
     assert fasta.count(">") == 4
+    assert (tmp_path / row["protein_fasta"]).read_text().count("MPEPTIDE") == 4
+    assert (tmp_path / row["cdna_fasta"]).read_text().count("ATGCCCGAACTGACCATCGATGAA") == 4
+    assert (tmp_path / row["three_di_fasta"]).read_text().count("ACDEFGHI") == 4
     with (tmp_path / row["members_tsv"]).open(newline="") as handle:
         metadata = list(csv.DictReader(handle, delimiter="\t"))
     assert {record["ancestor_hog_id"] for record in metadata} == {
@@ -154,3 +159,14 @@ def test_download_merged_family_records_component_assignment(tmp_path):
         "HOG:F1029536.1b",
     }
     assert {record["root_hog_id"] for record in metadata} == {"HOG:F1029536"}
+
+
+def test_expected_member_count_sums_components():
+    family = oma.Family(
+        "HOG:F1029536",
+        "HOG:F1029536",
+        ({"hog_id": "HOG:F1029536.1a", "nr_genes": 4},
+         {"hog_id": "HOG:F1029536.1b", "nr_genes": 2}),
+    )
+
+    assert oma.expected_member_count(family) == 6

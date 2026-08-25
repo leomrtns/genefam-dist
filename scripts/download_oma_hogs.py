@@ -21,7 +21,7 @@ import sys
 import tempfile
 import threading
 import time
-from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
@@ -33,6 +33,7 @@ from urllib.request import Request, urlopen
 
 DEFAULT_API = "https://omabrowser.org/api"
 TRANSIENT_HTTP_CODES = {429, 500, 502, 503, 504}
+SEQUENCE_TYPES = ("protein", "cdna", "3di")
 
 
 class OMAError(RuntimeError):
@@ -64,12 +65,14 @@ class OMAClient:
         refresh_cache: bool = False,
         timeout: float = 60.0,
         retries: int = 5,
+        started_at: float | None = None,
     ) -> None:
         self.api_base = api_base.rstrip("/")
         self.cache_dir = cache_dir
         self.refresh_cache = refresh_cache
         self.timeout = timeout
         self.retries = retries
+        self.started_at = time.monotonic() if started_at is None else started_at
         self._cache_lock = threading.Lock()
 
     def _url(self, path: str, params: dict[str, Any] | None = None) -> str:
@@ -120,6 +123,13 @@ class OMAClient:
                 failure = OMAError(f"Could not retrieve {url}: {error}")
             if not retry or attempt + 1 == self.retries:
                 raise failure
+            print(
+                f"[{elapsed_minutes(self.started_at):.1f} min] "
+                f"OMA request failed; retrying {url} "
+                f"({attempt + 2}/{self.retries}): {failure}",
+                file=sys.stderr,
+                flush=True,
+            )
             time.sleep(2**attempt)
         raise AssertionError("unreachable")
 
@@ -128,8 +138,15 @@ def iter_hogs_at_level(
     client: OMAClient, level: str, page_size: int = 1000
 ) -> Iterator[dict[str, Any]]:
     """Yield all HOGs representing genes in an ancestral genome."""
+    started_at = getattr(client, "started_at", time.monotonic())
     page = 1
     while True:
+        print(
+            f"[{elapsed_minutes(started_at):.1f} min] "
+            f"retrieving HOG metadata page {page}",
+            file=sys.stderr,
+            flush=True,
+        )
         data = client.get_json(
             "/hog/", {"level": level, "page": page, "per_page": page_size}
         )
@@ -186,6 +203,38 @@ def safe_family_name(family_id: str) -> str:
 
 def wrap_sequence(sequence: str, width: int = 80) -> str:
     return "\n".join(sequence[pos : pos + width] for pos in range(0, len(sequence), width))
+
+
+def elapsed_minutes(started_at: float) -> float:
+    return (time.monotonic() - started_at) / 60
+
+
+def sequence_from_protein(protein: dict[str, Any], sequence_type: str) -> str:
+    if sequence_type == "3di":
+        structure = protein.get("structure")
+        value = structure.get("sequence_3di", "") if isinstance(structure, dict) else ""
+    else:
+        key = "sequence" if sequence_type == "protein" else "cdna"
+        value = protein.get(key, "")
+    return str(value).replace("\n", "").replace(" ", "")
+
+
+def family_fasta_paths(
+    output_dir: Path, stem: str, sequence_type: str
+) -> dict[str, Path]:
+    extensions = {"protein": "faa", "cdna": "fna", "3di": "3di.fasta"}
+    selected = SEQUENCE_TYPES if sequence_type == "all" else (sequence_type,)
+    return {
+        kind: output_dir / "families" / f"{stem}.{extensions[kind]}"
+        for kind in selected
+    }
+
+
+def expected_member_count(family: Family) -> int | None:
+    reported = [hog.get("nr_genes") for hog in family.components]
+    if any(value is None for value in reported):
+        return None
+    return sum(int(float(value)) for value in reported)
 
 
 def member_species(member: dict[str, Any]) -> dict[str, Any]:
@@ -254,27 +303,46 @@ def download_family(
     min_species: int,
     max_members: int | None,
     force: bool,
+    started_at: float | None = None,
 ) -> dict[str, Any] | None:
     """Download one output family, returning its manifest row or None if filtered."""
-    extension = "faa" if sequence_type == "protein" else "fna"
+    if started_at is None:
+        started_at = time.monotonic()
     stem = safe_family_name(family.family_id)
-    fasta_path = output_dir / "families" / f"{stem}.{extension}"
+    fasta_paths = family_fasta_paths(output_dir, stem, sequence_type)
     members_path = output_dir / "members" / f"{stem}.members.tsv"
 
-    if fasta_path.exists() and members_path.exists() and not force:
+    path_fields = {
+        "protein_fasta": fasta_paths.get("protein"),
+        "cdna_fasta": fasta_paths.get("cdna"),
+        "three_di_fasta": fasta_paths.get("3di"),
+    }
+    relative_paths = {
+        field: str(path.relative_to(output_dir)) if path is not None else ""
+        for field, path in path_fields.items()
+    }
+    if all(path.exists() for path in fasta_paths.values()) and members_path.exists() and not force:
         return {
             "family_id": family.family_id,
             "root_hog_id": family.root_hog,
             "component_hogs": ",".join(str(h["hog_id"]) for h in family.components),
             "status": "existing",
-            "fasta": str(fasta_path.relative_to(output_dir)),
+            "fasta": next(path for path in relative_paths.values() if path),
+            **relative_paths,
             "members_tsv": str(members_path.relative_to(output_dir)),
         }
 
     assignments: list[tuple[dict[str, Any], str]] = []
     seen_entries: set[Any] = set()
-    for component in family.components:
+    for component_index, component in enumerate(family.components, start=1):
         component_id = str(component["hog_id"])
+        print(
+            f"[{elapsed_minutes(started_at):.1f} min] {family.family_id}: "
+            f"retrieving member list for component "
+            f"{component_index}/{len(family.components)} ({component_id})",
+            file=sys.stderr,
+            flush=True,
+        )
         for member in get_members(client, component_id, level):
             key = member.get("entry_nr", member.get("omaid"))
             if key in seen_entries:
@@ -283,6 +351,13 @@ def download_family(
                 )
             seen_entries.add(key)
             assignments.append((member, component_id))
+
+    print(
+        f"[{elapsed_minutes(started_at):.1f} min] {family.family_id}: "
+        f"found {len(assignments)} member genes",
+        file=sys.stderr,
+        flush=True,
+    )
 
     species_codes = {member_species(member).get("code") for member, _ in assignments}
     species_codes.discard(None)
@@ -293,19 +368,42 @@ def download_family(
     ):
         return None
 
-    with ThreadPoolExecutor(max_workers=workers) as executor:
-        proteins = list(executor.map(lambda pair: get_protein(client, pair[0]), assignments))
+    print(
+        f"[{elapsed_minutes(started_at):.1f} min] {family.family_id}: "
+        f"downloading {len(assignments)} protein JSON records with {workers} workers",
+        file=sys.stderr,
+        flush=True,
+    )
 
-    fasta_parts: list[str] = []
+    proteins: list[dict[str, Any] | None] = [None] * len(assignments)
+    with ThreadPoolExecutor(max_workers=workers) as executor:
+        futures = {
+            executor.submit(get_protein, client, pair[0]): index
+            for index, pair in enumerate(assignments)
+        }
+        report_every = max(1, len(assignments) // 10)
+        for downloaded, future in enumerate(as_completed(futures), start=1):
+            proteins[futures[future]] = future.result()
+            if downloaded == 1 or downloaded == len(assignments) or downloaded % report_every == 0:
+                print(
+                    f"[{elapsed_minutes(started_at):.1f} min] {family.family_id}: "
+                    f"downloaded {downloaded}/{len(assignments)} protein JSON records",
+                    file=sys.stderr,
+                    flush=True,
+                )
+
+    fasta_parts: dict[str, list[str]] = {kind: [] for kind in fasta_paths}
     metadata: list[dict[str, Any]] = []
-    sequence_key = "sequence" if sequence_type == "protein" else "cdna"
     for protein, (member, component_id) in zip(proteins, assignments):
-        sequence = str(protein.get(sequence_key, "")).replace("\n", "").replace(" ", "")
-        if not sequence:
-            raise OMAError(f"No {sequence_key} sequence returned for {protein.get('omaid')}")
+        assert protein is not None
         omaid = str(protein["omaid"])
-        fasta_parts.append(f">{omaid}\n{wrap_sequence(sequence)}\n")
+        sequences = {kind: sequence_from_protein(protein, kind) for kind in fasta_paths}
+        for kind, sequence in sequences.items():
+            if not sequence:
+                raise OMAError(f"No {kind} sequence returned for {omaid}")
+            fasta_parts[kind].append(f">{omaid}\n{wrap_sequence(sequence)}\n")
         species = member_species(member)
+        metadata_sequence = sequences.get("protein") or next(iter(sequences.values()))
         metadata.append(
             {
                 "omaid": omaid,
@@ -317,12 +415,13 @@ def download_family(
                 "ancestor_hog_id": component_id,
                 "root_hog_id": family.root_hog,
                 "member_hog_id": member.get("oma_hog_id", ""),
-                "sequence_length": len(sequence),
+                "sequence_length": len(metadata_sequence),
                 "sequence_md5": protein.get("sequence_md5", member.get("sequence_md5", "")),
             }
         )
 
-    _atomic_write_text(fasta_path, "".join(fasta_parts))
+    for kind, fasta_path in fasta_paths.items():
+        _atomic_write_text(fasta_path, "".join(fasta_parts[kind]))
     _atomic_write_text(members_path, _tsv_text(MEMBER_FIELDS, metadata))
     completeness = [float(h.get("completeness_score", 0.0)) for h in family.components]
     return {
@@ -336,7 +435,8 @@ def download_family(
         "max_component_completeness": max(completeness, default=""),
         "description": family.components[0].get("description", ""),
         "status": "downloaded",
-        "fasta": str(fasta_path.relative_to(output_dir)),
+        "fasta": next(path for path in relative_paths.values() if path),
+        **relative_paths,
         "members_tsv": str(members_path.relative_to(output_dir)),
     }
 
@@ -353,6 +453,9 @@ MANIFEST_FIELDS = (
     "description",
     "status",
     "fasta",
+    "protein_fasta",
+    "cdna_fasta",
+    "three_di_fasta",
     "members_tsv",
     "error",
 )
@@ -409,7 +512,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--min-completeness",
         type=float,
-        default=0.3,
+        default=0.2,
         help=(
             "minimum HOG completeness (in root-hog mode, at least one component "
             "must pass and all of that root's components are retained)"
@@ -418,7 +521,12 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--min-members", type=int, default=4)
     parser.add_argument("--min-species", type=int, default=4)
     parser.add_argument("--max-members", type=int)
-    parser.add_argument("--sequence-type", choices=("protein", "cdna"), default="protein")
+    parser.add_argument(
+        "--sequence-type",
+        choices=("all", *SEQUENCE_TYPES),
+        default="all",
+        help="sequence output to write; all reuses each protein JSON for protein, DNA, and 3Di",
+    )
     parser.add_argument("--workers", type=int, default=8)
     parser.add_argument("--page-size", type=int, default=1000)
     parser.add_argument("--api-base", default=DEFAULT_API)
@@ -462,6 +570,7 @@ def selected_hogs(client: OMAClient, args: argparse.Namespace) -> Iterator[dict[
 
 
 def main(argv: Sequence[str] | None = None) -> int:
+    started_at = time.monotonic()
     parser = build_parser()
     args = parser.parse_args(argv)
     validate_args(parser, args)
@@ -473,10 +582,11 @@ def main(argv: Sequence[str] | None = None) -> int:
         args.refresh_cache,
         args.timeout,
         args.retries,
+        started_at,
     )
 
     hogs = selected_hogs(client, args)
-    families = (
+    families = [
         family
         for family in group_hogs(hogs, args.grouping)
         if family_metadata_filter(
@@ -486,6 +596,13 @@ def main(argv: Sequence[str] | None = None) -> int:
             args.min_members,
             args.max_members,
         )
+    ]
+    maximum = args.max_families if args.max_families is not None else len(families)
+    print(
+        f"[{elapsed_minutes(started_at):.1f} min] Found {len(families)} metadata-matching "
+        f"gene families; expecting up to {min(maximum, len(families))} output families",
+        file=sys.stderr,
+        flush=True,
     )
     if args.dry_run:
         for index, family in enumerate(families, start=1):
@@ -501,11 +618,20 @@ def main(argv: Sequence[str] | None = None) -> int:
     manifest: list[dict[str, Any]] = []
     failures = 0
     completed = 0
-    for family in families:
+    for candidate_index, family in enumerate(families, start=1):
         attempted = completed + failures
         if args.max_families is not None and attempted >= args.max_families:
             break
-        print(f"[{attempted + 1}] {family.family_id}", file=sys.stderr, flush=True)
+        expected_genes = expected_member_count(family)
+        expectation = "unknown number of" if expected_genes is None else str(expected_genes)
+        print(
+            f"[{elapsed_minutes(started_at):.1f} min] "
+            f"[{attempted + 1}/{min(maximum, len(families))}; "
+            f"candidate {candidate_index}/{len(families)}] {family.family_id}: "
+            f"expecting {expectation} member genes",
+            file=sys.stderr,
+            flush=True,
+        )
         try:
             row = download_family(
                 client,
@@ -518,11 +644,15 @@ def main(argv: Sequence[str] | None = None) -> int:
                 args.min_species,
                 args.max_members,
                 args.force,
+                started_at,
             )
             if row is None:
                 continue
             manifest.append(row)
             completed += 1
+            _atomic_write_text(
+                output_dir / "families.tsv", _tsv_text(MANIFEST_FIELDS, manifest)
+            )
         except (OMAError, OSError, ValueError) as error:
             failures += 1
             manifest.append(
@@ -537,6 +667,9 @@ def main(argv: Sequence[str] | None = None) -> int:
                 }
             )
             print(f"error: {error}", file=sys.stderr)
+            _atomic_write_text(
+                output_dir / "families.tsv", _tsv_text(MANIFEST_FIELDS, manifest)
+            )
 
     _atomic_write_text(output_dir / "families.tsv", _tsv_text(MANIFEST_FIELDS, manifest))
     run_info = {
@@ -552,9 +685,14 @@ def main(argv: Sequence[str] | None = None) -> int:
         "requested_hog_ids": args.hog_id,
         "completed_families": completed,
         "failed_families": failures,
+        "candidate_families": len(families),
     }
     _atomic_write_text(output_dir / "run.json", json.dumps(run_info, indent=2) + "\n")
-    print(f"Wrote {completed} families to {output_dir}", file=sys.stderr)
+    print(
+        f"[{elapsed_minutes(started_at):.1f} min] Wrote {completed} families to {output_dir}; "
+        f"kept reusable JSON cache in {cache_dir}",
+        file=sys.stderr,
+    )
     return 1 if failures else 0
 
 
