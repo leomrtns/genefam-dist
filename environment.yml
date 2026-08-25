@@ -1,6 +1,7 @@
 name: treesignal
 channels:
   - conda-forge
+  - bioconda
 dependencies:
   - python>=3.9
   - c-compiler
@@ -10,5 +11,6 @@ dependencies:
   - numpy>=1.23
   - dendropy>=4.6
   - pytest
+  - foldmason
   - pip:
       - -e .
