@@ -119,7 +119,7 @@ The result contains:
 
 OMA levels are data-release-specific. The same command works for fungi or any
 other ancestral genome after replacing `--level` with the exact level shown by
-the [OMA ancestral-genome browser](https://omabrowser.org/oma/genomes/). Use a
+the [OMA ancestral-genome browser](https://omabrowser.org/oma/genome/). Use a
 small `--max-families` run first to validate the name and sampling. The OMA API
 defines HOGs at a taxonomic level and exposes their member proteins in its
 [REST documentation](https://omabrowser.org/api/docs).
