@@ -35,10 +35,19 @@ from urllib.request import Request, urlopen
 
 DEFAULT_AFDB_API = "https://alphafold.ebi.ac.uk/api/prediction"
 TRANSIENT_HTTP_CODES = {429, 500, 502, 503, 504}
+UNIPROT_ACCESSION = re.compile(
+  r"^(?P<accession>(?:[OPQ][0-9][A-Z0-9]{3}[0-9]|"
+  r"[A-NR-Z][0-9][A-Z0-9]{3}[0-9]|"
+  r"[A-NR-Z][0-9][A-Z0-9]{3}[0-9][A-Z0-9]{3}[0-9]))(?:-\d+)?$"
+)
 
 
 class AlignmentError(RuntimeError):
   """An input, download, or FoldMason result was invalid."""
+
+
+class UnsupportedAFDBIdentifier(AlignmentError):
+  """OMA has no AlphaFold DB-compatible identifier for a protein."""
 
 
 def atomic_write(path: Path, data: bytes) -> None:
@@ -287,6 +296,12 @@ def select_model(
   return exact[0]
 
 
+def afdb_accession(identifier: str) -> str | None:
+  """Return the UniProt accession accepted by the AlphaFold DB API, if present."""
+  match = UNIPROT_ACCESSION.fullmatch(identifier.strip())
+  return match.group("accession") if match else None
+
+
 def canonical_ids(
   family: FamilyInput,
   amino_acids: dict[str, str],
@@ -298,11 +313,15 @@ def canonical_ids(
     canonical = member_identifiers.get(omaid, "")
     if not canonical:
       canonical = str(cached_proteins.get(omaid, {}).get("canonicalid", ""))
-    if not canonical:
-      raise AlignmentError(
-        f"No canonical/UniProt ID for {family.stem}/{omaid} in member table or OMA cache"
+    accession = afdb_accession(canonical)
+    if accession is None:
+      raise UnsupportedAFDBIdentifier(
+        f"{family.stem}/{omaid} has OMA canonical ID {canonical!r}, not a UniProt "
+        "accession accepted by AlphaFold DB. OMA's 3Di sequence is not a coordinate "
+        "model, so FoldMason needs a predicted or experimental PDB/mmCIF structure "
+        "for this protein."
       )
-    result[omaid] = canonical
+    result[omaid] = accession
   return result
 
 
@@ -603,6 +622,19 @@ def main(argv: Sequence[str] | None = None) -> int:
         started_at,
         f"{family.stem}: {status} ({len(model_paths)} models)",
       )
+    except UnsupportedAFDBIdentifier as error:
+      failures += 1
+      manifest.append(
+        {
+          "family": family.stem,
+          "status": "error",
+          "structures": str(structure_dir.relative_to(output_dir)),
+          "error": str(error),
+        }
+      )
+      atomic_write_text(output_dir / "structure-alignments.tsv", tsv_text(manifest))
+      progress(started_at, f"Stopped: {error}")
+      return 2
     except (AlignmentError, OSError, ValueError) as error:
       failures += 1
       manifest.append(

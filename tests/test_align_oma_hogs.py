@@ -79,6 +79,28 @@ def test_cached_oma_json_supplies_missing_canonical_id(tmp_path):
   assert result == {"OMA1": "P00001", "OMA2": "P00002"}
 
 
+def test_canonical_ids_rejects_refseq_identifiers_for_alphafold_db(tmp_path):
+  family = write_family(tmp_path)
+  amino_acids, _three_di = aligner.validate_family_sequences(family)
+
+  try:
+    aligner.canonical_ids(
+      family,
+      amino_acids,
+      {"OMA1": "WP_013355364.1", "OMA2": "P00002"},
+      {},
+    )
+  except aligner.UnsupportedAFDBIdentifier as error:
+    assert "not a UniProt accession" in str(error)
+  else:
+    raise AssertionError("RefSeq IDs must not be sent to AlphaFold DB")
+
+
+def test_afdb_accession_strips_uniprot_isoform_suffix():
+  assert aligner.afdb_accession("P12345-2") == "P12345"
+  assert aligner.afdb_accession("WP_013355364.1") is None
+
+
 def test_validate_foldmason_output_checks_projected_amino_acids(tmp_path):
   family = write_family(tmp_path)
   output_prefix = tmp_path / "alignments" / family.stem

@@ -133,9 +133,14 @@ python scripts/align_oma_hogs.py \
 ```
 
 The script resolves each OMA member through `members/*.members.tsv` when
-available, queries the AlphaFold DB API using its canonical/UniProt ID, and
-accepts a model only when its amino-acid sequence exactly matches OMA. Cached
-OMA protein JSON supplies IDs when a member table is absent or incomplete.
+available, queries the AlphaFold DB API using a UniProt accession, and accepts
+a model only when its amino-acid sequence exactly matches OMA. Cached OMA
+protein JSON supplies IDs when a member table is absent or incomplete. This
+works only for proteins that OMA identifies with a UniProt accession. In
+particular, RefSeq/GenBank-only OMA proteins (such as `WP_...`) cannot be
+looked up in AlphaFold DB: their OMA 3Di strings are ProstT5 predictions, not
+downloadable AlphaFold coordinates. Provide predicted or experimental
+PDB/mmCIF structures for every member before using FoldMason in that case.
 Results are written below
 `structure-alignments/`:
 
