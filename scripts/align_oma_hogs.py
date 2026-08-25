@@ -1,53 +1,60 @@
 #!/usr/bin/env python3
-"""Download OMA members' AlphaFold models and align each family with FoldMason.
+"""Align OMA gene families from paired amino-acid and ProstT5 3Di FASTA files.
 
-The input directory is an output directory from ``download_oma_hogs.py``. Each
-family must have ``families/<name>.faa`` and ``families/<name>.3di.fasta``.
-Member tables provide canonical IDs when present; OMA protein JSON files in
-``.cache`` are used as a fallback.
-
-Only the Python standard library is required. FoldMason is an external runtime
-dependency unless ``--download-only`` is used.
+The input is produced by ``download_oma_hogs.py --sequence-type all``. For
+each family, this script builds matching Foldseek amino-acid and 3Di databases
+and runs FoldMason's ``structuremsa`` command. No coordinates, AlphaFold DB
+accessions, network access, or structure prediction are required.
 """
 
 from __future__ import annotations
 
 import argparse
 import csv
-import hashlib
-import json
 import os
 import re
 import shutil
 import subprocess
 import sys
 import tempfile
-import threading
 import time
-from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Iterable, Sequence
-from urllib.error import HTTPError, URLError
-from urllib.parse import quote
-from urllib.request import Request, urlopen
-
-
-DEFAULT_AFDB_API = "https://alphafold.ebi.ac.uk/api/prediction"
-TRANSIENT_HTTP_CODES = {429, 500, 502, 503, 504}
-UNIPROT_ACCESSION = re.compile(
-  r"^(?P<accession>(?:[OPQ][0-9][A-Z0-9]{3}[0-9]|"
-  r"[A-NR-Z][0-9][A-Z0-9]{3}[0-9]|"
-  r"[A-NR-Z][0-9][A-Z0-9]{3}[0-9][A-Z0-9]{3}[0-9]))(?:-\d+)?$"
-)
+from typing import Iterable, Sequence
 
 
 class AlignmentError(RuntimeError):
-  """An input, download, or FoldMason result was invalid."""
+  """An input or FoldMason result was invalid."""
 
 
-class UnsupportedAFDBIdentifier(AlignmentError):
-  """OMA has no AlphaFold DB-compatible identifier for a protein."""
+@dataclass(frozen=True)
+class FamilyInput:
+  stem: str
+  amino_acids: Path
+  three_di: Path
+
+
+MANIFEST_FIELDS = (
+  "family",
+  "member_count",
+  "status",
+  "amino_acid_alignment",
+  "three_di_alignment",
+  "guide_tree",
+  "error",
+)
+
+
+def elapsed_minutes(started_at: float) -> float:
+  return (time.monotonic() - started_at) / 60
+
+
+def progress(started_at: float, message: str) -> None:
+  print(
+    f"[{elapsed_minutes(started_at):.1f} min] {message}",
+    file=sys.stderr,
+    flush=True,
+  )
 
 
 def atomic_write(path: Path, data: bytes) -> None:
@@ -71,18 +78,6 @@ def atomic_write_text(path: Path, text: str) -> None:
 
 def safe_name(value: str) -> str:
   return re.sub(r"[^A-Za-z0-9._-]+", "_", value).strip("._")
-
-
-def elapsed_minutes(started_at: float) -> float:
-  return (time.monotonic() - started_at) / 60
-
-
-def progress(started_at: float, message: str) -> None:
-  print(
-    f"[{elapsed_minutes(started_at):.1f} min] {message}",
-    file=sys.stderr,
-    flush=True,
-  )
 
 
 def read_fasta(path: Path) -> dict[str, str]:
@@ -112,65 +107,21 @@ def read_fasta(path: Path) -> dict[str, str]:
   return {key: "".join(parts) for key, parts in records.items()}
 
 
-def read_member_ids(path: Path) -> dict[str, str]:
-  try:
-    with path.open(encoding="utf-8", newline="") as handle:
-      rows = csv.DictReader(handle, delimiter="\t")
-      if rows.fieldnames is None or "omaid" not in rows.fieldnames:
-        raise AlignmentError(f"Missing omaid column in {path}")
-      return {
-        str(row.get("omaid", "")): str(row.get("canonical_id", ""))
-        for row in rows
-        if row.get("omaid")
-      }
-  except OSError as error:
-    raise AlignmentError(f"Could not read {path}: {error}") from error
-
-
-def cached_oma_proteins(cache_dir: Path) -> dict[str, dict[str, Any]]:
-  """Index cached OMA protein records by OMA ID."""
-  proteins: dict[str, dict[str, Any]] = {}
-  if not cache_dir.is_dir():
-    return proteins
-  for path in cache_dir.rglob("*.json"):
-    try:
-      data = json.loads(path.read_text(encoding="utf-8"))
-    except (OSError, json.JSONDecodeError):
-      continue
-    if isinstance(data, dict) and data.get("omaid") and data.get("sequence"):
-      proteins[str(data["omaid"])] = data
-  return proteins
-
-
-@dataclass(frozen=True)
-class FamilyInput:
-  stem: str
-  amino_acids: Path
-  three_di: Path
-  members: Path | None
-
-
 def discover_families(input_dir: Path) -> list[FamilyInput]:
   family_dir = input_dir / "families"
-  member_dir = input_dir / "members"
   families: list[FamilyInput] = []
   for amino_acids in sorted(family_dir.glob("*.faa")):
     stem = amino_acids.name.removesuffix(".faa")
     three_di = family_dir / f"{stem}.3di.fasta"
-    members = member_dir / f"{stem}.members.tsv"
     if not three_di.is_file():
-      raise AlignmentError(f"Missing companion input for {amino_acids}: {three_di}")
-    families.append(
-      FamilyInput(stem, amino_acids, three_di, members if members.is_file() else None)
-    )
+      raise AlignmentError(f"Missing companion 3Di FASTA for {amino_acids}: {three_di}")
+    families.append(FamilyInput(stem, amino_acids, three_di))
   if not families:
     raise AlignmentError(f"No family .faa files found under {family_dir}")
   return families
 
 
-def validate_family_sequences(
-  family: FamilyInput,
-) -> tuple[dict[str, str], dict[str, str]]:
+def validate_family(family: FamilyInput) -> tuple[dict[str, str], dict[str, str]]:
   amino_acids = read_fasta(family.amino_acids)
   three_di = read_fasta(family.three_di)
   if amino_acids.keys() != three_di.keys():
@@ -181,287 +132,145 @@ def validate_family_sequences(
       f"AA-only={only_aa[:5]}, 3Di-only={only_3di[:5]}"
     )
   for omaid, sequence in amino_acids.items():
-    if "-" in sequence or "-" in three_di[omaid]:
+    structural = three_di[omaid]
+    if "-" in sequence or "-" in structural:
       raise AlignmentError(f"Input sequences must be unaligned: {family.stem}/{omaid}")
-    if len(sequence) != len(three_di[omaid]):
+    if len(sequence) != len(structural):
       raise AlignmentError(
         f"AA/3Di length mismatch for {family.stem}/{omaid}: "
-        f"{len(sequence)} != {len(three_di[omaid])}"
+        f"{len(sequence)} != {len(structural)}"
       )
   return amino_acids, three_di
 
 
-class AFDBClient:
-  """Cached and retrying client for AlphaFold DB metadata and model files."""
-
-  def __init__(
-    self,
-    api_base: str,
-    cache_dir: Path,
-    timeout: float,
-    retries: int,
-    refresh: bool,
-    started_at: float,
-  ) -> None:
-    self.api_base = api_base.rstrip("/")
-    self.cache_dir = cache_dir
-    self.timeout = timeout
-    self.retries = retries
-    self.refresh = refresh
-    self.started_at = started_at
-    self.cache_lock = threading.Lock()
-
-  def request(self, url: str, accept: str) -> bytes:
-    request = Request(
-      url,
-      headers={
-        "Accept": accept,
-        "User-Agent": "genefam-dist-structure-aligner/1.0",
-      },
-    )
-    for attempt in range(self.retries):
-      try:
-        with urlopen(request, timeout=self.timeout) as response:
-          return response.read()
-      except HTTPError as error:
-        retry = error.code in TRANSIENT_HTTP_CODES
-        failure = AlignmentError(f"HTTP {error.code} for {url}")
-      except (URLError, TimeoutError, OSError) as error:
-        retry = True
-        failure = AlignmentError(f"Could not retrieve {url}: {error}")
-      if not retry or attempt + 1 == self.retries:
-        raise failure
-      progress(
-        self.started_at,
-        f"request failed; retrying {url} ({attempt + 2}/{self.retries}): {failure}",
-      )
-      time.sleep(2**attempt)
-    raise AssertionError("unreachable")
-
-  def metadata(self, accession: str) -> list[dict[str, Any]]:
-    digest = hashlib.sha256(accession.encode("utf-8")).hexdigest()
-    path = self.cache_dir / "metadata" / f"{digest}.json"
-    if path.is_file() and not self.refresh:
-      try:
-        data = json.loads(path.read_text(encoding="utf-8"))
-        if isinstance(data, list):
-          return data
-      except (OSError, json.JSONDecodeError):
-        pass
-    url = f"{self.api_base}/{quote(accession, safe='')}"
-    payload = self.request(url, "application/json")
-    try:
-      data = json.loads(payload.decode("utf-8"))
-    except (UnicodeDecodeError, json.JSONDecodeError) as error:
-      raise AlignmentError(f"Invalid AlphaFold metadata for {accession}: {error}") from error
-    if not isinstance(data, list):
-      raise AlignmentError(f"Unexpected AlphaFold metadata for {accession}")
-    with self.cache_lock:
-      atomic_write(path, payload)
-    return data
-
-  def model(self, url: str, path: Path) -> None:
-    if path.is_file() and path.stat().st_size > 0 and not self.refresh:
-      return
-    payload = self.request(url, "chemical/x-mmcif,text/plain")
-    if not payload.lstrip().startswith(b"data_"):
-      raise AlignmentError(f"Downloaded AlphaFold model is not mmCIF: {url}")
-    with self.cache_lock:
-      atomic_write(path, payload)
-
-
-def select_model(
-  records: Iterable[dict[str, Any]],
-  accession: str,
-  expected_sequence: str,
-) -> dict[str, Any]:
-  exact = [
-    record
-    for record in records
-    if record.get("cifUrl")
-    and str(record.get("sequence") or record.get("uniprotSequence") or "")
-    == expected_sequence
-  ]
-  if not exact:
-    raise AlignmentError(
-      f"AlphaFold DB has no model whose sequence exactly matches OMA {accession}"
-    )
-  exact.sort(
-    key=lambda record: (
-      bool(record.get("isComplex")),
-      -int(record.get("latestVersion") or 0),
-      str(record.get("modelEntityId") or ""),
-    )
-  )
-  return exact[0]
-
-
-def afdb_accession(identifier: str) -> str | None:
-  """Return the UniProt accession accepted by the AlphaFold DB API, if present."""
-  match = UNIPROT_ACCESSION.fullmatch(identifier.strip())
-  return match.group("accession") if match else None
-
-
-def canonical_ids(
-  family: FamilyInput,
-  amino_acids: dict[str, str],
-  member_identifiers: dict[str, str],
-  cached_proteins: dict[str, dict[str, Any]],
-) -> dict[str, str]:
-  result: dict[str, str] = {}
-  for omaid in amino_acids:
-    canonical = member_identifiers.get(omaid, "")
-    if not canonical:
-      canonical = str(cached_proteins.get(omaid, {}).get("canonicalid", ""))
-    accession = afdb_accession(canonical)
-    if accession is None:
-      raise UnsupportedAFDBIdentifier(
-        f"{family.stem}/{omaid} has OMA canonical ID {canonical!r}, not a UniProt "
-        "accession accepted by AlphaFold DB. OMA's 3Di sequence is not a coordinate "
-        "model, so FoldMason needs a predicted or experimental PDB/mmCIF structure "
-        "for this protein."
-      )
-    result[omaid] = accession
-  return result
-
-
-def download_family_models(
-  client: AFDBClient,
-  family: FamilyInput,
-  amino_acids: dict[str, str],
-  identifiers: dict[str, str],
-  structure_dir: Path,
-  workers: int,
-  started_at: float,
-) -> list[Path]:
-  structure_dir.mkdir(parents=True, exist_ok=True)
-
-  def download_one(omaid: str) -> Path:
-    path = structure_dir / f"{safe_name(omaid)}.cif"
-    accession = identifiers[omaid]
-    record = select_model(client.metadata(accession), accession, amino_acids[omaid])
-    client.model(str(record["cifUrl"]), path)
-    return path
-
-  paths: list[Path] = []
-  with ThreadPoolExecutor(max_workers=workers) as executor:
-    futures = {executor.submit(download_one, omaid): omaid for omaid in amino_acids}
-    total = len(futures)
-    report_every = max(1, total // 10)
-    for completed, future in enumerate(as_completed(futures), start=1):
-      omaid = futures[future]
-      try:
-        paths.append(future.result())
-      except Exception as error:
-        raise AlignmentError(f"Could not download model for {family.stem}/{omaid}: {error}") \
-          from error
-      if completed == 1 or completed == total or completed % report_every == 0:
-        progress(
-          started_at,
-          f"{family.stem}: prepared {completed}/{total} AlphaFold models",
-        )
-  return sorted(paths)
-
-
 def find_foldmason(command: str) -> str:
   if os.sep in command:
-    path = Path(command)
-    if path.is_file() and os.access(path, os.X_OK):
-      return str(path)
+    candidate = Path(command)
+    if candidate.is_file() and os.access(candidate, os.X_OK):
+      return str(candidate)
   else:
     resolved = shutil.which(command)
     if resolved:
       return resolved
-  raise AlignmentError(
-    f"FoldMason executable not found: {command}; install it or use --download-only"
-  )
+  raise AlignmentError(f"FoldMason executable not found: {command}")
 
 
-def validate_foldmason_output(
-  family: FamilyInput,
-  output_prefix: Path,
-  expected_amino_acids: dict[str, str],
+def run_command(
+  command: list[str],
+  started_at: float,
+  label: str,
 ) -> None:
-  aa_path = Path(f"{output_prefix}_aa.fa")
-  three_di_path = Path(f"{output_prefix}_3di.fa")
-  if not aa_path.is_file() or not three_di_path.is_file():
+  try:
+    process = subprocess.Popen(command)
+    while True:
+      try:
+        return_code = process.wait(timeout=60)
+        break
+      except subprocess.TimeoutExpired:
+        progress(started_at, f"{label}: still running")
+  except OSError as error:
+    raise AlignmentError(f"Could not run {command[0]}: {error}") from error
+  if return_code:
     raise AlignmentError(
-      f"FoldMason did not create expected outputs {aa_path.name} and {three_di_path.name}"
+      f"Command failed with exit status {return_code}: {' '.join(command)}"
     )
+
+
+def output_paths(output_dir: Path, stem: str) -> tuple[Path, Path, Path]:
+  prefix = output_dir / "alignments" / stem
+  return Path(f"{prefix}_aa.fa"), Path(f"{prefix}_3di.fa"), Path(f"{prefix}.nw")
+
+
+def validate_alignment(
+  family: FamilyInput,
+  amino_acids: dict[str, str],
+  three_di: dict[str, str],
+  aa_path: Path,
+  three_di_path: Path,
+) -> None:
   aligned_aa = read_fasta(aa_path)
   aligned_3di = read_fasta(three_di_path)
-  if aligned_aa.keys() != aligned_3di.keys():
-    raise AlignmentError(f"FoldMason AA and 3Di identifiers differ for {family.stem}")
-  if aligned_aa.keys() != expected_amino_acids.keys():
+  expected_ids = amino_acids.keys()
+  if aligned_aa.keys() != expected_ids or aligned_3di.keys() != expected_ids:
     raise AlignmentError(f"FoldMason output identifiers differ from OMA for {family.stem}")
   lengths = {len(sequence) for sequence in aligned_aa.values()}
-  if len(lengths) != 1 or any(len(aligned_3di[key]) not in lengths for key in aligned_3di):
-    raise AlignmentError(f"FoldMason outputs are not rectangular for {family.stem}")
-  for omaid, sequence in aligned_aa.items():
-    if sequence.replace("-", "").upper() != expected_amino_acids[omaid].upper():
+  if len(lengths) != 1:
+    raise AlignmentError(f"FoldMason amino-acid output is not rectangular for {family.stem}")
+  alignment_length = next(iter(lengths))
+  if any(len(sequence) != alignment_length for sequence in aligned_3di.values()):
+    raise AlignmentError(f"FoldMason AA and 3Di alignment lengths differ for {family.stem}")
+  for omaid in amino_acids:
+    if aligned_aa[omaid].replace("-", "").upper() != amino_acids[omaid].upper():
       raise AlignmentError(f"FoldMason changed the amino-acid sequence for {family.stem}/{omaid}")
+    if aligned_3di[omaid].replace("-", "").upper() != three_di[omaid].upper():
+      raise AlignmentError(f"FoldMason changed the 3Di sequence for {family.stem}/{omaid}")
 
 
-def run_foldmason(
+def align_family(
   foldmason: str,
   family: FamilyInput,
-  structure_dir: Path,
-  output_prefix: Path,
-  expected_amino_acids: dict[str, str],
-  report_mode: int,
-) -> None:
-  output_prefix.parent.mkdir(parents=True, exist_ok=True)
-  temporary_root = output_prefix.parent.parent / ".foldmason"
-  temporary_root.mkdir(parents=True, exist_ok=True)
-  with tempfile.TemporaryDirectory(prefix=f"{family.stem}.", dir=temporary_root) as temporary:
-    work_dir = Path(temporary)
-    staged_prefix = work_dir / "result"
-    foldmason_tmp = work_dir / "tmp"
+  amino_acids: dict[str, str],
+  three_di: dict[str, str],
+  output_dir: Path,
+  threads: int,
+  refine_iters: int,
+  keep_work: bool,
+  started_at: float,
+) -> tuple[Path, Path, Path]:
+  work_root = output_dir / ".work"
+  work_root.mkdir(parents=True, exist_ok=True)
+  work_dir = Path(tempfile.mkdtemp(prefix=f"{family.stem}.", dir=work_root))
+  database = work_dir / "family_db"
+  staged_prefix = work_dir / "alignment"
+  try:
+    common = ["--shuffle", "0", "--threads", str(threads), "-v", "1"]
+    run_command(
+      [foldmason, "base:createdb", str(family.amino_acids), str(database), *common],
+      started_at,
+      f"{family.stem}: building amino-acid database",
+    )
+    run_command(
+      [foldmason, "base:createdb", str(family.three_di), f"{database}_ss", *common],
+      started_at,
+      f"{family.stem}: building 3Di database",
+    )
     command = [
       foldmason,
-      "easy-msa",
-      str(structure_dir),
+      "structuremsa",
+      str(database),
       str(staged_prefix),
-      str(foldmason_tmp),
-      "--report-mode",
-      str(report_mode),
+      "--threads",
+      str(threads),
+      "--refine-iters",
+      str(refine_iters),
+      "-v",
+      "1",
     ]
-    try:
-      subprocess.run(command, check=True)
-    except subprocess.CalledProcessError as error:
-      raise AlignmentError(
-        f"FoldMason failed for {family.stem} with exit status {error.returncode}"
-      ) from error
-    validate_foldmason_output(family, staged_prefix, expected_amino_acids)
-    staged_outputs = [path for path in work_dir.glob("result*") if path.is_file()]
-    if not staged_outputs:
-      raise AlignmentError(f"FoldMason created no output files for {family.stem}")
-    for staged in staged_outputs:
-      suffix = staged.name.removeprefix("result")
-      os.replace(staged, Path(f"{output_prefix}{suffix}"))
+    run_command(command, started_at, f"{family.stem}: FoldMason alignment")
+    staged = (
+      Path(f"{staged_prefix}_aa.fa"),
+      Path(f"{staged_prefix}_3di.fa"),
+      Path(f"{staged_prefix}.nw"),
+    )
+    if any(not path.is_file() for path in staged):
+      raise AlignmentError(f"FoldMason did not create all expected outputs for {family.stem}")
+    validate_alignment(family, amino_acids, three_di, staged[0], staged[1])
+    final = output_paths(output_dir, family.stem)
+    for source, destination in zip(staged, final):
+      atomic_write(destination, source.read_bytes())
+  except BaseException:
+    print(f"Retained failed work directory: {work_dir}", file=sys.stderr, flush=True)
+    raise
+  if not keep_work:
+    shutil.rmtree(work_dir)
+  return final
 
 
-MANIFEST_FIELDS = (
-  "family",
-  "member_count",
-  "status",
-  "structures",
-  "amino_acid_alignment",
-  "three_di_alignment",
-  "error",
-)
-
-
-def tsv_text(rows: Iterable[dict[str, Any]]) -> str:
+def tsv_text(rows: Iterable[dict[str, object]]) -> str:
   from io import StringIO
 
   stream = StringIO(newline="")
-  writer = csv.DictWriter(
-    stream,
-    fieldnames=MANIFEST_FIELDS,
-    delimiter="\t",
-    extrasaction="ignore",
-  )
+  writer = csv.DictWriter(stream, fieldnames=MANIFEST_FIELDS, delimiter="\t", extrasaction="ignore")
   writer.writeheader()
   writer.writerows(rows)
   return stream.getvalue()
@@ -469,7 +278,7 @@ def tsv_text(rows: Iterable[dict[str, Any]]) -> str:
 
 def build_parser() -> argparse.ArgumentParser:
   parser = argparse.ArgumentParser(
-    description="Download AlphaFold models for OMA families and align them with FoldMason."
+    description="Align paired OMA amino-acid and ProstT5 3Di sequences with FoldMason."
   )
   parser.add_argument("--input-dir", required=True, type=Path)
   parser.add_argument(
@@ -477,41 +286,26 @@ def build_parser() -> argparse.ArgumentParser:
     type=Path,
     help="default: INPUT_DIR/structure-alignments",
   )
-  parser.add_argument(
-    "--family",
-    action="append",
-    default=[],
-    help="family ID or filename stem (repeatable)",
-  )
+  parser.add_argument("--family", action="append", default=[], help="family stem; repeatable")
   parser.add_argument("--max-families", type=int)
-  parser.add_argument("--workers", type=int, default=4)
+  parser.add_argument("--threads", type=int, default=os.cpu_count() or 1)
   parser.add_argument("--foldmason", default="foldmason")
-  parser.add_argument("--afdb-api", default=DEFAULT_AFDB_API)
-  parser.add_argument("--timeout", type=float, default=60.0)
-  parser.add_argument("--retries", type=int, default=5)
-  parser.add_argument("--refresh", action="store_true", help="redownload models and realign")
+  parser.add_argument("--refine-iters", type=int, default=0)
+  parser.add_argument("--force", action="store_true", help="replace completed alignments")
+  parser.add_argument("--keep-work", action="store_true", help="keep intermediate Foldseek databases")
   parser.add_argument(
-    "--download-only",
+    "--stop-on-error",
     action="store_true",
-    help="download and validate structures without running FoldMason",
-  )
-  parser.add_argument(
-    "--report-mode",
-    choices=(0, 1, 2),
-    type=int,
-    default=1,
-    help="FoldMason report mode (default: 1, interactive HTML)",
+    help="stop after the first failed family instead of continuing",
   )
   return parser
 
 
 def validate_args(parser: argparse.ArgumentParser, args: argparse.Namespace) -> None:
-  if args.workers < 1:
-    parser.error("--workers must be positive")
-  if args.retries < 1:
-    parser.error("--retries must be positive")
-  if args.timeout <= 0:
-    parser.error("--timeout must be positive")
+  if args.threads < 1:
+    parser.error("--threads must be positive")
+  if args.refine_iters < 0:
+    parser.error("--refine-iters cannot be negative")
   if args.max_families is not None and args.max_families < 1:
     parser.error("--max-families must be positive")
 
@@ -539,118 +333,59 @@ def main(argv: Sequence[str] | None = None) -> int:
       families = families[:args.max_families]
     if not families:
       raise AlignmentError("No families selected")
-    foldmason = "" if args.download_only else find_foldmason(args.foldmason)
+    foldmason = find_foldmason(args.foldmason)
   except AlignmentError as error:
     parser.error(str(error))
 
   output_dir.mkdir(parents=True, exist_ok=True)
-  cached_proteins: dict[str, dict[str, Any]] | None = None
-  client = AFDBClient(
-    args.afdb_api,
-    output_dir / ".cache" / "afdb",
-    args.timeout,
-    args.retries,
-    args.refresh,
-    started_at,
-  )
   progress(started_at, f"Selected {len(families)} OMA gene families")
-  manifest: list[dict[str, Any]] = []
+  manifest: list[dict[str, object]] = []
   failures = 0
   for index, family in enumerate(families, start=1):
     progress(started_at, f"[{index}/{len(families)}] {family.stem}")
-    structure_dir = output_dir / "structures" / family.stem
-    output_prefix = output_dir / "alignments" / family.stem
-    aa_alignment = Path(f"{output_prefix}_aa.fa")
-    three_di_alignment = Path(f"{output_prefix}_3di.fa")
     try:
-      amino_acids, _three_di = validate_family_sequences(family)
-      member_identifiers = (
-        read_member_ids(family.members) if family.members is not None else {}
-      )
-      if any(not member_identifiers.get(omaid) for omaid in amino_acids):
-        if cached_proteins is None:
-          progress(started_at, "indexing cached OMA protein JSON for missing canonical IDs")
-          cached_proteins = cached_oma_proteins(input_dir / ".cache")
-      identifiers = canonical_ids(
-        family,
-        amino_acids,
-        member_identifiers,
-        cached_proteins or {},
-      )
-      model_paths = download_family_models(
-        client,
-        family,
-        amino_acids,
-        identifiers,
-        structure_dir,
-        args.workers,
-        started_at,
-      )
-      status = "downloaded"
-      if not args.download_only:
-        if aa_alignment.is_file() and three_di_alignment.is_file() and not args.refresh:
-          validate_foldmason_output(family, output_prefix, amino_acids)
-          status = "existing"
-        else:
-          progress(started_at, f"{family.stem}: running FoldMason")
-          run_foldmason(
-            foldmason,
-            family,
-            structure_dir,
-            output_prefix,
-            amino_acids,
-            args.report_mode,
-          )
-          status = "aligned"
+      amino_acids, three_di = validate_family(family)
+      aa_path, three_di_path, tree_path = output_paths(output_dir, family.stem)
+      status = "aligned"
+      if not args.force and aa_path.is_file() and three_di_path.is_file() and tree_path.is_file():
+        validate_alignment(family, amino_acids, three_di, aa_path, three_di_path)
+        status = "existing"
+      else:
+        progress(started_at, f"{family.stem}: aligning {len(amino_acids)} paired AA/3Di sequences")
+        aa_path, three_di_path, tree_path = align_family(
+          foldmason,
+          family,
+          amino_acids,
+          three_di,
+          output_dir,
+          args.threads,
+          args.refine_iters,
+          args.keep_work,
+          started_at,
+        )
       manifest.append(
         {
           "family": family.stem,
           "member_count": len(amino_acids),
           "status": status,
-          "structures": str(structure_dir.relative_to(output_dir)),
-          "amino_acid_alignment": (
-            str(aa_alignment.relative_to(output_dir)) if aa_alignment.is_file() else ""
-          ),
-          "three_di_alignment": (
-            str(three_di_alignment.relative_to(output_dir))
-            if three_di_alignment.is_file()
-            else ""
-          ),
+          "amino_acid_alignment": str(aa_path.relative_to(output_dir)),
+          "three_di_alignment": str(three_di_path.relative_to(output_dir)),
+          "guide_tree": str(tree_path.relative_to(output_dir)),
         }
       )
-      progress(
-        started_at,
-        f"{family.stem}: {status} ({len(model_paths)} models)",
-      )
-    except UnsupportedAFDBIdentifier as error:
-      failures += 1
-      manifest.append(
-        {
-          "family": family.stem,
-          "status": "error",
-          "structures": str(structure_dir.relative_to(output_dir)),
-          "error": str(error),
-        }
-      )
-      atomic_write_text(output_dir / "structure-alignments.tsv", tsv_text(manifest))
-      progress(started_at, f"Stopped: {error}")
-      return 2
+      progress(started_at, f"{family.stem}: {status} {len(amino_acids)} sequences")
     except (AlignmentError, OSError, ValueError) as error:
       failures += 1
-      manifest.append(
-        {
-          "family": family.stem,
-          "status": "error",
-          "structures": str(structure_dir.relative_to(output_dir)),
-          "error": str(error),
-        }
-      )
+      manifest.append({"family": family.stem, "status": "error", "error": str(error)})
       progress(started_at, f"{family.stem}: error: {error}")
+      if args.stop_on_error:
+        atomic_write_text(output_dir / "structure-alignments.tsv", tsv_text(manifest))
+        break
     atomic_write_text(output_dir / "structure-alignments.tsv", tsv_text(manifest))
 
   progress(
     started_at,
-    f"Finished {len(families) - failures} families; {failures} failed; output: {output_dir}",
+    f"Finished {len(manifest) - failures} families; {failures} failed; output: {output_dir}",
   )
   return 1 if failures else 0
 

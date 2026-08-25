@@ -70,8 +70,8 @@ there and the corresponding C implementation can be added under `lib/`.
 ## Downloading gene families from OMA
 
 [`scripts/download_oma_hogs.py`](scripts/download_oma_hogs.py) downloads the
-extant protein, coding-DNA, and AlphaFold 3Di sequences descended from genes
-inferred in an OMA
+extant protein, coding-DNA, and 3Di structural-alphabet sequences descended
+from genes inferred in an OMA
 ancestral genome. It uses only the Python standard library and caches API
 responses so an interrupted run can be resumed.
 
@@ -94,6 +94,11 @@ python scripts/download_oma_hogs.py \
   --max-families 10
 ```
 
+Add `--include-xrefs` to query OMA's per-protein cross-reference endpoint and
+include exact UniProtKB accessions and RefSeq identifiers in each member table.
+This adds one cached API request per protein. OMA does not expose UniRef50,
+UniRef90, or UniRef100 cluster memberships through this endpoint.
+
 To download every family passing the default filters (completeness at least
 0.2 and at least four member genes in four species), explicitly use `--all`.
 In root-HOG mode, a root family is selected if at least one ancestral-gene
@@ -112,8 +117,9 @@ The result contains:
 
 - `families/*.faa`, `*.fna`, and `*.3di.fasta`: protein, coding-DNA, and 3Di
   FASTA files (use `--sequence-type` to request only one type);
-- `members/*.members.tsv`: OMA protein, species, ancestral-HOG, and root-HOG
-  metadata for every sequence;
+- `members/*.members.tsv`: OMA protein, species, structural source,
+  ancestral-HOG, and root-HOG metadata for every sequence, plus UniProt/RefSeq
+  cross-references when `--include-xrefs` is used;
 - `families.tsv`: a family-level manifest;
 - `run.json`: the level, grouping, filters, and API endpoint used;
 - `.cache/`: cached OMA JSON responses used to resume or repeat a run. The
@@ -124,35 +130,30 @@ Completed family files and `families.tsv` are written atomically and act as
 checkpoints. Re-running the same command skips complete families and reuses
 the cached JSON unless `--force` or `--refresh-cache` is supplied.
 
-To download the exact AlphaFold models matching those OMA sequences and build
-structure-based amino-acid alignments with FoldMason:
+To align each family using the downloaded OMA 3Di strings and project the same
+gaps onto its amino-acid sequences:
 
 ```console
 python scripts/align_oma_hogs.py \
   --input-dir data/oma-enterobacterales
 ```
 
-The script resolves each OMA member through `members/*.members.tsv` when
-available, queries the AlphaFold DB API using a UniProt accession, and accepts
-a model only when its amino-acid sequence exactly matches OMA. Cached OMA
-protein JSON supplies IDs when a member table is absent or incomplete. This
-works only for proteins that OMA identifies with a UniProt accession. In
-particular, RefSeq/GenBank-only OMA proteins (such as `WP_...`) cannot be
-looked up in AlphaFold DB: their OMA 3Di strings are ProstT5 predictions, not
-downloadable AlphaFold coordinates. Provide predicted or experimental
-PDB/mmCIF structures for every member before using FoldMason in that case.
-Results are written below
-`structure-alignments/`:
+The script follows the database construction used by UniCore: it creates
+matching Foldseek amino-acid (`<db>`) and 3Di (`<db>_ss`) databases, then runs
+`foldmason structuremsa`. It therefore works with OMA IDs such as `WP_...`,
+requires no coordinates or network access, and does not run AlphaFold or
+ESMFold. Results are written below `structure-alignments/`:
 
-- `structures/<family>/*.cif`: downloaded AlphaFold models;
 - `alignments/<family>_aa.fa`: FoldMason amino-acid alignment;
 - `alignments/<family>_3di.fa`: matching FoldMason 3Di alignment;
+- `alignments/<family>.nw`: FoldMason guide tree;
 - `structure-alignments.tsv`: restartable family-level manifest;
-- `.cache/afdb/`: reusable AlphaFold metadata.
+- `.work/`: failed intermediate databases retained for diagnosis.
 
-Use `--download-only` to fetch and validate coordinates without running
-FoldMason. Existing models and completed alignments are reused by default;
-`--refresh` replaces them.
+Completed alignments are validated and reused by default; `--force` replaces
+them. Use `--max-families 1` for a quick integration check, `--threads` to
+control FoldMason parallelism, and `--keep-work` to retain every intermediate
+database rather than only failed ones.
 
 OMA levels are data-release-specific. The same command works for fungi or any
 other ancestral genome after replacing `--level` with the exact level shown by

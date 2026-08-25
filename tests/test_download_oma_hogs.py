@@ -117,6 +117,7 @@ def test_download_merged_family_records_component_assignment(tmp_path):
             "sequence": "MPEPTIDE",
             "cdna": "ATGCCCGAACTGACCATCGATGAA",
             "structure": {"source": "AlphaFold", "sequence_3di": "ACDEFGHI"},
+            "xref": f"https://omabrowser.org/api/protein/{index}/xref/",
             "sequence_md5": f"md5-{index}",
         }
 
@@ -130,6 +131,23 @@ def test_download_merged_family_records_component_assignment(tmp_path):
         }
     for entry_nr, protein in proteins.items():
         responses[(f"/protein/{entry_nr}/", ())] = protein
+        responses[(f"/protein/{entry_nr}/xref/", ())] = [
+            {
+                "xref": f"P0000{entry_nr}",
+                "source": "UniProtKB/SwissProt",
+                "seq_match": "exact",
+            },
+            {
+                "xref": f"PROT{entry_nr}_SPECIES",
+                "source": "UniProtKB/SwissProt",
+                "seq_match": "exact",
+            },
+            {
+                "xref": f"WP_00000000{entry_nr}.1",
+                "source": "RefSeq",
+                "seq_match": "exact",
+            },
+        ]
     client = FakeClient(responses)
     family = oma.Family("HOG:F1029536", "HOG:F1029536", components)
 
@@ -144,6 +162,7 @@ def test_download_merged_family_records_component_assignment(tmp_path):
         min_species=4,
         max_members=None,
         force=False,
+        include_xrefs=True,
     )
 
     assert row is not None
@@ -159,6 +178,14 @@ def test_download_merged_family_records_component_assignment(tmp_path):
         "HOG:F1029536.1b",
     }
     assert {record["root_hog_id"] for record in metadata} == {"HOG:F1029536"}
+    assert {record["uniprot_accessions"] for record in metadata} == {
+        "P00001",
+        "P00002",
+        "P00003",
+        "P00004",
+    }
+    assert {record["structure_source"] for record in metadata} == {"AlphaFold"}
+    assert {record["xrefs_queried"] for record in metadata} == {"yes"}
 
 
 def test_expected_member_count_sums_components():

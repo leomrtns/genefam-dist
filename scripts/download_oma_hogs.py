@@ -34,6 +34,11 @@ from urllib.request import Request, urlopen
 DEFAULT_API = "https://omabrowser.org/api"
 TRANSIENT_HTTP_CODES = {429, 500, 502, 503, 504}
 SEQUENCE_TYPES = ("protein", "cdna", "3di")
+UNIPROT_ACCESSION = re.compile(
+    r"^(?:[OPQ][0-9][A-Z0-9]{3}[0-9]|"
+    r"[A-NR-Z][0-9][A-Z0-9]{3}[0-9]|"
+    r"[A-NR-Z][0-9][A-Z0-9]{3}[0-9][A-Z0-9]{3}[0-9])$"
+)
 
 
 class OMAError(RuntimeError):
@@ -219,6 +224,43 @@ def sequence_from_protein(protein: dict[str, Any], sequence_type: str) -> str:
     return str(value).replace("\n", "").replace(" ", "")
 
 
+def get_xrefs(client: OMAClient, protein: dict[str, Any]) -> list[dict[str, Any]]:
+    """Retrieve OMA cross-references for one protein."""
+    entry_nr = protein.get("entry_nr")
+    if entry_nr is None:
+        raise OMAError(f"Protein {protein.get('omaid', '')} has no OMA entry number")
+    data = client.get_json(f"/protein/{entry_nr}/xref/")
+    if not isinstance(data, list) or any(not isinstance(item, dict) for item in data):
+        raise OMAError(f"Malformed cross-reference response for OMA entry {entry_nr}")
+    return data
+
+
+def exact_xrefs(records: Iterable[dict[str, Any]], source: str) -> list[str]:
+    """Return sorted exact identifiers for an OMA cross-reference source."""
+    return sorted(
+        {
+            str(record.get("xref", ""))
+            for record in records
+            if record.get("source") == source
+            and record.get("seq_match") == "exact"
+            and record.get("xref")
+        }
+    )
+
+
+def uniprot_accessions(records: Iterable[dict[str, Any]]) -> list[str]:
+    """Extract exact UniProt accessions, excluding mnemonic entry names."""
+    return sorted(
+        {
+            str(record.get("xref", ""))
+            for record in records
+            if str(record.get("source", "")).startswith("UniProtKB/")
+            and record.get("seq_match") == "exact"
+            and UNIPROT_ACCESSION.fullmatch(str(record.get("xref", "")))
+        }
+    )
+
+
 def family_fasta_paths(
     output_dir: Path, stem: str, sequence_type: str
 ) -> dict[str, Path]:
@@ -280,6 +322,11 @@ def _tsv_text(fieldnames: Sequence[str], rows: Iterable[dict[str, Any]]) -> str:
 MEMBER_FIELDS = (
     "omaid",
     "canonical_id",
+    "uniprot_accessions",
+    "refseq_ids",
+    "structure_source",
+    "xref_url",
+    "xrefs_queried",
     "entry_nr",
     "species_code",
     "species_name",
@@ -304,6 +351,7 @@ def download_family(
     max_members: int | None,
     force: bool,
     started_at: float | None = None,
+    include_xrefs: bool = False,
 ) -> dict[str, Any] | None:
     """Download one output family, returning its manifest row or None if filtered."""
     if started_at is None:
@@ -321,7 +369,23 @@ def download_family(
         field: str(path.relative_to(output_dir)) if path is not None else ""
         for field, path in path_fields.items()
     }
-    if all(path.exists() for path in fasta_paths.values()) and members_path.exists() and not force:
+    cached_xrefs = False
+    if members_path.exists() and include_xrefs:
+        try:
+            with members_path.open(encoding="utf-8", newline="") as handle:
+                rows = csv.DictReader(handle, delimiter="\t")
+                records = list(rows)
+                cached_xrefs = bool(records) and all(
+                    row.get("xrefs_queried") == "yes" for row in records
+                )
+        except OSError:
+            cached_xrefs = False
+    if (
+        all(path.exists() for path in fasta_paths.values())
+        and members_path.exists()
+        and (not include_xrefs or cached_xrefs)
+        and not force
+    ):
         return {
             "family_id": family.family_id,
             "root_hog_id": family.root_hog,
@@ -377,9 +441,26 @@ def download_family(
         for future in as_completed(futures):
             proteins[futures[future]] = future.result()
 
+    xrefs: list[list[dict[str, Any]]] = [[] for _ in proteins]
+    if include_xrefs:
+        print(
+            f"[{elapsed_minutes(started_at):.1f} min] {family.family_id}: "
+            f"downloading cross-references for {len(proteins)} genes",
+            file=sys.stderr,
+            flush=True,
+        )
+        with ThreadPoolExecutor(max_workers=workers) as executor:
+            futures = {
+                executor.submit(get_xrefs, client, protein): index
+                for index, protein in enumerate(proteins)
+                if protein is not None
+            }
+            for future in as_completed(futures):
+                xrefs[futures[future]] = future.result()
+
     fasta_parts: dict[str, list[str]] = {kind: [] for kind in fasta_paths}
     metadata: list[dict[str, Any]] = []
-    for protein, (member, component_id) in zip(proteins, assignments):
+    for protein, (member, component_id), protein_xrefs in zip(proteins, assignments, xrefs):
         assert protein is not None
         omaid = str(protein["omaid"])
         sequences = {kind: sequence_from_protein(protein, kind) for kind in fasta_paths}
@@ -389,10 +470,16 @@ def download_family(
             fasta_parts[kind].append(f">{omaid}\n{wrap_sequence(sequence)}\n")
         species = member_species(member)
         metadata_sequence = sequences.get("protein") or next(iter(sequences.values()))
+        structure = protein.get("structure")
         metadata.append(
             {
                 "omaid": omaid,
                 "canonical_id": protein.get("canonicalid", member.get("canonicalid", "")),
+                "uniprot_accessions": ";".join(uniprot_accessions(protein_xrefs)),
+                "refseq_ids": ";".join(exact_xrefs(protein_xrefs, "RefSeq")),
+                "structure_source": structure.get("source", "") if isinstance(structure, dict) else "",
+                "xref_url": protein.get("xref", ""),
+                "xrefs_queried": "yes" if include_xrefs else "no",
                 "entry_nr": protein.get("entry_nr", member.get("entry_nr", "")),
                 "species_code": species.get("code", ""),
                 "species_name": species.get("species", ""),
@@ -518,6 +605,14 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--timeout", type=float, default=60.0)
     parser.add_argument("--retries", type=int, default=5)
     parser.add_argument("--refresh-cache", action="store_true")
+    parser.add_argument(
+        "--include-xrefs",
+        action="store_true",
+        help=(
+            "query one additional OMA endpoint per protein and add exact UniProt/RefSeq "
+            "identifiers to member tables"
+        ),
+    )
     parser.add_argument("--force", action="store_true", help="replace completed family files")
     parser.add_argument("--dry-run", action="store_true", help="list matching HOG metadata only")
     return parser
@@ -630,6 +725,7 @@ def main(argv: Sequence[str] | None = None) -> int:
                 args.max_members,
                 args.force,
                 started_at,
+                include_xrefs=args.include_xrefs,
             )
             if row is None:
                 continue
@@ -663,6 +759,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         "level": args.level,
         "grouping": args.grouping,
         "sequence_type": args.sequence_type,
+        "include_xrefs": args.include_xrefs,
         "min_completeness": args.min_completeness,
         "min_members": args.min_members,
         "min_species": args.min_species,
