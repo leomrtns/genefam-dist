@@ -13,6 +13,7 @@ import argparse
 import csv
 import os
 import re
+import signal
 import shutil
 import subprocess
 import sys
@@ -25,6 +26,17 @@ from typing import Iterable, Sequence
 
 class AlignmentError(RuntimeError):
   """An input or FoldMason result was invalid."""
+
+
+class CommandError(AlignmentError):
+  """An external command returned a non-zero exit status."""
+
+  def __init__(self, command: list[str], return_code: int):
+    self.command = command
+    self.return_code = return_code
+    super().__init__(
+      f"Command failed with exit status {return_code}: {' '.join(command)}"
+    )
 
 
 @dataclass(frozen=True)
@@ -41,8 +53,9 @@ MANIFEST_FIELDS = (
   "amino_acid_alignment",
   "three_di_alignment",
   "guide_tree",
-  "error",
 )
+
+ERROR_FIELDS = ("family", "member_count", "error")
 
 
 def elapsed_minutes(started_at: float) -> float:
@@ -171,9 +184,7 @@ def run_command(
   except OSError as error:
     raise AlignmentError(f"Could not run {command[0]}: {error}") from error
   if return_code:
-    raise AlignmentError(
-      f"Command failed with exit status {return_code}: {' '.join(command)}"
-    )
+    raise CommandError(command, return_code)
 
 
 def output_paths(output_dir: Path, stem: str) -> tuple[Path, Path, Path]:
@@ -246,7 +257,18 @@ def align_family(
       "-v",
       "1",
     ]
-    run_command(command, started_at, f"{family.stem}: FoldMason alignment")
+    try:
+      run_command(command, started_at, f"{family.stem}: FoldMason alignment")
+    except CommandError as error:
+      if error.return_code != -signal.SIGSEGV or threads == 1:
+        raise
+      progress(
+        started_at,
+        f"{family.stem}: FoldMason crashed with {threads} threads; retrying with 1",
+      )
+      retry_command = command.copy()
+      retry_command[retry_command.index("--threads") + 1] = "1"
+      run_command(retry_command, started_at, f"{family.stem}: FoldMason single-thread retry")
     staged = (
       Path(f"{staged_prefix}_aa.fa"),
       Path(f"{staged_prefix}_3di.fa"),
@@ -266,11 +288,14 @@ def align_family(
   return final
 
 
-def tsv_text(rows: Iterable[dict[str, object]]) -> str:
+def tsv_text(
+  rows: Iterable[dict[str, object]],
+  fields: Sequence[str] = MANIFEST_FIELDS,
+) -> str:
   from io import StringIO
 
   stream = StringIO(newline="")
-  writer = csv.DictWriter(stream, fieldnames=MANIFEST_FIELDS, delimiter="\t", extrasaction="ignore")
+  writer = csv.DictWriter(stream, fieldnames=fields, delimiter="\t", extrasaction="ignore")
   writer.writeheader()
   writer.writerows(rows)
   return stream.getvalue()
@@ -338,13 +363,19 @@ def main(argv: Sequence[str] | None = None) -> int:
     parser.error(str(error))
 
   output_dir.mkdir(parents=True, exist_ok=True)
+  manifest_path = output_dir / "structure-alignments.tsv"
+  errors_path = output_dir / "structure-alignment-errors.tsv"
   progress(started_at, f"Selected {len(families)} OMA gene families")
   manifest: list[dict[str, object]] = []
+  errors: list[dict[str, object]] = []
+  atomic_write_text(errors_path, tsv_text(errors, ERROR_FIELDS))
   failures = 0
   for index, family in enumerate(families, start=1):
     progress(started_at, f"[{index}/{len(families)}] {family.stem}")
+    member_count: int | str = ""
     try:
       amino_acids, three_di = validate_family(family)
+      member_count = len(amino_acids)
       aa_path, three_di_path, tree_path = output_paths(output_dir, family.stem)
       status = "aligned"
       if not args.force and aa_path.is_file() and three_di_path.is_file() and tree_path.is_file():
@@ -376,12 +407,18 @@ def main(argv: Sequence[str] | None = None) -> int:
       progress(started_at, f"{family.stem}: {status} {len(amino_acids)} sequences")
     except (AlignmentError, OSError, ValueError) as error:
       failures += 1
-      manifest.append({"family": family.stem, "status": "error", "error": str(error)})
-      progress(started_at, f"{family.stem}: error: {error}")
+      manifest.append(
+        {"family": family.stem, "member_count": member_count, "status": "error"}
+      )
+      errors.append(
+        {"family": family.stem, "member_count": member_count, "error": str(error)}
+      )
+      atomic_write_text(errors_path, tsv_text(errors, ERROR_FIELDS))
+      progress(started_at, f"{family.stem}: error; details: {errors_path}")
       if args.stop_on_error:
-        atomic_write_text(output_dir / "structure-alignments.tsv", tsv_text(manifest))
+        atomic_write_text(manifest_path, tsv_text(manifest))
         break
-    atomic_write_text(output_dir / "structure-alignments.tsv", tsv_text(manifest))
+    atomic_write_text(manifest_path, tsv_text(manifest))
 
   progress(
     started_at,

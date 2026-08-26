@@ -1,4 +1,5 @@
 import importlib.util
+import signal
 import shutil
 import sys
 from pathlib import Path
@@ -128,3 +129,57 @@ def test_completed_alignment_is_a_checkpoint(tmp_path):
 
   manifest = (output_dir / "structure-alignments.tsv").read_text(encoding="utf-8")
   assert "HOG_F0981989\t4\texisting" in manifest
+
+
+def test_foldmason_segfault_is_retried_with_one_thread(tmp_path, monkeypatch):
+  family = write_family(tmp_path)
+  amino_acids, three_di = aligner.validate_family(family)
+  output_dir = tmp_path / "output"
+  structure_commands = []
+
+  def fake_run(command, started_at, label):
+    if "structuremsa" not in command:
+      return
+    structure_commands.append(command.copy())
+    if len(structure_commands) == 1:
+      raise aligner.CommandError(command, -signal.SIGSEGV)
+    prefix = Path(command[3])
+    Path(f"{prefix}_aa.fa").write_text(fasta_text(amino_acids), encoding="utf-8")
+    Path(f"{prefix}_3di.fa").write_text(fasta_text(three_di), encoding="utf-8")
+    Path(f"{prefix}.nw").write_text("(LACPS00918,LACPS00919);\n", encoding="utf-8")
+
+  monkeypatch.setattr(aligner, "run_command", fake_run)
+  aligner.align_family(
+    "foldmason",
+    family,
+    amino_acids,
+    three_di,
+    output_dir,
+    8,
+    0,
+    False,
+    0,
+  )
+
+  assert structure_commands[0][structure_commands[0].index("--threads") + 1] == "8"
+  assert structure_commands[1][structure_commands[1].index("--threads") + 1] == "1"
+
+
+def test_failure_details_are_written_only_to_error_report(tmp_path, monkeypatch):
+  write_family(tmp_path)
+  output_dir = tmp_path / "output"
+  detail = "Command failed with exit status -11: a very long command"
+  monkeypatch.setattr(aligner, "find_foldmason", lambda command: command)
+  monkeypatch.setattr(
+    aligner,
+    "align_family",
+    lambda *args, **kwargs: (_ for _ in ()).throw(aligner.AlignmentError(detail)),
+  )
+
+  assert aligner.main(["--input-dir", str(tmp_path), "--output-dir", str(output_dir)]) == 1
+
+  manifest = (output_dir / "structure-alignments.tsv").read_text(encoding="utf-8")
+  errors = (output_dir / "structure-alignment-errors.tsv").read_text(encoding="utf-8")
+  assert "HOG_F0981989\t4\terror" in manifest
+  assert detail not in manifest
+  assert detail in errors
