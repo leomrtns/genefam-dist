@@ -1,3 +1,4 @@
 include AUTHORS COPYING LICENSE README.md
 recursive-include lib *.c *.h
 include python/treesignal/_treesignalc.c
+recursive-include python/treesignal *.h

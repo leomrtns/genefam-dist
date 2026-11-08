@@ -41,6 +41,14 @@
 /*! \brief Parse one or more Newick trees into an owning native tree-space object. */
 topology_space genefam_module_parse_newick_trees (const char *treelist_string, bool use_root_location);
 
+/*! \brief Length distances on the common induced taxon set (patristic RMS, weighted RF, KF).
+ * Missing lengths or fewer than two shared taxa return zero. Normalization divides
+ * each matrix by its mean pair distance and each split vector by total edge
+ * length; an all-zero matrix or tree is left at zero. */
+int genefam_module_treesignal_lengths (topology_space gene, topology_space species, bool normalize, double **output);
+/*! \brief Generate exactly count native reference trees, with unit unrooted edge lengths. */
+topology_space genefam_module_generate_tree_space (int nleaves, int count, int nspr, unsigned long long seed);
+
 /*! \brief Calculate unnormalized distances from already-parsed native tree spaces. */
 int genefam_module_treesignal_from_topology_spaces (topology_space genetree, topology_space sptree, double **output_distances);
 /*! \brief Calculate theoretically rescaled distances from already-parsed native tree spaces. */

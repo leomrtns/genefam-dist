@@ -13,7 +13,7 @@ def lowlevel_generate_spr_trees_string(n_species=8, chain_size=10, n_spr=1):
     if n_species < 4:
         n_species =4
     if chain_size < 2:
-        chain_zise = 2
+        chain_size = 2
     return _treesignalc.generate_spr_trees(n_species, chain_size, n_spr)
 
 def lowlevel_randomise_trees_with_spr_string(tree_str, n_copies=2, n_spr=1):

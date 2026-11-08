@@ -7,9 +7,12 @@ and helpers are imported lazily so existing callers retain their public names.
 from ._treesignalc import (
     TreeSpace,
     from_tree_spaces,
+    from_tree_spaces_lengths,
     from_tree_spaces_pvalue,
     from_tree_spaces_rescale,
 )
+
+from .analysis import TreeAnalysis, analyze_files, generate_references
 
 
 _LEGACY_UTILS = {
@@ -24,8 +27,12 @@ _LEGACY_UTILS = {
 __all__ = [
     "TreeSpace",
     "from_tree_spaces",
+    "from_tree_spaces_lengths",
     "from_tree_spaces_rescale",
     "from_tree_spaces_pvalue",
+    "TreeAnalysis",
+    "analyze_files",
+    "generate_references",
     "TreeSignal",
     *_LEGACY_UTILS,
 ]

@@ -1,12 +1,18 @@
 # genefam_dist
 
 The main goal of *genefam_dist* is to describe the "tree signal" of a gene family, which is a vector of 'scores' describing how well
-supported this gene family is by a set of reference species trees. You can download [here (PDF)](docs/Evolution2018_LeoMartinsPoster.pdf) 
+supported this gene family is by a set of reference species trees. You can download [here (PDF)](notebooks/Evolution2018_LeoMartinsPoster.pdf)
 a low-resolution version of the poster presented at [Evolution 2018](https://www.evolutionmontpellier2018.org/).
 
 The software is composed of a low-level C library to handle mul-trees, a Python module, and standalone programs using the library.
-The Python module is called `treesignal` and is the standard way of creating tree signatures. It uses
-[DendroPy](https://www.dendropy.org/) for tree manipulation and NumPy for its result arrays. The standalone programs are described below.
+The Python module is called `treesignal` and is the standard way of creating tree signatures.
+Its native API owns reusable C tree structures and requires neither DendroPy nor NumPy.
+Those dependencies are optional for the historical `TreeSignal` class.
+The standalone programs are described below.
+
+The [Docsify documentation](docs/README.md) includes a [tutorial](docs/tutorial.md),
+[API reference](docs/api.md), and [technical report](docs/technical-report.md).
+The original notebooks and manuscript have been preserved in [`notebooks/`](notebooks).
 
 The library is written in C, with functions to calculate distances between mul-trees (gene families) and species trees. 
 It uses a modified internal biomcmc library, part of the [guenomu software](https://bitbucket.org/leomrtns/guenomu/). 
@@ -39,6 +45,51 @@ species = TreeSpace(
 )
 distances = from_tree_spaces(gene, species)
 ```
+
+### Branch lengths and a collection of gene families
+
+For length-aware analysis, use the same Python interface for a reusable reference
+panel, individual comparisons, and one inferred gene tree per file:
+
+```python
+from pathlib import Path
+from treesignal import TreeSpace, TreeAnalysis, analyze_files, generate_references
+
+references = TreeSpace(
+    "((A:1,B:1):1,(C:1,D:1):1);"
+    "((A:2,B:1):1,(C:1,D:1):1);",
+    rooted=True,
+)
+analysis = TreeAnalysis(references)
+scores = analysis.compare("((A:1,B:1):1,(C:1,D:1):1);")
+# patristic matrix RMS, weighted RF (L1), and KF branch score (L2)
+assert scores["wrf"] == (0.0, 1.0)
+
+# Once gene-family trees have been inferred, one tree per file:
+# analyze_files(sorted(Path("families").glob("*.nwk")), references,
+#               output="signatures.tsv", normalize=True)
+```
+
+The equivalent file-based command is:
+
+```console
+python -m treesignal analyze --references references.nwk \
+  --genes 'families/*.nwk' --metrics patristic wrf kf --output signatures.tsv
+```
+
+For paralogous families, use `--metrics patristic` and a two-column
+`--mapping mapping.tsv` identifying each gene copy's species. The API supports
+minimum or mean cross-copy distances. Ordinary wRF/KF require single-copy labels.
+Both raw and explicitly normalized comparisons are available; see the
+[distance definitions and limitations](docs/technical-report.md).
+The original six reconciliation/topological scores retain their meanings.
+
+Generate reference topologies directly from Python with
+`generate_references(species, count=20, seed=42)`, or use
+`python -m treesignal references`. Supplying `branch_length=1.0` assigns synthetic
+lengths for experiments; it does not estimate biological lengths. No auxiliary
+executable is needed. An [executable notebook](notebooks/010.branch_lengths.ipynb)
+demonstrates comparisons, paralogs, and a directory of tree files.
 
 `TreeSpace` owns the parsed C `topology_space` and can be reused across calls.
 The original string-based functions remain available in `treesignal._treesignalc`
@@ -174,7 +225,9 @@ make
 make install
 ```
 
-This standalone installation is independent of the Python package. See the notebooks in the [docs directory](docs) for examples.
+This optional standalone installation is independent of the Python package.
+See the historical [notebooks directory](notebooks) for examples. The recommended
+Python workflow does not require building these executables.
 
 
 ## Programs
@@ -219,8 +272,8 @@ dSPR algortihm.
 Notice that our current implementations of these distances can work on mul-trees on a very experimental setting (using the *extended species tree* concept from the 
 [mulRF algorithm](https://www.ncbi.nlm.nih.gov/pubmed/25273112)), but the results below assume the same leaf set between trees. 
 
-![](docs/performance_hdist.png)
-![](docs/performance_spr_rf.png)
+![](notebooks/performance_hdist.png)
+![](notebooks/performance_spr_rf.png)
 
 ## License 
 Copyright (C) 2016-today  [Leonardo de Oliveira Martins](https://github.com/leomrtns)

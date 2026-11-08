@@ -184,10 +184,14 @@ add_topology_to_topology_space_if_distinct (topology topol, topology_space tsp, 
   tsp->tree = (topology*) biomcmc_realloc ((topology*) tsp->tree, sizeof (topology) * (tsp->ntrees+1));
 
   /* comparison includes root location (faster than unrooted since uses hash) */ 
-  for (i=0; (i < tsp->ndistinct) && (found_id < 0); i++) if (topology_is_equal (topol, tsp->distinct[i])) found_id = i;
-  if ((!use_root_location) && (tsp->ndistinct) && (found_id < 0)) { /* if they look distinct (different root), then do slower unrooted calculation */ 
+  /* Length-bearing trees are individual observations, not topology averages.
+   * Keep input order and never discard a second branch-length assignment. */
+  for (i=0; !topol->blength && (i < tsp->ndistinct) && (found_id < 0); i++)
+    if (!tsp->distinct[i]->blength && topology_is_equal (topol, tsp->distinct[i])) found_id = i;
+  if ((!topol->blength) && (!use_root_location) && (tsp->ndistinct) && (found_id < 0)) { /* compare unrooted lengthless trees */
     splitset split = new_splitset (topol->nleaves);
-    for (i=0; (i < tsp->ndistinct) && (found_id < 0); i++) if (topology_is_equal_unrooted (topol, tsp->distinct[i], split, i)) found_id = i;
+    for (i=0; (i < tsp->ndistinct) && (found_id < 0); i++)
+      if (!tsp->distinct[i]->blength && topology_is_equal_unrooted (topol, tsp->distinct[i], split, i)) found_id = i;
     del_splitset (split);
   }
 
@@ -970,6 +974,14 @@ number_of_leaves_in_newick (char **string, bool resolve_trifurcation)
     char *tstring = NULL;
     int add = 3;
     if (has_branches) add = 7;
+    /* The old root's stem is not an edge in the unrooted tree. A synthetic
+     * resolution must have length zero, rather than inheriting that stem (or
+     * accidentally scanning a preceding child's length when no stem exists). */
+    if (has_branches) {
+      char *root_close = strrchr (*string, ')');
+      root_close[1] = '\0';
+      len = strlen (*string);
+    }
     *string = (char *) biomcmc_realloc ((char *) *string, sizeof (char) * (len + add + 1));
     tstring = (char *) biomcmc_malloc (sizeof (char) * (len + add + 1));
     bzero (tstring, sizeof (char) * (len + add + 1));
@@ -977,7 +989,7 @@ number_of_leaves_in_newick (char **string, bool resolve_trifurcation)
     tstring = strcat (tstring, ",("); // replaces "," for ",("
     tstring = strncat (tstring, *string + nsplit + 1, len - nsplit - 1);
 
-    if (has_branches) tstring = strcat (tstring, "):0.0");
+    if (has_branches) tstring = strcat (tstring, ":0.0)");
     else tstring = strcat (tstring, ")");
 
     strcpy (*string, tstring);

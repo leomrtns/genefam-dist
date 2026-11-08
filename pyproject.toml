@@ -26,6 +26,9 @@ classifiers = [
 Homepage = "https://github.com/leomrtns/genefam-dist"
 Repository = "https://github.com/leomrtns/genefam-dist"
 
+[project.scripts]
+treesignal = "treesignal.__main__:main"
+
 [project.optional-dependencies]
 legacy = [
   "DendroPy>=4.6",

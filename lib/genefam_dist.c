@@ -25,6 +25,163 @@ static topology copy_topology_for_calculation (topology source);
 /*! \brief wrap a copied topology in a minimal owning topology space */
 static topology_space new_calculation_tree_space (topology source);
 
+/* A split-length coordinate after pruning to a shared leaf set. Complementary
+ * root edges and chains left by pruning are summed into the same coordinate. */
+typedef struct {
+  bipartition split;
+  double length;
+} length_split;
+
+static int
+induced_length_splits (topology tree, const int *leaf_ids, int nleaves, length_split **result, double *total)
+{
+  int i, j, k, count = 0;
+  bipartition split = new_bipartition (nleaves);
+  *result = (length_split*) biomcmc_malloc (tree->nnodes * sizeof (length_split));
+  *total = 0.;
+  if (!tree->traversal_updated) update_topology_traversal (tree);
+  for (i = 0; i < tree->nnodes; i++) {
+    if (tree->nodelist[i] == tree->root) continue; /* no root stem in an unrooted metric */
+    bipartition_zero (split);
+    for (j = 0; j < nleaves; j++)
+      if (bipartition_is_bit_set (tree->nodelist[i]->split, leaf_ids[j])) bipartition_set (split, j);
+    bipartition_count_n_ones (split);
+    if (!split->n_ones || split->n_ones == nleaves) continue;
+    bipartition_flip_to_smaller_set (split);
+    for (k = 0; k < count; k++) if (bipartition_is_equal ((*result)[k].split, split)) break;
+    if (k == count) {
+      (*result)[count].split = new_bipartition_copy_from (split);
+      (*result)[count++].length = 0.;
+    }
+    (*result)[k].length += tree->blength[i];
+    *total += tree->blength[i];
+  }
+  del_bipartition (split);
+  return count;
+}
+
+static void
+free_length_splits (length_split *splits, int count)
+{
+  int i;
+  for (i = 0; i < count; i++) del_bipartition (splits[i].split);
+  free (splits);
+}
+
+int
+genefam_module_treesignal_lengths (topology_space gene, topology_space species, bool normalize, double **output)
+{
+  int i, j, k, s, ncommon = 0, ng, ns, *gid, *sid;
+  double gt, st, delta, rms, wrf, kf, gscale, sscale, gd, sd, gmean, smean, pairs;
+  length_split *gs, *ss;
+  distance_matrix gm, sm;
+  topology g;
+
+  if (!gene || !species || !gene->ndistinct || !species->ndistinct) return 0;
+  g = gene->distinct[0];
+  if (!g->blength) return 0;
+  for (s = 0; s < species->ndistinct; s++) if (!species->distinct[s]->blength) return 0;
+  gid = (int*) biomcmc_malloc (g->nleaves * sizeof (int));
+  sid = (int*) biomcmc_malloc (g->nleaves * sizeof (int));
+  for (i = 0; i < g->nleaves; i++) {
+    j = lookup_hashtable (species->taxlabel_hash, g->taxlabel->string[i]);
+    if (j >= 0) { gid[ncommon] = i; sid[ncommon++] = j; }
+  }
+  if (ncommon < 2) { free (gid); free (sid); return 0; }
+  ng = induced_length_splits (g, gid, ncommon, &gs, &gt);
+  if (!isfinite (gt)) { free_length_splits (gs, ng); free (gid); free (sid); return -1; }
+  gm = new_distance_matrix_for_topology (g->nleaves);
+  fill_distance_matrix_from_topology (gm, g, g->blength, true);
+  *output = (double*) biomcmc_malloc (3 * species->ndistinct * sizeof (double));
+  gscale = normalize && gt > 0. ? gt : 1.;
+  for (s = 0; s < species->ndistinct; s++) {
+    topology sp = species->distinct[s];
+    ns = induced_length_splits (sp, sid, ncommon, &ss, &st);
+    sm = new_distance_matrix_for_topology (sp->nleaves);
+    fill_distance_matrix_from_topology (sm, sp, sp->blength, true);
+    if (!isfinite (st)) {
+      free_length_splits (ss, ns); del_distance_matrix (sm);
+      free_length_splits (gs, ng); del_distance_matrix (gm); free (gid); free (sid);
+      free (*output); *output = NULL; return -1;
+    }
+    sscale = normalize && st > 0. ? st : 1.;
+    pairs = (double)ncommon * (ncommon - 1) / 2.;
+    gmean = smean = 0.;
+    if (normalize) for (i = 0; i < ncommon; i++) for (j = i + 1; j < ncommon; j++) {
+      gd = gid[i] < gid[j] ? gm->d[gid[i]][gid[j]] : gm->d[gid[j]][gid[i]];
+      sd = sid[i] < sid[j] ? sm->d[sid[i]][sid[j]] : sm->d[sid[j]][sid[i]];
+      if (!isfinite (gd) || !isfinite (sd)) {
+        free_length_splits (ss, ns); del_distance_matrix (sm);
+        free_length_splits (gs, ng); del_distance_matrix (gm); free (gid); free (sid);
+        free (*output); *output = NULL; return -1;
+      }
+      gmean += gd / pairs; smean += sd / pairs;
+    }
+    if (gmean <= 0.) gmean = 1.;
+    if (smean <= 0.) smean = 1.;
+    rms = wrf = kf = 0.;
+    for (i = 0; i < ncommon; i++) for (j = i + 1; j < ncommon; j++) {
+      gd = gid[i] < gid[j] ? gm->d[gid[i]][gid[j]] : gm->d[gid[j]][gid[i]];
+      sd = sid[i] < sid[j] ? sm->d[sid[i]][sid[j]] : sm->d[sid[j]][sid[i]];
+      delta = gd / gmean - sd / smean;
+      rms = hypot (rms, delta);
+    }
+    for (i = 0; i < ng; i++) {
+      for (j = 0; j < ns; j++) if (bipartition_is_equal (gs[i].split, ss[j].split)) break;
+      delta = gs[i].length / gscale - (j < ns ? ss[j].length / sscale : 0.);
+      wrf += fabs (delta); kf = hypot (kf, delta);
+    }
+    for (j = 0; j < ns; j++) {
+      for (k = 0; k < ng; k++) if (bipartition_is_equal (gs[k].split, ss[j].split)) break;
+      if (k == ng) { delta = ss[j].length / sscale; wrf += delta; kf = hypot (kf, delta); }
+    }
+    (*output)[3*s] = rms / sqrt (pairs);
+    (*output)[3*s + 1] = wrf;
+    (*output)[3*s + 2] = kf;
+    free_length_splits (ss, ns);
+    del_distance_matrix (sm);
+  }
+  free_length_splits (gs, ng);
+  del_distance_matrix (gm);
+  free (gid); free (sid);
+  return 3 * species->ndistinct;
+}
+
+topology_space
+genefam_module_generate_tree_space (int nleaves, int count, int nspr, unsigned long long seed)
+{
+  int i, j;
+  char label[40];
+  topology current, copy;
+  topology_space space = new_topology_space ();
+
+  space->taxlabel = new_char_vector (nleaves);
+  space->taxlabel_hash = new_hashtable (nleaves);
+  for (i = 0; i < nleaves; i++) {
+    snprintf (label, sizeof (label), "T%d", i + 1);
+    char_vector_add_string_at_position (space->taxlabel, label, i);
+    insert_hashtable (space->taxlabel_hash, space->taxlabel->string[i], i);
+  }
+  biomcmc_random_number_init (seed);
+  current = new_topology (nleaves);
+  randomize_topology (current);
+  for (i = 0; i < count; i++) {
+    if (i) for (j = 0; j < nspr; j++) topology_apply_spr_unrooted (current, false);
+    copy = copy_topology_for_calculation (current);
+    copy->taxlabel = space->taxlabel;
+    space->taxlabel->ref_counter++;
+    topology_malloc_blength (copy);
+    for (j = 0; j < copy->nnodes; j++) copy->blength[j] = 1.;
+    copy->blength[copy->root->id] = 0.;
+    copy->blength[copy->root->left->id] = copy->blength[copy->root->right->id] = 0.5;
+    add_topology_to_topology_space_if_distinct (copy, space, true);
+  }
+  space->has_branch_lengths = true;
+  del_topology (current);
+  biomcmc_random_number_finalize ();
+  return space;
+}
+
 topology_space
 genefam_module_parse_newick_trees (const char *treelist_string, bool use_root_location)
 {
