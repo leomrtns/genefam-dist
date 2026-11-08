@@ -19,7 +19,7 @@ and external programs. The new tutorial uses the current Python interface.
 
 ## Installation
 
-From a checkout, with Python 3.9 or later, a C compiler, and Python headers:
+From a checkout, with Python 3.11 or later, a C compiler, and Python headers:
 
 ```bash
 python -m pip install .

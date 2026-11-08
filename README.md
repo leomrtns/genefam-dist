@@ -24,7 +24,7 @@ It uses a modified internal biomcmc library, part of the [guenomu software](http
 The Python package uses the native [CPython C API](https://docs.python.org/3/c-api/) directly. Its build compiles the
 `genefam_dist` C sources into `treesignal._treesignalc`, so no separate library installation, hard-coded paths, or 
 runtime linker configuration is needed. 
-A C compiler and Python development headers are required. 
+Python 3.11 or later, a C compiler, and Python development headers are required.
 
 Install the dependency-free native API from the repository root:
 

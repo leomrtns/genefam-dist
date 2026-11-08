@@ -7,7 +7,7 @@ name = "treesignal"
 version = "1.0.0"
 description = "Calculate phylogenetic signals for gene-family trees"
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.11"
 license = "GPL-3.0-or-later"
 license-files = ["LICENSE", "COPYING"]
 authors = [
